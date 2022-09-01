@@ -1,0 +1,60 @@
+###############################################
+[Legacy TE] Extra null pointer catch [Fracture]
+###############################################
+.RESET
+op cmplwi r0, 0x30 @ $8018CFC4
+op blt- 0x34	   @ $8018CFC8
+
+.include Source/LegacyTE/Replays.asm
+.include Source/Project+/StageFiles.asm
+.include Source/Project+/CustomRequirements.asm
+.include Source/Project+/Shake.asm
+.include Source/Project+/CStick.asm
+.include Source/Project+/LedgeGrab.asm
+.include Source/Project+/ScreenKO.asm
+.include Source/Project+/Timeout.asm
+.include Source/Project+/UCF.asm
+.include Source/Project+/PSA.asm
+.include Source/ProjectM/Constants.asm
+.include Source/ProjectM/PSA/Effects.asm
+.include Source/ProjectM/PSA/Misc.asm
+.include Source/ProjectM/PSA/Tethers.asm
+.include Source/ProjectM/PSA/TauntCancel.asm
+.include Source/ProjectM/PSA/PowerShield.asm
+.include Source/ProjectM/PSA/Items.asm
+.include Source/ProjectM/PSA/Hitstun.asm
+.include Source/ProjectM/PSA/C-Stick.asm
+.include Source/ProjectM/PSA/MeteorCancel.asm
+.include Source/ProjectM/PSA/WallCling.asm
+.include Source/ProjectM/PSA/Glide.asm
+.include Source/ProjectM/PSA/Grabs.asm
+.include Source/ProjectM/PSA/SlowTurn.asm
+.include Source/ProjectM/PSA/Edge.asm
+
+.include Source/Project+/L-Cancel.asm
+.include Source/Project+/InputSystem.asm
+.include Source/Project+/Moonwalk.asm
+.include Source/Project+/AirDodge.asm
+
+.include source/P+Ex/AllStar.asm
+.include source/P+Ex/Angle.asm
+.include source/P+Ex/CustomEnding.asm
+.include source/P+Ex/Maths.asm
+.include source/P+Ex/Misc.asm
+.include source/P+Ex/PlatformIgnore.asm
+.include source/P+Ex/PointerWizardry.asm
+.include source/P+Ex/PSA.asm
+.include source/P+Ex/SoundbankFix.asm
+.include source/P+Ex/Subspace.asm
+.include source/P+Ex/VariableParameter.asm
+.include source/P+Ex/BigHeadMode.asm
+.include source/P+Ex/InputBuffer.asm
+.include source/P+Ex/RandomAngleMode.asm
+.include source/P+Ex/ScaleModifier.asm
+.include source/P+Ex/SpeedModifier.asm
+.include source/P+Ex/WarMode.asm
+
+.include Source/Extras/Console.asm	# Only use this on a Wii or Wii U! The codes in this are necessary for the slower specifications of the actual console.
+#.include Source/Extras/Netplay.asm	# Only use this in Dolphin! The codes in this will result in bad behavior on the Wii!
+
+.include Source/Extras/More.asm

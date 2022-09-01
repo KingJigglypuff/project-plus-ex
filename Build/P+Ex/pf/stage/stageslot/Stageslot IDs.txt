@@ -1,0 +1,66 @@
+01 - Battlefield
+02 - Final Destination
+03 - Delfino Secret
+04 - Luigi's Mansion
+05 - Metal Cavern
+06 - Bowser's Castle
+07 - Kongo Jungle
+08 - Rumble Falls
+09 - Pirate Ship
+0B - Norfair
+0C - Frigate Orpheon
+0D - Yoshi's Island
+0E - Halberd
+13 - Lylat Cruise
+14 - Saffron City
+15 - Spear Pillar
+16 - Port Town
+17 - Infinite Glacier
+18 - Flat Zone
+19 - Castle Siege
+1C - Wario Land
+1D - Distant Planet
+1E - Skyworld
+1F - Fountain of Dreams
+20 - Fourside
+21 - Smashville
+22 - Shadow Moses Island (written as Shadow Moses)
+23 - Green Hill Zone
+24 - PictoChat
+25 - Hanenbow
+26 - Config (Not a playable stage)
+28 - Results (The Results Screen Background)
+29 - Temple
+2A - Yoshi's Story
+2B - Jungle Japes
+2C - Onett
+2D - Dream Land
+2E - Pokemon Stadium 2
+2F - Peach Castle
+30 - Corneria
+31 - Big Blue
+32 - Brinstar
+33 - Hyrule Castle
+34 - Home Run (Home Run Contest Stage)
+35 - Edit Stage (Stage Builder Stages)
+36 - Rest Area (The rest area used in the solo modes)
+37 - Training Room (written as Training)
+38 - Break the Targets (Break the Targets Stages)
+39 - Staff Roll (Credits roll background used in the Solo Modes)
+40 - Dracula's Castle
+41 - Mario Circuit
+42 - Clock Town
+43 - Sky Sanctuary
+44 - Dead Line
+45 - Dinosaur Land
+46 - Oil Drum Alley
+47 - Golden Temple
+48 - Bell Tower
+49 - Metroid Lab
+4A - Cookie Country
+4B - Venus Lighthouse
+4C - Mushroom Kingdom
+4D - WarioWare
+4E - Subspace
+4F - Rainbow Cruise
+50 - Poke Floats

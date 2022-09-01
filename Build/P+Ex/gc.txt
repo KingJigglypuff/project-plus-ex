@@ -1,0 +1,8 @@
+RSBE??:
+codeliststart = 80566528
+codelistend = 80580000
+hooktype = 7
+poke(800042B8, 60000000)
+pokeifequal(803E9930, 4BFECA1D, 803E9930, 60000000)
+pokeifequal(803E99A8, 4BFECA1D, 803E99A8, 60000000)
+pokeifequal(803E9D5C, 4BFECA1D, 803E9D5C, 60000000)

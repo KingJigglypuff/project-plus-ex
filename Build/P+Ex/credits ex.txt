@@ -1,0 +1,88 @@
+BrawlEx Engine and CSS Expansion by PhantomWings and SammiHusky. P+Ex logo by Link Tahuterasu Spirit.
+
+###################
+Project+Ex Dev Team
+###################
+-KingJigglypuff
+-DesiacX
+-DukeItOut
+-Eon
+
+##################
+Project+Ex Testers
+##################
+-DukeItOut
+-PyroPM
+-Kapedani
+-King Draco
+-pikamaxi
+-Sammi Husky
+-KorytheMaril
+-codes/TheGag96
+-Ripple
+-Motobug
+-Cahalan
+-ZaTaisho
+
+##############################
+Characters + Skins + Portraits
+##############################
+
+RIDLEY
+Pose by BaganSmashBros, model polish by tyleo, rendered by tryptech, Mach7, tyleo and KingJigglypuff
+For the creation of the moveset itself, please refer to this external document containing all credits for those involved with the making of Ridley. https://docs.google.com/document/d/1H65jq-rQE-Gd-Ozz7L2It9bYv7ibEszxodSLiqsJDyU/edit?usp=sharing
+00 - Default by BaganSmashBros, Moblin, and King Draco
+01 - Red Default by KingJigglypuff
+02 - Green Default by KingJigglypuff
+03 - Blue Default by KingJigglypuff
+04 - Black Default by KingJigglypuff
+05 - Pale Default by KingJigglypuff
+06 - Pink Defauly by RYO
+07 - Brown Default by KingJigglypuff
+08 - Gold Default by RYO
+10 - Prime 1 Meta Ridley alt by King Draco and Moblin
+11 - Red Prime 1 Meta Ridley by KingJigglypuff
+12 - Green Prime 1 Meta Ridley by KingJigglypuff
+13 - Blue Prime 1 Meta Ridley by KingJigglypuff
+14 - Black Prime 1 Meta Ridley by KingJigglypuff
+15 - Pale Prime 1 Meta Ridley by KingJigglypuff
+16 - Pink Prime 1 Meta Ridley by KingJigglypuff, based off RYO's Pink Default
+17 - Brown Prime 1 Meta Ridley by KingJigglypuff
+18 - Gold Prime 1 Meta Ridley by KingJigglypuff, based off RYO's Gold Default
+20 - Prime 3 Meta Ridley alt by King Draco
+21 - Red Prime 3 Meta Ridley by KingJigglypuff
+22 - Green Prime 3 Meta Ridley by KingJigglypuff
+23 - Blue Prime 3 Meta Ridley by KingJigglypuff
+24 - Black Prime 3 Meta Ridley by Cahalan
+30 - Omega Ridley alt by King Draco
+40 - Nintendo Land Ridley alt by King Draco
+41 - Black Nintendo Land Ridley by King Draco
+42 - Red Nintendo Land Ridley by King Draco
+43 - Green Nintendo Land Ridley by King Draco
+44 - Blue Nintendo Land Ridley by King Draco
+AltR - Clone Ridley by King Draco and Cahalan
+AltZ - Metroid Manual Ridley by King Draco
+
+WALUIGI
+Pose, model polish, and renders by Mach7
+For the creation of the moveset itself, please refer to this external document containing all credits for those involved with the making of Waluigi. https://docs.google.com/document/d/1XZi0RL-zmJ2-gPsf65tKWesj6u8KZPB5Vr7kOiQrHQY/edit?usp=sharing
+00 - Default by MKHT and Mach7
+01 - Red Default by MKHT and Mach7
+02 - Green Default by MKHT and Mach7
+03 - Blue Default by MKHT and Mach7
+04 - Pink Default by MKHT and Mach7
+05 - Brown Default by MKHT and Mach7
+20 - Biker by MKHT, Mach7, and Dapperman
+21 - Red Biker by MKHT, Mach7, and Dapperman
+22 - Blue Biker by MKHT, Mach7, and Dapperman
+23 - Green Biker by MKHT, Mach7, and Dapperman
+24 - White Biker by MKHT, Mach7, and Dapperman
+25 - Brown Biker by MKHT, Mach7, and Dapperman
+30 - Strikers by MKHT, Mach7, and Dapperman
+31 - Red Strikers by MKHT, Mach7, and Dapperman
+32 - Green Strikers by MKHT, Mach7, and Dapperman
+33 - Blue Strikers by MKHT, Mach7, and Dapperman
+34 - Yellow Strikers by MKHT, Mach7, and Dapperman
+35 - Brown Strikers by MKHT, Mach7, and Dapperman
+AltR - Assist Trophy Waluigi by KingJigglypuff
+AltZ - Brawl in the Family Waluigi by MKHT

@@ -1,0 +1,1 @@
+GCTRealMate.exe -g -l "%~1"
