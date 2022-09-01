@@ -1,0 +1,9 @@
+Super Smash Bros. HD Retexture Project | Brawl & Project M 4.0
+
+
+Yami 2b - Project Starter, Maintener, Menus, HUDs, HD Straps Loader, HD Wii Menu ...
+disraelie - Providing image ressources for the strap loader
+Miraj - Optional custom textures for CSPs & Battle Portraits
+Lucs - All hail the Food !
+Winchester7314 - Golder Metal Mewtwo CSP/BP / HD Controllers Buttons (PS3/PS4/Xbox360/XboxOne)
+PMBR Team - Project M / High Res CSPs from new characters
