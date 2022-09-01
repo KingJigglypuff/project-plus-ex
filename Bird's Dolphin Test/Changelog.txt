@@ -1,0 +1,59 @@
+Dolphin build by Bird with help from mister_person (Mac) and Kaloshade (Linux)
+Github source: https://github.com/Birdthulu/Ishiiruka/tree/master
+
+Thanks to Jetfantastic, Pikmon, Mangachu, Guttey, TwistyCap69, Pineapple, Woody, Scarfy, Tiffany Brockhoff, Hakeembisiolu, 
+Alan Estrada, Caravan, Jonny Celestin, Evan Coleman, Jagz$, Jaylon Bliss, Elijah Huertas, Morgan Medacier, Jeffrey Warner,
+SuperMrJMT, Fortress, Eric, Anton, Tia, Corkxx, MeleeSadPosts, and ECHOnce for the support on Patreon!
+https://www.patreon.com/FasterPM to support the project! Join the discord here: https://discord.gg/ZHYxnFp
+
+1.0
+Default buffer is 4 (Can now be set in Dolphin.ini under the NetPlay settings. EX: BufferSize = 4)
+SD cards up to 4gb
+Up and down arrow in game control volume
+Client side music off check box on netplay window (To make this default right click Brawl and go to properties then patches and check the music off box)
+Open chat in game with T
+PM runs on SI Read polling
+Setting to show clock in game
+PM shows frame time
+Added true aspect ratio for PM (69:40)
+Black frame insertion and burn in reduction (An external frame limiter is needed to make BFI work. Use your graphics card's vsync instead of dolphin's)
+Option to enable/disable writing to sd/memory card when playing offline (In config->general)
+Discord Rich Presence
+Fixed Gecko Code downloading
+Changed buffer behavior so player buffers follow the minimum buffer if player buffer wasn't changed
+Lowered dolphin's internal volume for the cubeb audio backend so you don't destroy your ears above 20% volume
+Dolphin logo can now be set with Dolphin.png, dolphin_logo.png and dolphin_logo@2x.png in the Sys\Resources
+
+2.1
+Added netplay button to the main bar to make joining easier (Image by fudgepop01)
+Now when hosting a netplay lobby the code is automatically copied to your clipboard
+Added option to stream GCC inputs to file. Found in controller settings. (Credit to Hyperflame. Check Input Display.txt for instructions on usage.)
+Added ability to check the MD5 checksum of brawl save files in the netplay window
+
+2.15
+Client side music off button saves choice when enabled or disabled between sessions
+Fixed .elf not loading a banner from a png
+Add a warning when the GC adapter returns an error and center sticks instead of holding down
+Disable sd card writing without affecting memory cards. Move the setting to the wii pane.
+Add /dev/dolphin for homebrew to get information about Dolphin
+Now only dumps textures in .png format
+
+2.2
+Netplay session replays that are saved to the WII (NOT SD CARD) will be saved in the folder named "ReplayData" 
+	To view these replays use Bird's Replay Manager.exe or copy the one from the session you want and go here: 
+	/User/Wii/title/00010000/52534245/data and replace collect.vff with the one you want to view (rename it to collect.vff) then launch the game offline (not in a netplay window)
+Added spectator mode setting when joining a code and in the netplay window! No more asking the host to turn your port off!
+Added ability to view a gamecube adapter's pollrate in the controller menu
+Added WASAPI as an audio option and a cubeb update from mainline
+Fixed offbrand adapters not working
+Dolphin now has an updater included for easy auto updates!
+
+2.25
+Fix updater paths on windows and mac
+
+2.27
+Change ishiiruka path on linux to FasterPPlus
+
+2.29
+Now using a high quality P+ icon on Linux
+Spectator mode no longer has a hitbox the size of saturn
