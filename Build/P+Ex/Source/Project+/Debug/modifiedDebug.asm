@@ -255,7 +255,7 @@ PULSE
 * 38000000 FFBF0040 # if heldInput && 0x40 = 0x40
 * 38000020 FFFE0001 #   if pressedInput && 0x1 = 0x1
 * 86410001 00000001 #     gr1 = gr1 + 1
-* E2000003 00000000 # endif
+* E2000002 00000000 # endif
 #option 5
 * 38000000 F7FF0800 # if heldInput && 0x80 = 0x80 
 * 38000020 FFFD0002 #   if pressedInput && 0x2 = 0x2

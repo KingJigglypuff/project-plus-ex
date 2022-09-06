@@ -49,23 +49,7 @@ PULSE
 
 * E2000002 00000000
 
-##################################################
-![Legacy TE] Boot Directly to CSS v4  [PyotrLuzhin]
-##################################################
-CODE @ $806DD5F8
-{
-	addi r4, r21, 0x1B54; li r5, 0
-}
-HOOK @ $8002D3A0
-{
-  mr r4, r27
-  lis r5, 0x8042;	ori r5, r5, 0xA40
-  cmpw r4, r5;		bne- %END%
-  li r5, 0x3
-  stb r5, 0x2A5(r28);	stb r5, 0x2B1(r28)
-  li r30, 0x0
-}
-op b 0x10 @ $80078E14
+.include Source/P+Ex/BootToCSS.asm
 
 #############################################################################
 Reset multipac stage lock status between Classic & All-Star matches [wiiztec]
@@ -188,7 +172,7 @@ op NOP 		@ $800F15D8
 ###########################################################################################################
 Sudden Death Port Fix (Requires Analog C-Stick, L R, & Light-Shield Button Stored as Variables v2.1) [ds22]
 ###########################################################################################################
-op lwz r0, 0x44(r3) 	@ $8081AD08
+op lwz r0, 0x44(r3) @ $8081AD08
 op cmplwi r0, 0		@ $8081AD0C
 op beq- 0x30		@ $8081AD10
 
@@ -209,24 +193,24 @@ op beq- 0x30		@ $8081AD10
 ############################
 1 Team Matches [spunit262]
 ############################
-* 0468D534 38600000
+op li r3, 0 @ $8068D534
 
 #####################################
 Online Handicap Disable [spunit262]
 #####################################
-* 046F3DA4 60000000
+op nop @ $806F3DA4
 
 #####################################
 Training Room Item Fix [ds22]
 #####################################
-* 046D1704 60000000
+op nop @ $806D1704
 
-#################
+################
 Infinite Replays
-#################
-* 040E5DE8 60000000
-* 04953184 60000000
-* 04953224 60000000
+################
+op nop @ $800E5DE8
+op nop @ $80953184
+op nop @ $80953224
 
 ###################################################
 Allow Pausing When Set to Off v3 [standardtoaster]
@@ -600,39 +584,6 @@ HOOK @ $806def74
 	stw r0, 0x34(r27)
 	stw r0, 0x30(r27)
 }
-
-#####################################################################################################
-[Project+] Disable Smash Balls during Classic's Team <Character> Battles [DukeItOut]
-#
-# This is needed due to a crash relating to swapping characters in and out 
-# This code can likely be removed in the future if a way to expand the memory allocation of the 
-# decompression buffer without adversely affecting other parts of the game is made possible.
-#
-# Note that this does not cover All-Star Vs. so that people can use the first costume for characters
-# with Smash Balls in that mode, but the crash will occur if using other skins for the same reasoning
-# that it does in Classic's team horde battles!
-#####################################################################################################
-HOOK @ $809AE4E0
-{
-	subi r0, r3, 1	# Original operation, ticks down the timer for when smash balls can be available
-	# however, if set to -1, Smash Balls won't appear for the rest of the match (value normally used when a Smash Ball is present)
-	lis r12, 0x805B			# \
-	lwz r12, 0x50AC(r12)	# | Retrieve the game mode name
-	lwz r12, 0x10(r12)		# |
-	lwz r12, 0x0(r12)		# /
-	lis r6, 0x8070; ori r6, r6, 0x24D0	# \ Only trigger for Classic mode!
-	cmpw r6, r12; bne+ %END%			# /
-isClassic:
-	lis r12, 0x90FF
-	lwz r12, 0x50F4(r12)
-	cmpwi r12, 0; beq+ %END%		# Don't read this if it is empty!
-	lwz r4, 0x1C8(r12)				# Amount in the team
-	cmpwi r4, 10; bne+ %END%		# Verify that there are ten members, this amount doesn't change in teams regardless of difficulty
-	lwz r4, 0x1C4(r12)				# Amount in the team KO'd
-	cmpwi r4, 10; beq+ %END%		# If 10 members have been KO'd, this round is over and the info is retained into non-team rounds as a leftover
-forceDisable:	
-	li r0, -1
-}		
 
 #####################################################
 Subspace uses same Internal Constants as Versus [Eon]
@@ -1185,25 +1136,25 @@ HOOK @ $8076E0F0
   fcmpo cr0, f28, f0
 }
 
-##################################################
+################################################
 Electric Element Uses Normal Hitlag Type [Magus]
-##################################################
-* 0476D254 60000000
-* 048761C8 60000000
+################################################
+op nop @ $8076D254
+op nop @ $808761C8
 
-#################################################################
+###############################################################
 Attacker Never has Electric Hitlag [Dantarion, Standardtoaster]
-#################################################################
-* 0476E228 4800006C
+###############################################################
+op b 0x6C @ $8076E228
 
-#######################################################
+######################################################
 Disable Vertical Boost on Tumble KB [Dantarion, Magus]
-#######################################################
-* 0486DBDC C05E8D40
+######################################################
+op lfs	f2, -0x72C0 (r30) @ $8086DBDC
 
-###############################################################################################
+#################################################################################################
 Reset Variables on Action Changes & RCO Lag Fix v2 [standardtoaster, ds22, Magus, DukeItOut, Eon]
-###############################################################################################
+#################################################################################################
 .alias action = 28
 .alias situation = 29
 HOOK @ $8077F780
@@ -1302,66 +1253,81 @@ float 32.0 @ $80B87AC0
 float 32.1 @ $80B87AC4
 
 ############################################
-Base Tripping Rate on Action 43 is 0 [Magus]
+Only Trip Rate 1.0 Can Trip Foes [DukeItOut]
 ############################################
-float 0.0 @ $80B883D4
-float 0.0 @ $80B883D8 
+op nop @ $8076D120
+op lfs f1, 0x18(r13) @ $8076D124
+op bne+ 0x40 @ $8076D130
 
 ##################################################################
 Weight Independent Knockback and Forced Tumble on Throws [Magus]
 ##################################################################
-* C2769EA0 00000008
-* 7C0300AE 81580034
-* 7C0AD800 41A1002C
-* 38000000 895B0024
-* 2C0A00BF 40A2001C
-* 8157003C 812A0070
-* 81290024 8129000C
-* 39002329 91090004
-* 60000000 00000000
+HOOK @ $80769EA0
+{
+	lbzx r0, r3, r0
+	lwz r10, 52(r24)
+	cmpw r10, r27
+	bgt+ 0x2C
+	li r0, 0x0
+	lbz r10, 36(r27)
+	cmpwi r10, 0xBF
+	bne+ 0x1C
+	lwz r10, 60(r23)
+	lwz r9, 112(r10)
+	lwz r9, 36(r9)
+	lwz r9, 12(r9)
+	li r8, 0x2329
+	stw r8, 4(r9)
+ }
 
 ##########################################################
 [Project+] Can Grab Characters Slightly Behind [DukeItOut]
 ##########################################################
 HOOK @ $80756984
 {
-    fmuls f0, f1, f0    # original operation
-    lis r3, 0xC0D0        # \
-    stw r3, -0x4(r1)    # | -6.5 units maximum behind
+    fmuls f0, f1, f0     # original operation
+    lis r3, 0xC0D0       # \
+    stw r3, -0x4(r1)     # | -6.5 units maximum behind
     lfs f31, -0x4(r1)    # /
 }
 
 
-##################################################
+################################################
 Shield Break Minimum Disabled Time Fix [Magus]
-##################################################
-* C2875D40 00000003
-* FC1F0840 40A00008
-* FFE00890 FC010840
-* 60000000 00000000
+################################################
+HOOK @ $80875D40
+{
+	fcmpo cr0, f31, f1
+	bge+ 0x8
+	fmr f31, f1
+	fcmpo cr0, f1, f1
+}
 
-##########################################################
+#######################################################
 Outside Damage Grab Break Uses Current Hit Only [Magus]
-##########################################################
-* 047712C8 D03D0028
+#######################################################
+op stfs	f1, 0x0028 (r29) @ $807712C8
 
-####################################################
+#################################################
 Item Throw XY Velocity are Scaled Equally [Magus]
-####################################################
-* C29C1868 00000003
-* C07C00E0 EC630072
-* D07C00E0 C07F0004
-* 60000000 00000000
+#################################################
+HOOK @ $809C1868
+{
+	lfs f3, 224(r28)
+	fmuls f3, f3, f1
+	stfs f3, 224(r28)
+	lfs f3, 4(r31)
+}
 
-###############################################
+#############################################
 Slopes do not Affect Landing Velocity [Magus]
-###############################################
-* 04794634 FC401050
-* 0479463C FC001090
+#############################################
+op fneg	f2,f2 	@ $80794634
+op fmr	f0,f2 	@ $8079463C
 
-########################################################################
+######################################################################
 Traction 2x on Non-Dash Character Momentum > Max Walking Speed [Magus]
-########################################################################
+######################################################################
 * C2794D3C 00000010
 * 3C808100 60840000
 * 7C1A2000 41800060
@@ -1398,13 +1364,16 @@ Dash Exit into Wait, Dash, and Taunt Keep Full Velocity [Magus]
 * C023CF54 BBC10008
 * 38210010 00000000
 
-#######################################################
+####################################################
 Guard On Momentum Limit Attribute is Ignored [Magus]
-#######################################################
-* C286CF44 00000003
-* C0410008 FC201090
-* FC200A10 FC600850
-* 60000000 00000000
+####################################################
+HOOK @ $8086CF44
+{
+	lfs f2, 8(r1)
+	fmr f1, f2
+	fabs f1, f1
+	fneg f3, f1
+}
 
 ###########################################
 Powershield Reflect Sets Variable [Magus]
@@ -1472,22 +1441,26 @@ Dream Land Wind Uses TopN-X for Collision Detection [Magus]
 * 40A20008 C004FFF4
 * 60000000 00000000
 
-###############################################################
+#############################################################
 KO Ownership Timer doesn't Trigger on Certain Actions [Magus]
-###############################################################
-* C283C320 00000006
-* 2C19004A 41820014
-* 2C190060 4182000C
-* 2C190061 40A20010
-* 3860FFFF 2C03FFFF
-* 48000008 2C00FFFF
-* 60000000 00000000
+#############################################################
+HOOK @ $8083C320
+{
+  cmpwi r25, 0x4A;  beq- 0x14	# Hitting the ground in tumble
+  cmpwi r25, 0x60;  beq- 0xC	# Teching the ground
+  cmpwi r25, 0x61;  bne+ 0x10	# Tech roll
+  li r3, 0xFFFF
+  cmpwi r3, 0xFFFF; b 0x8
+  cmpwi r0, 0xFFFF
+}
 
-#######################
+#####################
 Momentum Capture Data
-#######################
-* 065A7DD0 00000004
-* FF001000 00000000
+#####################
+CODE @ $805A7DD0
+{
+    fcmpu	cr6,f0,f2
+}
 
 ############################################
 Hitstun Modifier [Phantom Wings, spunit262] 
@@ -1503,7 +1476,7 @@ Tripping Rate is 0 V2 [ds22, KirbyIsCool]
 ##################################################
 Triple Jump Glitch Fix [Phantom Wings, spunit262]
 ##################################################
-* 04858DCC 38830003
+op addi	r4, r3, 3 @ $80858DCC
 
 ######################################################################
 [Project+] Wiggle out of Tumble Window extended to 2 frames [Fracture]
@@ -1597,15 +1570,10 @@ HOOK @ $8089DBD0
   lwz r3, 0xD8(r30)
   lwz r3, 0x70(r3)
   lwz r3, 0x34(r3)
-  cmpwi r3, 0x61 #techRoll
-  beq dontSlideoff
-  
-  cmpwi r3, 0x1e  #spotdodge
-  beq dontSlideOffLater
-  cmpwi r3, 0x1f  #rollF
-  beq dontSlideOffLater
-  cmpwi r3, 0x20  #rollB
-  beq dontSlideOffLater
+  cmpwi r3, 0x61; beq dontSlideoff 	#techRoll  
+  cmpwi r3, 0x1E; beq dontSlideOffLater #spotdodge
+  cmpwi r3, 0x1F; beq dontSlideOffLater #rollF
+  cmpwi r3, 0x20; beq dontSlideOffLater #rollB
 
 slideoff:
   li r3, 1
@@ -1642,44 +1610,6 @@ _AllowDrift:
 _end:
 	cmpwi r3, 0
 }
-
-######################################################################
-On the Fly Attribute Modification (Item Crash Fix) [codes, Mawootad]
-######################################################################
-* C27AD58C 00000019
-* 28000020 418000B8
-* 28000025 408000B0
-* 1FA0000C 3BBDFE80
-* 80FF00D8 3C6080B8
-* 808368D8 806700C4
-* 1C8401C8 38A00BB8
-* 54A0103A 7C632214
-* 7C630214 3B83D138
-* 57DFA53E 57DE053E
-* 48000005 7C0802A6
-* 3BBD001C 7FBD0214
-* 7FA903A6 57C0103A
-* 7C1C042E 4E800420
-* 7FFC052E 48000034
-* 60000000 EC00F82A
-* 7C1C052E 48000024
-* EC00F828 7C1C052E
-* 48000018 EC0007F2
-* 7C1C052E 4800000C
-* EC00F824 7C1C052E
-* 3BDE0001 7C1EF800
-* 4081FFB4 3D80807B
-* 398CD5BC 7D8903A6
-* 4E800420 3C6080AD
-* 60000000 00000000
-* 047ACE78 2C000025
-* C27ACEA0 00000005
-* 28000025 4080001C
-* 28000020 41A00014
-* 3C60807B 3863D2A0
-* 7C6903A6 4E800420
-* 60000000 00000000
-
 
 ###############################################################################################################
 [Project+] Customizable Attacker Hitlag Modifier [DukeItOut]
@@ -2045,12 +1975,12 @@ end:
 #######################
 Tags in replays [Y.S]
 #######################
-* 0404B140 38A00000
+op li r5, 0 @ $8004B140
 
-#########################################
+######################################
 Timer Always Displays 6th Digit [ds22]
-#########################################
-* 040DE17C 60000000
+######################################
+op nop @ $800DE17C
 
 ########################################################################
 Individual Stock Icons (info.pac) V2.6 PMEx + 50CC [ds22, wiiztec, DukeItOut, PyotrLuzhin, KingJigglypuff]
@@ -2695,13 +2625,13 @@ Team Colour Shade Modifier [ds22]
 #######################################
 Phantom Hit SFX & GFX Modifier [ds22]
 #######################################
-* 0476205C 38800015
-* 0476BCCC 38800000
+op li r4, 21 	@ $8076205C
+op li r4, 0 	@ $8076BCCC
 
 ###############################
 Wall Jump GFX Modifier [ds22]
 ###############################
-* 04879CBC 38800000
+op li r4, 0 @ $80879CBC
 
 ########################################################
 SFX Survival -> Choose Your Character [Standardtoaster]
@@ -2734,14 +2664,15 @@ loc_0x10:
   	lwz r3, 8(r3)
 }
 
-####################
+#########################################
 SFX Fade Fix PMEXv0.5 [ds22, PyotrLuzhin]
-####################
+#########################################
 * C21C7574 00000004
 * 2C1A2431 41800010
 * 2C1A26F8 41810008
 * 38000005 901F0000
 * 60000000 00000000
+
 ###########################
 On-hit SFX Modifier [ds22]
 ###########################
@@ -2771,7 +2702,7 @@ op li r0, 0xFFF @ $8004FAE4
 ###############################################
 Cape Reversed Control Time [standardtoaster]
 ###############################################
-* 0485B814 38800014
+op li r4, 20 @ $8085B814
 
 ###########################################################
 Yoshi Eggs are Costume Based v1.1 [ds22] (char id fix fix)
@@ -2809,20 +2740,20 @@ op NOP @ $80A15820
 #########################################################
 int 9 @ $80B88FD4
 
-###############################################
+##############################################
 Yoshi Eggs don't despawn when Yoshi dies [Eon]
-###############################################
+##############################################
 op nop @ $80A15CC0
 
-##############################################################
+###############################################################
 [Project+] Diddy Kong Flip Base Hold Time 70 > Infinite [Boiko]
-##############################################################
+###############################################################
 float Infinite @ $80B88738
 
 #########################################
 Spacies Up-B Air Friction Fix [Magus]
 #########################################
-* 04A1B848 FC000850
+op fneg	f0,f1 @ $80A1B848
 
 ###########################
 Falco Low Laser Fix [Eon]
@@ -2920,7 +2851,7 @@ Squirtle Side-B Footstool Uses Normal Requirement 0x2713 [Magus]
 #############################################################
 Pokemon Trainer Infinite Stamina [Phantom Wings, spunit262]
 #############################################################
-* 04A8BDAC 60000000
+op nop @ $80A8BDAC
 
 ############################################################
 PT Pokemon Have Final Smashes & FS Characters Don't [ds22]
@@ -2991,12 +2922,12 @@ Aura Sphere Cancel [ds22]
 * 40820004 00000000
 * 04AA6590 40820040
 
-#####################################################################
+#######################################################################
 [Project+] Aura Sphere Only Pulsates Horizontally v1.2 [DukeItOut, Eon]
 #
 # 1.1: Fixes issue where Kirby's Shadow Ball wouldn't match Mewtwo's
 # 1.2: Improves Kirby check to no longer require LA-Basic[8] to be set
-#####################################################################
+#######################################################################
 HOOK @ $80AABBA0
 {
   lis r4, 0x1000		# \ LA-Basic[9] of the projectile, which contains the character ID of who spawned it
@@ -3062,17 +2993,17 @@ finish:
 op cmpwi r26, 0x112 @ $80aa66c0
 op blt 0x20 @ $80aa66c4
 
-#######################################################
+########################################
 Samus Aerial Charge Shot Charging [ds22]
-#######################################################
-* 04A06348 4BFFFDD0
-* 04A06210 4BFFFDD0
-* 04A07050 48000040
-* 04A06580 60000000
-* 04A065C4 60000000
-* 04A068C0 60000000
-* 04A068C4 60000000
-* 04A06160 4080009C
+########################################
+op b -0x230	@ $80A06348
+op b -0x230	@ $80A06210
+op b 0x40	@ $80A07050
+op nop @ $80A06580
+op nop @ $80A065C4
+op nop @ $80A068C0
+op nop @ $80A068C4
+op bge-	0x9C @ $80A06160
 
 ################################
 ZSS Jumbo Screen Name Fix [ds22]
@@ -3254,9 +3185,9 @@ Snake's U-Smash can Have Horizontal Velocity [Magus]
 * 48000008 C0049560
 * 60000000 00000000
 
-########################################################
+##########################################################
 [Project+] Sonic/Knuckles Spin Dash Bucket Brake Fix [Eon]
-########################################################
+##########################################################
 op nop @ $80ac7d2c
 
 ####################################################################
@@ -3311,12 +3242,12 @@ Move_On:
 	stb r3, 0x2A8(r30)	# /
 }	
 
-###############################################
+#############################################
 Alloys Can Shield, Dodge & Grab Ledges [ds22]
-###############################################
-* 048A082C 48000088
-* 048A083C 48000078
-* 048A087C 48000038
+#############################################
+op b 0x88	@ $808A082C
+op b 0x78	@ $808A083C
+op b 0x38	@ $808A087C
 
 ###################################################
 PSA command 11210100 sets next GFX anim index [Eon]
@@ -3360,7 +3291,7 @@ HOOK @ $807A55F0
     li r3, 1
 }
 
-
+.include Source/Project+/Attributes.asm
 .include Source/Project+/PokeTrainer.asm
 .include Source/Project+/Debug/modifiedDebug.asm
 

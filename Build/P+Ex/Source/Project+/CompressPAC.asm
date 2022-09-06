@@ -31,66 +31,37 @@ Decompress:
   bctr 
 }
 
-##############################################################
-Costume decompression possible during boss battles [DukeItOut]
-##############################################################
-.macro Load()
-{
-    lis r3, 0x8042        # Enforce FighterTechniq, which is the decompression buffer
-    ori r3, r3, 0x1BB8
-    lis r12, 0x8002
-    ori r12, r12, 0x44C4
-    mtctr r12
-    bctrl
-
-    lis r12, 0x806B
-    ori r12, r12, 0xE080
-    mtctr r12
-    bctr 
-}
-.macro Unload()
-{
-    lis r3, 0x8042        # make sure FighterTechniq is deallocated when done
-    ori r3, r3, 0x1BB8
-    lis r12, 0x8002
-    ori r12, r12, 0x4790
-    mtctr r12
-    bctrl
-    lis r3, 0x8042
-}
-
-HOOK @ $806BD714
-{
-	%Load()
-}
-HOOK @ $806BDEDC
-{
-	%Unload()
-}
-HOOK @ $806BCBBC
-{
-	%Unload()
-}
-HOOK @ $806BD284
-{
-	%Unload()
-}
-HOOK @ $806BCF8C
-{
-	%Unload()
-}
-HOOK @ $806BD9D0
-{
-	%Unload()
-}
-
-word 0x00F00100 @ $80421FAC # normally 16.0MB instead of 15.0MB, freed 1.0MB so there is room for decompression (1.1MB)
-
-#####################################################################
-SSE P2 Always Uses The First Costume V1.1 [DukeItOut]
+#############################################################################
+Character Costumes are decompressed in the Network Heap [Kapedani, DukeItOut]
 #
-# v1.1: Fixed issue where the first battle in the SSE could crash
-#####################################################################
-byte 00 @ $806DA4E3
-byte 00 @ $806EBA8F
-byte 00 @ $806DAFCB
+# This avoids a conflict where final smashes and compressed costumes
+# attempted to use the same memory allocation, causing crashes.
+#############################################################################
+op li r9, 6 @ $8084FE2C
+# The following gets rid of the pause/endgame buffer
+# The game can allocate a new one when it needs to. 
+HOOK @ $8084FDB8			
+{
+	lis r3, 0x805A
+	lwz r3, 0x90(r3)
+	lis r12, 0x8003			
+	ori r12, r12, 0x7BE4
+	mtctr r12				
+	bctrl					
+	mr r3, r26		# Original operation
+}
+
+####################################################
+Bowser and Giga Bowser Can Be Compressed [DukeItOut]
+####################################################
+op NOP @ $808275B4
+byte 0x4C @ $8081DF63	# Used by Bowser
+byte 0x6C @ $8081DF87	# Used by Giga Bowser!
+#word 0 @ $80AD8028 #Commented out, as P+Ex uses FighterConfig files to determine if Kirby Hat files are loaded.
+
+###############################################################
+Only New Characters Need a Spy Costume Added [DukeItOut]
+#
+# Disables alt Clear Brawl skins for Pika, Jigglypuff and Sonic
+###############################################################
+op li r5, 0 @ $8084CB6C

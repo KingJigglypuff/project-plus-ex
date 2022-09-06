@@ -5,9 +5,15 @@
 # 901A2288 -> 80545698	Store Variables into Hitstun CILs v1.1 
 # 901A2500 -> 805457D0	Jab Reset Hitstun Linker
 # 9019B000 -> 80545810	Jab Resets v8.4
-#########################################
-NonTumble Hitstun Canceling v1.2 [Shanus]
-#########################################
+#############################################
+NonTumble Hitstun Canceling v1.2b [Shanus]
+#
+# 1.2b: 
+# LA-Basic[25] -> LA-Basic[82]
+# LA-Basic[30] -> LA-Basic[83]
+#
+# fixes bugs related to turbo and star items
+#############################################
 .alias PSA_Off  = 0x805454E0
 .alias PSA_Off2 = 0x80545648
 CODE @ $805454E0
@@ -22,20 +28,20 @@ CODE @ $805454E0
 	word 5; IC_Basic 20003
 	word 0; word 1
 	word 1; scalar 69.0
-	#+0x40 Basic Variable Set: LA-Basic[25] = LA-Basic[30]
-	word 5; LA_Basic 30
-	word 5; LA_Basic 25
-	#+0x50 Additional Action Requirement: Compare: LA-Float[25] > 0.0
+	#+0x40 Basic Variable Set: LA-Basic[82] = LA-Basic[83]
+	word 5; LA_Basic 83
+	word 5; LA_Basic 82
+	#+0x50 Additional Action Requirement: Compare: LA-Basic[82] > 0.0
 	word 6; word 7
-	word 5; LA_Basic 25
+	word 5; LA_Basic 82
 	word 0; word 5
 	word 1; scalar 0.0
-	#+0x70 Basic Variable Set: LA-Basic[30] = 0xA
+	#+0x70 Basic Variable Set: LA-Basic[83] = 0xA
 	word 0; word 0xA
-	word 5; LA_Basic 30
-	#+0x80 Basic Variable Set: LA-Basic[25] = 0
+	word 5; LA_Basic 83
+	#+0x80 Basic Variable Set: LA-Basic[82] = 0
 	word 0; word 0
-	word 5; LA_Basic 25
+	word 5; LA_Basic 82
 	#+0x90 Additional Action Requirement: Compare: LA-Float[7] <= -0.7
 	word 6; word 7
 	word 5; LA_Float 7
@@ -96,13 +102,13 @@ CODE @ $80545648
 	word 2; word PSA_Off2+0x30
 
 	#Injection2
-	word 0x12000200; word PSA_Off+0x70 	#Basic Variable Set: LA-Basic[30] = 0xA
+	word 0x12000200; word PSA_Off+0x70 	#Basic Variable Set: LA-Basic[83] = 0xA
 	word 0x02010200; word 0x80FB32C4 	#Change Action: Requirement: Action=0x7E, Requirement=On Ground
 	word 0x02040100; word 0x80FB32D4 	#Additional Action Requirement: Has Passed Over Ledge (Backwards)
 	word 0x00080000; word 0
 
 	#Injection3
-	word 0x12000200; word PSA_Off+0x70 	#Basic Variable Set: LA-Basic[30] = 0xA
+	word 0x12000200; word PSA_Off+0x70 	#Basic Variable Set: LA-Basic[83] = 0xA
 	word 0x02000300; word 0x80FB3EE4 	#Change Action Status: Requirement: ID=2715, Action=0x49, Requirement=Animation End
 	word 0x02040200; word 0x80FB3EFC 	#Additional Action Requirement: Requirement Bit Is Set: RA-Bit[17]
 	word 0x00080000; word 0
@@ -118,14 +124,16 @@ CODE @ $80FB3F3C # 80F9FC20 + 1431C
 	word 0x00020000; word 0 			#nop
 }
 
-###############################################
-Store Variables into Hitstun CILs v1.1 [Shanus]
-###############################################
+################################################
+Store Variables into Hitstun CILs v1.1b [Shanus]
+#
+# 1.1b: LA-Basic[30] -> LA-Basic[83]
+################################################
 .alias PSA_Off = 0x80545698
 CODE @ $80545698
 {
 	#0x0 If Requirement: Not Is in Hitlag
-	word 5; LA_Basic 30
+	word 5; LA_Basic 83
 	#0x8 IF Requirement: Not On Ground
 	word 6; word 0x80000003 # NOT 3
 	#Float Variable Set: LA-Float[7] = IC-Basic[23] (Y-velocity ignoring knockback)
@@ -142,7 +150,7 @@ CODE @ $80545698
 
 	#0x38 Injection1
 	word 0x000A0400; word PSA_Off+0x20 	#If Requirement: Not Is in Hitlag
-	word 0x12040100; word PSA_Off 		#	Basic Variable Decrement: LA-Basic[30]--
+	word 0x12040100; word PSA_Off 		#	Basic Variable Decrement: LA-Basic[83]--
 	word 0x000F0000; word 0 			#End If
 	word 0x000A0200; word 0x80FB3264 	#If Requirement Value: Bit is Set RA-Bit[17] 
 	word 0x000A0200; word 0x80FB3274 	#	If Requirement Value: Not Bit is Set RA-Bit[16] 
@@ -153,7 +161,7 @@ CODE @ $80545698
 	word 0x00080000; word 0 			#Return
 	#0x88 Injection2
 	word 0x000A0400; word PSA_Off+0x20 	#If Requirement: Not Is in Hitlag
-	word 0x12040100; word PSA_Off 		#	Basic Variable Decrement: LA-Basic[30]--
+	word 0x12040100; word PSA_Off 		#	Basic Variable Decrement: LA-Basic[83]--
 	word 0x000F0000; word 0 			#Endif
 	word 0x000A0100; word 0x80FB344C 	#If Requirement: Not 2723
 	word 0x000A0200; word 0x80FB3454 	#	If Requirement Value: Bit is Set RA-Bit[17]

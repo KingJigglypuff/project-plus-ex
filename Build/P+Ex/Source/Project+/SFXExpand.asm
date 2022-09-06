@@ -120,9 +120,18 @@ Table_Skip:
 	.RESET
 
 ###########################################################################################################################################################
-[Project+] SoundBank Expansion System (RSBE.Ver) (Kirby-cide fix + Voice clips volume fix + CSS Hiccup Fix + Mr. Resetti fix) v1.2 [codes, DukeItOut, JOJI]
+[Project+] SoundBank Expansion System (RSBE.Ver) v2.0 [codes, DukeItOut, JOJI]
+# v1.1 - Kirbycide Fix + Voice clips volume fix + CSS Hiccup Fix
 # v1.2 - Fixes Mr. Resetti's brsar conflicts
+# v2.0 - Removed Sound Resource table occupation and made dynamic to better support resource size changes
+#
+# 90432134 references -> Sound Resource + 0x298934-to-0x29897F
+# 901A3090 references -> Written to CodeFlag+0x4
+# 901A30F8 references -> Written to CodeFlag+0x8
+# 901A30FC references -> Written to CodeFlag+0xC
+# 901A3200 size index table -> 8053ED00
 ###########################################################################################################################################################
+
 .alias CustomSoundbankRange = 0x0144	# Custom soundbanks are 0x144 or higher
 .alias CustomSound_Lo		= 0x4000	# Custom sfx lower range 
 .alias CustomSound_Hi 		= 0xE500	# Custom sfx upper range 
@@ -130,80 +139,87 @@ Table_Skip:
 .alias normalMusic_Hi		= 0x286B	# Brawl music upper range
 .alias MrResettiBank		= 2			# What it expects if this is Mr. Resetti's special brsar
 
+	.BA<-TablePointer
+	.BA->$801C75A4
+	.GOTO->SkipTable
+
+CodeFlag:
+	word[4] 0, 0, 0, 0	# Turned into C0DE, two indexes and a blank space if initialized correctly
+TablePointer:
+	word[18] |				# Table 1 (0x48 bytes)
+	0x01B872A0, 0x0000B720, |
+	0x01B57540, 0x000CC1A0, |
+	0x01000000, 0x000E3C94, |
+	0x00000002, 0x01000000, |
+	0x000E3CA8, 0x01000000, |
+	0x000E3CC0, 0x00004321, |
+	0x00003460, 0x00000000, |
+	0x00003460, 0x000082C0, |
+	0x00100000, 0x00001234	
+
+	word[18] |				# Table 2 (0x48 bytes) (offset 0x48)
+	0x000041C3, 0x00006000, |
+	0x00000002, 0x01000000, |
+	0x00084090, 0x2E400300, |
+	0x01030000, 0x00084080, |
+	0x00000000, 0x00000000, |
+	0x00000000, 0x00000000, |
+	0x00000001, 0x40000000, |
+	0x00000000, 0x00000005, |
+	0x01800000, 0x00000000	
+	
+	word[18] |				# Table 3 (0x48 bytes) (offset 0x90)
+	0x00004194, 0x00007000, |
+	0x00000002, 0x01000000, |
+	0x00042CD8, 0x3E400300, |
+	0x01030000, 0x00042CC8, |
+	0x00000000, 0x00000000, |
+	0x00000000, 0x00000025, |
+	0x00000001, 0x40000000, |
+	0x00000000, 0x00000005, |
+	0x01800000, 0x00000000	
+	
+	word[10] |				# Table 4 (0x28 bytes) (offset 0xD8)
+	0x00003460, 0x00053A80, |
+	0xFFFFFFFF, 0x00000000, |
+	0x00000000, 0x01000000, |
+	0x000CFE0C, 0x00000001, |
+	0x01000000, 0x000CFE18	
+	
+	word[10] |				# Table 5 (0x28 bytes) (offset 0x100)
+	0x000082C0, 0x00078340, |
+	0xFFFFFFFF, 0x00000000, |
+	0x00000000, 0x01000000, |
+	0x000D4FDC, 0x00000001, |
+	0x01000000, 0x000D4FE8
+	
+	
+SkipTable:
+	.RESET
+
 HOOK @ $801C7A00
 {
-  lis r4, 0x901A;  ori r4, r4, 0x3090
+  # lis r4, 0x901A;  ori r4, r4, 0x3090
+  lis r4, 0x801C; lwz r4, 0x75A4(r4)
   lis r0, 0x0;  ori r0, r0, 0xC0DE
-  stw r0, 0(r4)
+  # stw r0, 0(r4)
+  stw r0, -0xC(r4)
   lwz r0, 0(r3)						# Original operation
   cmplwi r29, CustomSoundbankRange  
   blt- %END%
   cmpwi r0, MrResettiBank; beq %END%  
   li r0, 0x244
 }
-* 4A000000 90000000
-
-# Associated with hook $801C73CC
-* 161A3040 00000048
-* 01B872A0 0000B720
-* 01B57540 000CC1A0
-* 01000000 000E3C94
-* 00000002 01000000
-* 000E3CA8 01000000
-* 000E3CC0 00004321
-* 00003460 00000000
-* 00003460 000082C0
-* 00100000 00001234
-
-# Associated with hook $801C7E94, $801C7C2C, $801C742C, $801C7318, $801C80A8
-* 161A3100 00000048
-* 000041C3 00006000
-* 00000002 01000000
-* 00084090 2E400300
-* 01030000 00084080
-* 00000000 00000000
-* 00000000 00000000
-* 00000001 40000000
-* 00000000 00000005
-* 01800000 00000000
-
-# Associated with hook $801C7570
-* 161A3150 00000048
-* 00004194 00007000
-* 00000002 01000000
-* 00042CD8 3E400300
-* 01030000 00042CC8
-* 00000000 00000000
-* 00000000 00000025
-* 00000001 40000000
-* 00000000 00000005
-* 01800000 00000000
-
-# Associated with hook $801C7A00, $801C78EC, $801C7BD8, $801C9784, $801C98D0, $801CA2F8, $801CA420, $801CA474, $801C73CC
-* 161A30A0 00000028
-* 00003460 00053A80
-* FFFFFFFF 00000000
-* 00000000 01000000
-* 000CFE0C 00000001
-* 01000000 000CFE18
-
-# Associated with hook $801C7E38, $801C7D34
-* 161A30D0 00000028
-* 000082C0 00078340
-* FFFFFFFF 00000000
-* 00000000 01000000
-* 000D4FDC 00000001
-* 01000000 000D4FE8
-
-# Others: Block 901A3200 from hook $801C8374, $801C7AB4, $801C7ABC
-# Block 90432134 from hook $801C7A14, $801C73CC
-* E0000000 80008000
+HOOK @ $801C75A0
+{
+	addi r1, r1, 0x20 # Original operations, making room for pointer to tables
+	blr
+}
 
 HOOK @ $801C78EC
 {
   mr r0, r3
-  lis r3, 0x901A;  ori r3, r3, 0x3090
-  lwz r3, 0(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); lwz r3, -0xC(r3)
   cmplwi r3, 0xC0DE
   mr r3, r0
   lwz r0, 0(r3)	# Original operation
@@ -215,8 +231,7 @@ HOOK @ $801C78EC
 HOOK @ $801C7BD8
 {
   mr r0, r3
-  lis r3, 0x901A;  ori r3, r3, 0x3090
-  lwz r3, 0(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); lwz r3, -0xC(r3)
   cmplwi r3, 0xC0DE
   mr r3, r0
   lwz r3, 0(r3)	# Original operation
@@ -228,8 +243,7 @@ HOOK @ $801C7BD8
 HOOK @ $801C9784
 {
   mr r0, r3
-  lis r3, 0x901A;  ori r3, r3, 0x3090
-  lwz r3, 0(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); lwz r3, -0xC(r3)
   cmplwi r3, 0xC0DE
   mr r3, r0
   lwz r0, 0(r3)		# Original operation
@@ -240,8 +254,7 @@ HOOK @ $801C9784
 HOOK @ $801C98D0
 {
   mr r0, r3
-  lis r3, 0x901A;  ori r3, r3, 0x3090
-  lwz r3, 0(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); lwz r3, -0xC(r3)
   cmplwi r3, 0xC0DE
   mr r3, r0
   lwz r0, 0(r3)		# Original operation
@@ -252,8 +265,7 @@ HOOK @ $801C98D0
 HOOK @ $801CA2F8
 {
   mr r0, r3
-  lis r3, 0x901A;  ori r3, r3, 0x3090
-  lwz r3, 0(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); lwz r3, -0xC(r3)
   cmplwi r3, 0xC0DE
   mr r3, r0
   lwz r0, 0(r3)		# Original operation
@@ -264,8 +276,7 @@ HOOK @ $801CA2F8
 HOOK @ $801CA420
 {
   mr r0, r8
-  lis r8, 0x901A;  ori r8, r8, 0x3090
-  lwz r8, 0(r8)
+  lis r8, 0x801C; lwz r8, 0x75A4(r8); lwz r8, -0xC(r8)
   cmplwi r8, 0xC0DE
   mr r8, r0
   lwz r0, 0(r8)		# Original operation
@@ -276,8 +287,7 @@ HOOK @ $801CA420
 HOOK @ $801CA474
 {
   mr r0, r8
-  lis r8, 0x901A;  ori r8, r8, 0x3090
-  lwz r8, 0(r8)
+  lis r8, 0x801C; lwz r8, 0x75A4(r8); lwz r8, -0xC(r8)
   cmplwi r8, 0xC0DE
   mr r8, r0
   lwz r0, 0(r8)		# Original operation
@@ -289,8 +299,13 @@ HOOK @ $801C836C
 {
   mtctr r12			# Original operation
   cmplwi r26, CustomSoundbankRange;  blt- %END%
-  lis r4, 0x9043;  ori r4, r4, 0x2134
-  addi r5, r26, 0x7
+  
+  lis r4, 0x8049		# \ Resource heap pile at 80494958
+  lwz r4, 0x49AC(r4)    # | Sound Resource is 5, therefore 5 * 0x10 + 4 = 0x54 and 0x80494958 + 0x54 = 0x804949AC
+  addis r4, r4, 0x2A	# | Desired Offset is Sound Resource + 0x298934
+  subi r4, r4, 0x76CC	# / 
+  
+  addi r5, r26, 0x7		# Soundbank ID + 7
   stw r5, 0(r4)
 
 }
@@ -310,14 +325,19 @@ HOOK @ $801CA314
 HOOK @ $801C8374
 {
   cmpwi r26, CustomSoundbankRange;  blt- loc_0x34
-  lis r14, 0x9043;  ori r14, r14, 0x2134
-  lis r15, 0x901A;  ori r15, r15, 0x3200	# Todo, remove copy or move it
+  
+  lis r14, 0x8049		# \ Resource heap pile at 80494958
+  lwz r14, 0x49AC(r14)  # | Sound Resource is 5, therefore 5 * 0x10 + 4 = 0x54 and 0x80494958 + 0x54 = 0x804949AC
+  addis r14, r14, 0x2A	# | Desired Offset is Sound Resource + 0x298934
+  subi r14, r14, 0x76CC	# /  
+  
+  lis r15, 0x8053;  ori r15, r15, 0xED00	
   subi r19, r26, CustomSoundbankRange
   mulli r19, r19, 0x8
   add r15, r19, r15
-  lwz r19, 76(r14)
+  lwz r19, 0x4C(r14)
   stw r19, 0(r15)
-  lwz r19, 96(r14)
+  lwz r19, 0x60(r14)
   stw r19, 4(r15)
 
 loc_0x34:
@@ -330,7 +350,7 @@ HOOK @ $801C7AB4
   cmplwi r30, 0;  beq- %END%
   subi r29, r29, CustomSoundbankRange
   mulli r29, r29, 0x8
-  lis r28, 0x901A;  ori r28, r28, 0x3200
+  lis r28, 0x8053;  ori r28, r28, 0xED00
   add r28, r28, r29
   lwz r0, 4(r28)
 
@@ -342,7 +362,7 @@ HOOK @ $801C7ABC
   cmplwi r30, 1;  beq- %END%
   subi r29, r29, CustomSoundbankRange
   mulli r29, r29, 0x8
-  lis r28, 0x901A;  ori r28, r28, 0x3200
+  lis r28, 0x8053;  ori r28, r28, 0xED00
   add r28, r28, r29
   lwz r0, 0(r28)
 }
@@ -352,7 +372,13 @@ HOOK @ $801C7A14
   cmplwi r29, CustomSoundbankRange;  blt- %END%
   li r0, CustomSoundbankRange
   rlwinm r0, r0, 3, 0, 28
-  lis r5, 0x9043;  ori r5, r5, 0x2134
+  
+  lis r5, 0x8049		# \ Resource heap pile at 80494958
+  lwz r5, 0x49AC(r5)    # | Sound Resource is 5, therefore 5 * 0x10 + 4 = 0x54 and 0x80494958 + 0x54 = 0x804949AC
+  addis r5, r5, 0x2A	# | Desired Offset is Sound Resource + 0x298934
+  subi r5, r5, 0x76CC	# / 
+  
+  
   addi r4, r29, 0x7
   stw r4, 0(r5)
 }
@@ -375,9 +401,8 @@ loc_0x2C:
   b loc_0x2C
 
 loc_0x40:
-  lis r4, 0x901A
-  ori r4, r4, 0x30F8
-  stw r14, 0(r4)
+  lis r4, 0x801C; lwz r4, 0x75A4(r4); stw r14, -0x8(r4)  
+  
   li r14, CustomSound_Lo+0x2F
   li r15, CustomSound_Lo+0xA5
 
@@ -389,7 +414,7 @@ loc_0x54:
   b loc_0x54
 
 loc_0x78:
-  stw r16, 4(r4)
+  stw r16, -0x4(r4)
   li r0, 0xE5
   rlwinm r0, r0, 8, 0, 31
   lwz r14, 4(r1)
@@ -421,21 +446,26 @@ HOOK @ $801C750C
 HOOK @ $801C7570
 {
   cmplwi r30, CustomSound_Lo;  blt- loc_0x10
-  lis r3, 0x901A
-  ori r3, r3, 0x313C
+  
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x84 # Table 2 + 0x3C
 loc_0x10:
   lwz r0, 0(r3)			# Original operation
 }
 HOOK @ $801C73CC
-{
-  lis r4, 0x901A
-  ori r4, r4, 0x3090
-  lwz r0, 0(r4);  cmplwi r0, 0xC0DE;  bne- loc_0x68
-  lis r4, 0x901A;  ori r4, r4, 0x3040
-  lis r8, 0x9043;  ori r8, r8, 0x2144
+{  
+  lis r4, 0x801C; lwz r4, 0x75A4(r4); lwz r0, -0xC(r4) 
+  cmplwi r0, 0xC0DE;  bne- loc_0x68
+   
+  # r4 has pointer to Table 1 already
+  
+  lis r8, 0x8049		# \ Resource heap pile at 80494958
+  lwz r8, 0x49AC(r8)    # | Sound Resource is 5, therefore 5 * 0x10 + 4 = 0x54 and 0x80494958 + 0x54 = 0x804949AC
+  addis r8, r8, 0x2A	# | Desired Offset is Sound Resource + 0x298944
+  subi r8, r8, 0x76BC	# /
 
+  
 loc_0x24:
-  lwz r0, 0(r4);  cmplwi r0, 0x4321;  beq- loc_0x40
+  lwz r0, 0(r4);  cmplwi r0, 0x4321;  beq- loc_0x40	
   stw r0, 0(r8)
   addi r4, r4, 0x4
   addi r8, r8, 0x4
@@ -455,9 +485,9 @@ loc_0x40:
 
 loc_0x68:
   cmplwi r30, normalMusic_Lo;  blt- loc_0x84		# Branch if a normal sound effect
-  lis r4, 0x901A;  ori r4, r4, 0x3090
   lis r0, 0x0;  ori r0, r0, 0xC0DE
-  stw r0, 0(r4)
+  lis r4, 0x801C; lwz r4, 0x75A4(r4)
+  stw r0, -0xC(r4)
 
 loc_0x84:
   lwz r0, 0(r3)		# Original operation
@@ -477,12 +507,17 @@ HOOK @ $801C742C
   lwz r4, 4(r3)			# Original operation
   cmplwi r30, CustomSound_Lo;  blt- %END%
   cmplwi r30, CustomSound_Hi;  bge- %END%
-  lis r3, 0x901A;  ori r3, r3, 0x3100	# \ Load from resource
-  lwz r4, -4(r3)
-  lwz r0, -8(r3)
-  cmplwi r4, 0;  bne- loc_0x30
-  addi r3, r3, 0x50
+  
 
+  
+  lis r3, 0x801C; lwz r3, 0x75A4(r3)
+  lwz r4, -0x4(r3)
+  lwz r0, -0x8(r3)
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x48	# Table 2
+
+  cmplwi r4, 0;  bne- loc_0x30
+
+  addi r3, r3, 0x48	# Table 3
 loc_0x30:
   lwz r4, 4(r3)
   add r4, r4, r0
@@ -505,8 +540,8 @@ HOOK @ $801C72F0
 HOOK @ $801C7318
 {
   cmplwi r31, CustomSound_Lo;  blt- loc_0x10
-  lis r3, 0x901A
-  ori r3, r3, 0x3100
+
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x48	# Table 2
 loc_0x10:
   lbz r0, 0x16(r3)		# Original operation
 }
@@ -528,9 +563,8 @@ HOOK @ $801C80A8
 {
   cmplwi r31, CustomSound_Lo;  blt- loc_0x18 # min sound ID
   cmplwi r31, CustomSound_Hi;  bge- loc_0x18 # max sound ID
-  lis r3, 0x901A
-  ori r3, r3, 0x3100
 
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x48	# Table 2
 loc_0x18:
   lwz r4, 0x18(r3)	# Original operation
 }
@@ -560,11 +594,9 @@ loc_0x28:
 HOOK @ $801C7D34
 {
   cmplwi r31, 0x6000;  blt- loc_0x20
-  lis r3, 0x901A
-  ori r3, r3, 0x30D0
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x100 # Table 5
   cmplwi r31, 0x7000;  blt- loc_0x1C
-  subi r3, r3, 0x30
-
+  subi r3, r3, 0x28 # Table 4
 loc_0x1C:
   mr r30, r3
 
@@ -592,10 +624,9 @@ loc_0x24:
 HOOK @ $801C7E38
 {
   cmplwi r29, 0x6000;  blt- loc_0x20
-  lis r3, 0x901A
-  ori r3, r3, 0x30D0
+  lis r3, 0x801C; lwz r3, 0x75A4(r3); addi r3, r3, 0x100 # Table 5
   cmplwi r29, 0x7000;  blt- loc_0x1C
-  subi r3, r3, 0x30
+  subi r3, r3, 0x28 # Table 4
 
 loc_0x1C:
   mr r4, r3
@@ -607,9 +638,10 @@ HOOK @ $801C7E94
 {
   lwz r0, 0(r3)		# Original operation
   cmplwi r29, 0x6000;  blt- %END%
-  lis r3, 0x901A;
-  ori r3, r3, 0x30F8
-  lwz r0, 0(r3)
+  
+  lis r4, 0x801C; lwz r4, 0x75A4(r4); lwz r0, -0x8(r4)
+  
+  
   subi r4, r29, 0x6000
   cmplwi r29, 0x7000;  blt- loc_0x28
   subi r4, r29, 0x7000

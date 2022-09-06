@@ -2,8 +2,11 @@
 # 9019FC00 -> 80540370 Missfoot is FFable, can grab edges, has air control, and goes into tumble or hard landing
 # 9019BD50 -> 805403D8 Slide Off Edges During Hard/Light Landing
 #################################################
+
+#################################################
 Edge Grabs Disabled During Damage Actions [Magus]
-* 04FB3498 00000000
+#################################################
+word 0x0 @ $80FB3498
 
 Ledgedrop/Grab Speedup [Yeroc]
 * 06FB656C 00000008

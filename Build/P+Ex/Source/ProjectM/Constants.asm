@@ -124,7 +124,7 @@
 	int 4 @ $80B88F30
 
 23085 - Base Held Time in Grabs [90->76]
-* 04B88F3C 0000004C
+	int 76 @ $80B88F3C
 
 23087 - Frames After Landing Until KO Ownership is Lost [10800->60]
 	int 60 @ $80B88F44

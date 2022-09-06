@@ -1,6 +1,8 @@
+##############################################
 Glidestop (w/o Jump Removal) [Standardtoaster]
-* 04FB31D0 00000010
-* 04FB3230 00000010
+##############################################
+word 0x10 @ $80FB31D0
+word 0x10 @ $80FB3230
 
 Glide Input is Now Hold Down and Hold Jump [Shanus]
 * 06FAB5A4 00000038
@@ -14,6 +16,7 @@ Glide Input is Now Hold Down and Hold Jump [Shanus]
 * 06FAB62C 00000008
 * 00020000 00000000
 
+##############################################
 Glide Attack Goes Into Special Landing [Magus]
-* 06FC2950 00000008
-* 02000300 80FAE64C
+##############################################
+word[2] 0x2000300, 0x80FAE64C @ $80FC2950

@@ -88,7 +88,7 @@ Lucario Clone Aura Sphere GFX Fix [Dantarion, ds22, DesiacX]
 }
 HOOK @ $80AA95B8    #Uses Fighter ID followed by Effect.pac ID
 {
-    %GFXFix (0x26, 0x8F)    #Mewtwo
+    %GFXFix (0x26, 0x27)    #Mewtwo
 	%GFXFix (0x2A, 0x187)   #Ridley
     lis r3, 0x22            #If no fix is specified, use Lucario's
 }

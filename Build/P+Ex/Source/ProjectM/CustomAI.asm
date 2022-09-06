@@ -1,27 +1,64 @@
+#################
 CPU DI fix [Bero]
-* 04917300 48000040
-* 04B8A40C 00000500
+#################
+op b 0x40	@ $80917300
+word 0x500  @ $80B8A40C
 
+#####################################################
 CPUs Don't Ignore Other CPUs to Target Humans [Magus]
-* 04907D60 4800001C
+#####################################################
+op b 0x1C	@ $80907D60
 
-Nana automatic throw enabler(auto throw routine 6100) [Bero]
-* C2904958 0000000F
-* 887E01BA 2C03000A
-* 4082005C 80770044
-* A0830078 2C046100
-* 41820020 38600000
-* 90780000 90780004
-* 90610008 906100D0
-* 906100D4 48000010
-* 8083005C 2C040000
-* 40820024 80770044
-* 38A00001 90A3005C
-* 38806100 3CA08090
-* 60A53F4C 7CA903A6
-* 4E800420 80770044
-* 38800000 9083005C
-* E3E101F8 00000000
+########################################################################
+Nana automatic throw enabler(auto throw routine 6100) [Bero, fix by Eon]
+########################################################################
+HOOK @ $80904958
+{
+loc_0x0:
+  lbz r3, 0x1BA(r30)
+  cmpwi r3, 0xA
+  bne- notCatchWait #if not catchWait
+  lwz r3, 0x44(r23)
+  lhz r4, 0x78(r3)
+  cmpwi r4, 0x6100 #if md = 6100 
+  beq- loc_0x38
+  li r3, 0x0
+  stw r3, 0x0(r24)
+  stw r3, 0x4(r24)
+  stw r3, 0x8(r1)
+  stw r3, 0xD0(r1)
+  stw r3, 0xD4(r1)
+  b loc_0x44
+
+loc_0x38:
+  lwz r4, 0x5C(r3)
+  cmpwi r4, 0x0
+  bne- notThrow
+
+loc_0x44:
+#act_change to 0x6100
+  lwz r3, 0x44(r23)
+  li r5, 0x1
+  stw r5, 0x5C(r3)
+  li r4, 0x6100
+
+  lis r5, -1            #\ initialise this variable that PMDT never did
+  stb r5, 0x24(r1)      #/
+
+  lis r12, 0x8090
+  ori r12, r12, 0x3F4C
+  mtctr r12
+  bctr 
+
+#exit
+notCatchWait:
+notThrow:
+  lwz r3, 0x44(r23)
+  li r4, 0x0
+  stw r4, 0x5C(r3)
+  psq_l f31, 504(r1), 0, 0
+
+}
 
 Custom AI Function Loader [Magus]
 * C291E108 0000002A

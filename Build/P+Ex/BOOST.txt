@@ -35,6 +35,7 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/Project+/InputSystem.asm
 .include Source/Project+/Moonwalk.asm
 .include Source/Project+/AirDodge.asm
+.include Source/Project+/Items.asm
 
 .include source/P+Ex/AllStar.asm
 .include source/P+Ex/Angle.asm

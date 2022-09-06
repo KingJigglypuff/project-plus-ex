@@ -558,9 +558,10 @@ Swim Jump uses JumpSquat instead of JumpF [camelot]
 ###################################################
 int 0x14 @ $80FBC518
 
+######################################
 Shield Endlag is now 15 frames [Shanus]
-* 06FB0FFC 00000008
-* 00000000 0000000F
+######################################
+int[2] 0, 15 @ $80FB0FFC	# Edit second hex to change amount of endlag
 
 DACUS Window Is 2 Frames v2 [standardtoaster]
 * 06FB23B4 00000008

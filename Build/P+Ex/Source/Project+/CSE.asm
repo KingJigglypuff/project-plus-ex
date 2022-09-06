@@ -37,8 +37,6 @@
 #	set for all song IDs that utilize them!
 ####################################################################################################
 [Project+] Custom Sound Engine v4.2 [Dantarion, PyotrLuzhin, DukeItOut]
-# 
-# Allows song IDs from 0xF000 through 0xFFFF to be loaded from IDs EX_000.brstm through EX_FFF.brstm 
 ####################################################################################################
 .alias exMusicRange_Lo = 0xF000 # lowest custom music ID possible 
 .alias exMusicRange_Hi = 0xFFFF # highest custom music ID possible

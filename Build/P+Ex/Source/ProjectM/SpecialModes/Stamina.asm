@@ -76,9 +76,7 @@ co:
 	addi r1, r1, 0x30 
 	li r30,0xBD 			#set current player action to death
 end:
-	cmpwi r25,0x14
-	bne ssdfc 				#branches to skip stamina dead flags clear if not beginning or end of match
-	stw r7,0(r12) 			#clears stamina dead flags for all players
+
 ssdfc:
 	stw r30,52(r29) 		#original instruction at hooked address
 }
@@ -88,11 +86,11 @@ HOOK @ $800E14A4
   stwu r1, -32(r1)
   lis r12, 0x9018
   lbz r12, -3208(r12);  cmpwi r12, 0x2;  bne- %END%
-  lis r0, 0x8120;       cmpwi r4, 0x0;  bne- %END%
-                        cmplw r30, r0;  blt- %END%
-  lbz r11, 2(r30);      mulli r11, r11, 0x5C
-  lis r12, 0x9018;      ori r12, r12, 0xC1C
-  lhzx r4, r12, r11 
+  lis r0, 0x8120;  		cmplw r21, r0;  bgt- %END%
+						cmplw r30, r0;  blt- %END%
+  lbz r11, 2(r30);  	mulli r11, r11, 0x5C
+  lis r12, 0x9018;  	ori r12, r12, 0xC1C
+  lhzx r4, r12, r11
 
 }
 HOOK @ $80816108
@@ -103,38 +101,9 @@ HOOK @ $80816108
 loc_0x1C:
   	subic. r21, r3, 1
 }
-HOOK @ $80816588
-{
-  cmpwi r20, 0x0
-  beq %end%
 
-loc_0x18:
-  addi r5, r5, 0x1
+op b 0x80 @ $8083BBA0 #disable stamina death from double counting death (replaces three branches involving r20)
 
-}
-
-HOOK @ $80816088
-{
-  cmpwi r20, 0x0
-  beq- %end%
-
-loc_0x18:
-  addi r4, r4, 0x1
-}
-
-HOOK @ $80816794
-{
-loc_0x0:
-  mr r0, r3
-  cmpwi r20, 0x0
-  beq- loc_0x20
-
-loc_0x1C:
-  addi r0, r3, 0x1
-
-loc_0x20:
-
-}
 
 
 

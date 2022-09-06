@@ -15,7 +15,7 @@ op stb r0, -0x1(r5) @ $8003CB1C
 op NOP				@ $8003CB28
 
 ##############################################################################################
-File Patch Code REDUX v0.90 (/Project+) [Sammi Husky]
+File Patch Code REDUX v0.95 (/P+Ex/./.) [Sammi Husky]
 ##############################################################################################
 .alias _pf               = 0x80507b70
 .alias FPC_PATH          = 0x805a7c00
@@ -77,7 +77,7 @@ File Patch Code REDUX v0.90 (/Project+) [Sammi Husky]
 .RESET
 * 225664EC 00000000 # only execute if value at 0x805664EC != 0x0 (sd mounted)
 
-string    "/P+EX/././"                          @ $80406920 # Sets path used for SD lookups / reads
+string    "/P+Ex/././"                          @ $80406920 # Sets path used for SD lookups / reads
 string    "pf"                                  @ $80507b70
 string    "SDStreamOpen (slot:%d): %s"          @ $80507b80
 uint8_t   0xA                                   @ $80507b9a
@@ -497,8 +497,23 @@ end:
 #                THPOpen Routine                         
 ################################################################
 op  bl 0x52B9F4 @ $8007be0c    # THPPlayerOpen
-op  nop         @ $8007ed5c    # mvMoviePlayer::loadLastFrameInfo
-op  nop         @ $8007ee60    # mvMoviePlayer::loadLastFrame
+
+.macro lastFrameOpenPatch()
+{
+    %lwi    (r5, STREAM_FILES)
+    lwz     r0, 0x0(r5)
+    cmpwi   r0, 0
+    bne     %END%
+    %call   (DVDOpen)
+}
+HOOK @ $8007ed5c        # mvMoviePlayer::loadLastFrameInfo
+{
+    %lastFrameOpenPatch()
+}
+HOOK @ $8007ee60        # mvMoviePlayer::loadLastFrame
+{
+    %lastFrameOpenPatch()
+}
 CODE @ $805A7800
 {
 _sdopen:
@@ -533,8 +548,23 @@ op  bl 0x52B964   @ $8007c19c   # THPPlayerClose
 op  bl 0x52BBF4   @ $8007bf0c   # THPPlayerOpenProc
 op  bl 0x52BAAC   @ $8007c054   # THPPlayerOpenProc
 op  bl 0x528F68   @ $8007eb98   # mvMoviePlayer::__dt
-op  nop           @ $8007ee08   # mvMoviePlayer::closeLastFrameInfo
-op  nop           @ $8007ef28   # mvMoviePlayer::closeLastFrame
+
+.macro lastFrameClosePatch()
+{
+    %lwi    (r5, STREAM_FILES)
+    lwz     r0, 0x0(r5)
+    cmpwi   r0, 0
+    bne     %END%
+    %call   (DVDClose)
+}
+HOOK @ $8007ee08        # mvMoviePlayer::closeLastFrameInfo
+{
+    %lastFrameClosePatch()
+}
+HOOK @ $8007ef28        # mvMoviePlayer::closeLastFrame
+{
+    %lastFrameClosePatch()
+}
 CODE @ $805A7B00
 {
 _start:

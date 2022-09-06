@@ -61,13 +61,11 @@ loc_0x1C:
   fmuls f2, f27, f2
 }
 
-Stale Move Queue Ratios Modifier [spunit262]
-* 06FC0988 00000028
-* 00000000 3DB851EC
-* 3DA3D70A 3D8F5C29
-* 3D75C28F 3D4CCCCD
-* 3D23D70A 3CF5C28F
-* 3CA3D70A 3C23D70A
+#####################################
+Stale Move Ratio Modifier [spunit262]
+#####################################
+float[10] 0.0, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01 @ $80FC0988
+#First one is a Freshness bonus. Starting from second float, the queue starts. Damage - (Damage * (Total Queue floats))
 
 ######################################################
 Store Hitbox Damage into Variables On Hit v1.2 [Magus]

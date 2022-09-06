@@ -1,9 +1,9 @@
 #####################################################################################
-[Project+] Independent Button Presses v2 [Magus] (with 2 frame ZSync Extension [Eon])
+[Project+] Independent Button Presses v2 [Magus] (with 2 frame ZSync Extension [Eon]) (ICs ZSync Replay Fix [Eon])
 #####################################################################################
 HOOK @ $80048F64
 {
-	cmpwi r12, 0x2329;	beqlr-;	lbz r5, 8(r5
+	cmpwi r12, 0x2329;	beqlr-;	lbz r5, 8(r5)
 }
 HOOK @ $80049DB4
 {
@@ -18,11 +18,9 @@ HOOK @ $8004A19C
 }
 HOOK @ $80764F14
 {
- lwz r10, 8(r28)
-  cmpwi r10, 0x0;  blt- loc_0x108
-  cmpwi r10, 0x8;  bge- loc_0x108
   stwu r1, -0x28(r1)
   stmw r24, 8(r1)
+  
   lwz r31, -4(r30)
   lwz r26, 8(r31)
   lwz r27, 0x110(r26)
@@ -41,6 +39,11 @@ loc_0x3C:
   addi r5, r2, 0x14
   addi r6, r2, 0x54
   mulli r25, r4, 0x1C4
+  
+  lwz r10, 8(r28)
+  cmpwi r10, 0x0;  blt- updateInputHistory
+  cmpwi r10, 0x8;  bge- updateInputHistory
+
   mulli r10, r10, 0x40
   add r9, r9, r10
 
@@ -65,9 +68,25 @@ loc_0x84:
   lwz r9, 0x48(r30)
   andc r8, r9, r10
   stw r8, 0x48(r30)
+updateInputHistory:
+
   cmpwi r27, 0xF;  bne+ loc_0x100
+#only Update past if ICs apparently
   lis r9, 0x8062;  ori r9, r9, 0x13D4
   add r9, r9, r25
+
+
+  #go into input list found at 
+  lwz r8, 0x40(r9)
+  subi r8, r8, 1
+  cmpwi r8, 0x0;  bge 0x8
+  li r8, 0xF
+  mulli r8, r8, 0x4
+  lwzx r7, r9, r8 #getPrevFrame in queue
+  
+  lwz r8, 0x48(r30) #current calced prevFrame
+  andc r10, r7, r8
+
   lwz r8, 0x40(r9)
   li r25, 3 			#number of frames to retroactively change (caps at 16 coz only 16 frames are remembered)
 DecrementInputCounter: 	#defines how many frames are available to Zsync, 1 makes it match vanilla
@@ -97,30 +116,29 @@ loc_0x108:
 
 }
 
+
 #####################################################################################
 Gamecube Controller Light LR Button Presses when not Set to Shield [Dantarion, Magus]
 #####################################################################################
 HOOK @ $80029700
 {
-  stb r0, 0x34(r31)
-  cmpwi r0, 0x2D;  blt- %END%
-  lbz r0, -0x26B0(r6)
-  cmpwi r0, 0x3;   beq- %END%
-  lwz r0, 0(r31)
-  ori r0, r0, 0x40	# L-button
-  stw r0, 0(r31)
-  stw r0, 4(r31)
+  stb r0, 0x34(r31)									# Analog L (0-255), original operation
+  cmpwi r0, 45;  blt- %END%							# If held less than 17.6% down (45/255)
+  lbz r0, -0x26B0(r6);  cmpwi r0, 0x3;   beq- %END%	# If set to Shield
+  lwz r0, 0(r31)	# \
+  ori r0, r0, 0x40	# | L-button
+  stw r0, 0(r31)	# |
+  stw r0, 4(r31)	# /
 }
 HOOK @ $80029708
 {
-  stb r0, 0x35(r31)
-  cmpwi r0, 0x2D;  blt- %END%
-  lbz r0, -0x26AF(r6)
-  cmpwi r0, 0x3;   beq- %END%
-  lwz r0, 0(r31)
-  ori r0, r0, 0x20	# R-button
-  stw r0, 0(r31)
-  stw r0, 4(r31)
+  stb r0, 0x35(r31)									# Analog R (0-255), original operation
+  cmpwi r0, 45;  blt- %END%							# If held less than 17.6% down (45/255)
+  lbz r0, -0x26AF(r6);  cmpwi r0, 0x3;   beq- %END%	# If set to Shield
+  lwz r0, 0(r31)	# \
+  ori r0, r0, 0x20	# | R-button
+  stw r0, 0(r31)	# |
+  stw r0, 4(r31)	# /
 }
 
 #########################################################################
@@ -128,29 +146,29 @@ Classic Controller Light LR Button Presses when not Set to Shield [Magus]
 #########################################################################
 HOOK @ $80029E30
 {
-  stb r0, 0x34(r18)
-  cmpwi r0, 0x39;  blt- %END%
-  subi r11, r17, 0x393C
-  mulli r0, r19, 0x21
-  lbzx r0, r11, r0
-  cmpwi r0, 0x3;   beq- %END%
-  lwz r0, 0(r18)
-  ori r0, r0, 0x40	# L-button
-  stw r0, 0(r18)
-  stw r0, 4(r18)
+  stb r0, 0x34(r18)					# Analog L (0-255), original operation
+  cmpwi r0, 57;  blt- %END%			# If held less than 22.3% down (57/255)
+  subi r11, r17, 0x393C				# \
+  mulli r0, r19, 0x21				# | Get relevant port
+  lbzx r0, r11, r0					# /
+  cmpwi r0, 0x3;   beq- %END%		# If set to Shield
+  lwz r0, 0(r18)	# \
+  ori r0, r0, 0x40	# | L-button
+  stw r0, 0(r18)	# |
+  stw r0, 4(r18)	# /
 }
 HOOK @ $80029E48
 {
-  stb r0, 53(r18)
-  cmpwi r0, 0x39;  blt- %END%
-  subi r11, r17, 0x393B
-  mulli r0, r19, 0x21
-  lbzx r0, r11, r0
-  cmpwi r0, 0x3;   beq- %END%
-  lwz r0, 0(r18)
-  ori r0, r0, 0x20; # R-button
-  stw r0, 0(r18)
-  stw r0, 4(r18)
+  stb r0, 0x35(r18)					# Analog R (0-255), original operation
+  cmpwi r0, 57;  blt- %END%			# If held less than 22.3% down (57/255)
+  subi r11, r17, 0x393B				# \
+  mulli r0, r19, 0x21				# | Get relevant port
+  lbzx r0, r11, r0  				# /
+  cmpwi r0, 0x3;   beq- %END%		# If set to Shield
+  lwz r0, 0(r18)	# \
+  ori r0, r0, 0x20  # | R-button
+  stw r0, 0(r18)	# |
+  stw r0, 4(r18)	# /
 
 }
 
@@ -399,7 +417,7 @@ Up-B, Any Taunt, and Tap Jump Button Timers (tap-jump window fixed 0.715 -> 0.7)
 HOOK @ $80765380
 {
                        cmpwi r7, 0x2;    bne+ loc_0x60
-  lbz r10, 0x8A(r30);  cmplwi r10, 254;  bge- loc_0x1C
+  lbz r10, 0x8A(r30);  cmplwi r10, 0xFE; bge- loc_0x1C
   addi r10, r10, 0x1
   stb r10, 0x8A(r30)
 

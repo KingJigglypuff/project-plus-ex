@@ -320,6 +320,22 @@ Mushroomy Kingdom's slot only loads one tracklist [DukeItOut]
 #############################################################
 op b 0x174	@ $8117DF88
 
+###################################################
+Salty Runback Expansion Stage Music Fix [DukeItOut]
+###################################################
+# Fixes Salty Runback music not working 
+# appropriately with expansion stages due to 
+# higher values not being checked for music
+###################################################
+op NOP @ $8010F9C0
+
+################################################
+#Salty Runback Always Shuffles Music [DukeItOut]
+# 
+# Disabled on purpose, but left here for builds that want to make it shuffle.
+#
+#op b 0x68 @ $8010F9A8
+
 ##################################################################################
 Hanenbow can display song titles, but stage builder stages can't [JOJI, DukeItOut]
 ##################################################################################
@@ -408,16 +424,16 @@ HOOK @ $8117E5C0
 }
 
 ##########################################################################################################
-MyMusic loads from 8053F200 instead of 81521F18 [Desi]
+MyMusic loads from 8053F200 instead of 81521F18 V1.1 [Desi, DukeItOut]
 #
 #The goal of each of these hook points is to make MyMusic read Song IDs from 8053F200 instead of 81521F18. 
 #By doing this, 8117E180 can be NOP and not overwrite the Song Count at 81521F54.
+#
+#1.1: Fixed issue where altering the My Music menu too extensively would break compatibility with this code
 ##########################################################################################################
 HOOK @ $8117E7B8
 {
-	lis r5, 0x8152
-	ori r5, r5, 0x1880
-	sub r3, r3, r5
+	sub r3, r3, r28
 	mulli r3, r3, 0x4
 	lis r5, 0x8053
 	ori r5, r5, 0xF20C
@@ -427,9 +443,7 @@ HOOK @ $8117E7B8
 
 HOOK @ $8117f0E0
 {
-	lis r29, 0x8152
-	ori r29, r29, 0x1880
-	subf r29, r28, r6
+	sub r29, r6, r28
 	mulli r29, r29, 0x4
 	lis r6, 0x8053
 	ori r6, r6, 0xF20C

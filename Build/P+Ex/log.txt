@@ -1,4 +1,6 @@
 AXNextFrame -> VBI Hook Switch After Strap Screen v1.1 [Magus, Sammi-Husky]
+Source/P+Ex/BootToCSS.asm
+	Boot Directly to CSS v5.1  (Hold Shield for training) [PyotrLuzhin, SammiHusky]
 Reset multipac stage lock status between Classic & All-Star matches [wiiztec]
 Stock/Frame Control not disabled in 300% Mode 1.1 [wiiztec]
 Special Mode flags clear [wiiztec]
@@ -36,13 +38,12 @@ Effect.pac Roster Expansion System (RSBE.Ver) V2 (Costume-Specific Etc File Supp
 [Project+] Turbo item does not fire curry shots in any mode [DukeItOut]
 [Project+] Stickers do not randomly drop [DukeItOut]
 [Project+] Item Frequency None if all items turned off and Items spoofed off if item frequency None  [Eon]
-[Project+] Disable Smash Balls during Classic's Team <Character> Battles [DukeItOut]
 Subspace uses same Internal Constants as Versus [Eon]
 Preloaded Texture memory leak band-aid [Eon]
 [Project+] Pitfall effect can have no-bury with trip rate 2.0 [Eon]
 Ground Below on IC-Basic[20027] [Eon]
 Source/ProjectM/ButtonPresses.asm
-	[Project+] Independent Button Presses v2 [Magus] (with 2 frame ZSync Extension [Eon])
+	[Project+] Independent Button Presses v2 [Magus] (with 2 frame ZSync Extension [Eon]) (ICs ZSync Replay Fix [Eon])
 	Gamecube Controller Light LR Button Presses when not Set to Shield [Dantarion, Magus]
 	Classic Controller Light LR Button Presses when not Set to Shield [Magus]
 	Analog C-Stick, L R, & Light-Shield Button Stored as Variables v2.3 [Magus, DukeItOut]
@@ -79,7 +80,7 @@ Source/ProjectM/CloneEngine.asm
 Source/ProjectM/CustomAI.asm
 	CPU DI fix [Bero]
 	CPUs Don't Ignore Other CPUs to Target Humans [Magus]
-	Nana automatic throw enabler(auto throw routine 6100) [Bero]
+	Nana automatic throw enabler(auto throw routine 6100) [Bero, fix by Eon]
 	Custom AI Function Loader [Magus]
 	Custom AI Functions [Magus]
 	Custom AI Requirement Loader[Bero]
@@ -121,13 +122,16 @@ Source/ProjectM/SpecialModes/Stamina.asm
 	[Legacy TE] New DBZ Lite with camera stabilization 2.0 [wiiztec] [wiiztec,Yohan1044] (write non-zero value to 9018F387 to toggle off)
 	Throws Don't Cut Early for Victim Damage in Stamina [codes, DukeItOut]
 Source/ProjectM/SpecialModes/Turbo.asm
-	Turbo Mode - On Hit Interrupts v1.2 [Magus, Dantarion, standardtoaster, DukeItOut]
+	Turbo Mode - On Hit Interrupts v2.3 [Magus, Dantarion, standardtoaster, DukeItOut]
 	Turbo Mode - Turbo Cleared in Normal Allow Interrupt [Magus]
+	Turbo Mode - Dash Cancel Range in Dodge Animations [DukeItOut]
 	Turbo Mode - Repeat Action Change v1.2 [Magus]
 	Turbo Mode - Disable Curry Wait and Run [Magus]
 	Turbo Mode - Curry Special Brawl Uses Curry Aura [Magus]
 	Turbo Mode - Curry Special Brawl Doesn't Exclude Nana [Magus]
 	Super Spicy Curry has no SFX [standardtoaster]
+	The Turbo item is not delicious [DukeItOut]
+	Turbo Boost makes Power Up Noise on Acquisition [DukeItOut]
 Source/ProjectM/SpecialModes/Wild.asm
 	[Project+]Slow Brawl -> Wild Brawl [DukeItOut]
 Source/ProjectM/SpecialModes/Zero2Death.asm
@@ -150,11 +154,12 @@ Source/Project+/Boss.asm
 Source/Project+/CodeMenu.asm
 Source/Project+/CompressPAC.asm
 	Costume PAC files can be compressed V2 [DukeItOut]
-	Costume decompression possible during boss battles [DukeItOut]
-	SSE P2 Always Uses The First Costume V1.1 [DukeItOut]
+	Character Costumes are decompressed in the Network Heap [Kapedani, DukeItOut]
+	Bowser and Giga Bowser Can Be Compressed [DukeItOut]
+	Only New Characters Need a Spy Costume Added [DukeItOut]
 Source/Project+/FilePatchCode.asm
 	Remove "RSBX" from SD Path
-	File Patch Code REDUX v0.90 (/Project+) [Sammi Husky]
+	File Patch Code REDUX v0.95 (/P+Ex/./.) [Sammi Husky]
 	[Project+] RSBE v1.30 (/Project+/pf/sfx, can load soundbank clones for stages) (requires CSSLE) [InternetExplorer, DukeItOut]
 	SDHC Extension 1.1[Bero]
 Source/Project+/IndependentSub.asm
@@ -196,7 +201,7 @@ Disable Vertical Boost on Tumble KB [Dantarion, Magus]
 Reset Variables on Action Changes & RCO Lag Fix v2 [standardtoaster, ds22, Magus, DukeItOut, Eon]
 Tether Limit is 1 for Zair and 2 for others V1.2 [standardtoaster]
 Melee 361 Angle [Magus]
-Base Tripping Rate on Action 43 is 0 [Magus]
+Only Trip Rate 1.0 Can Trip Foes [DukeItOut]
 Weight Independent Knockback and Forced Tumble on Throws [Magus]
 [Project+] Can Grab Characters Slightly Behind [DukeItOut]
 Shield Break Minimum Disabled Time Fix [Magus]
@@ -227,7 +232,6 @@ Triple Jump Glitch Fix [Phantom Wings, spunit262]
 [Project+] Disable Screen-KOs in teams [ds22, Eon]
 [Project+] Melee Tech Rolls [Fracture]
 [Project+] Player Can Drift if Hitstun Ends Prematurely [Eon]
-On the Fly Attribute Modification (Item Crash Fix) [codes, Mawootad]
 [Project+] Customizable Attacker Hitlag Modifier [DukeItOut]
 Defender Electric Hitlag disabled by 2.0x trip chance [Eon]
 Knockback during Timer Slo-mo is also slowed down v2.0 [Eon]
@@ -247,7 +251,7 @@ changeMaterialTex returns if getResTex returned a null pointer [Eon]
 Source/ProjectM/Damage.asm
 	[Project M] Half Damage from Outside Sources While Grabbed v1.2 [Magus]
 	Stale Moves Stale Damage Output but not KBG v3.1 [Magus]
-	Stale Move Queue Ratios Modifier [spunit262]
+	Stale Move Ratio Modifier [spunit262]
 	Store Hitbox Damage into Variables On Hit v1.2 [Magus]
 	Store Damage Absorbed into Variable [Magus]
 Source/ProjectM/DirectionalInfluence.asm
@@ -374,7 +378,7 @@ Source/Project+/ResultsMusic.asm
 	Classic and All-Star Results Music Table [DukeItOut]
 Source/Project+/SFXExpand.asm
 	SFX and Music Setting Customizer [DukeItOut]
-	[Project+] SoundBank Expansion System (RSBE.Ver) (Kirby-cide fix + Voice clips volume fix + CSS Hiccup Fix + Mr. Resetti fix) v1.2 [codes, DukeItOut, JOJI]
+	[Project+] SoundBank Expansion System (RSBE.Ver) v2.0 [codes, DukeItOut, JOJI]
 	Hitbox Sound Effect Change System v2.1 [Eon]
 	[Project+] Sawnd Pop Fix V2 [DukeItOut]
 	[Project+] Expansion sawnd characters are mute while metal [DukeItOut]
@@ -410,6 +414,8 @@ Snake's U-Smash can Have Horizontal Velocity [Magus]
 [Project+] All-Star allows Giga Bowser to the next stage [DukeItOut]
 Alloys Can Shield, Dodge & Grab Ledges [ds22]
 PSA command 11210100 sets next GFX anim index [Eon]
+Source/Project+/Attributes.asm
+	On the Fly Attribute Modification (Item Crash Fix) [codes, Mawootad, DukeItOut]
 Source/Project+/PokeTrainer.asm
 	[Project+] Solo Pokemon Trainer Pokemon (other PT Pokemon recognize independence) [DukeItOut, Eon]
 	Independent Pokemon for Subspace [Eon]

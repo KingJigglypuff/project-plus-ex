@@ -1,3 +1,27 @@
+New to P+ 2.3:
+
+################################
+ItmCommonGen.pac
+
+Group 4: Food Spawn Range (0x7D1) for Party Ball 7-to-5 -> 13-to-10 
+
+ItmBombheiParam.pac
+
+Subaction 7 - SFX:
+	<cleared out>				# Moved to Action A to not replay when turning around
+Action 8:
+	Frame Speed Modifier: 3.0	# Ledge/Wall turn animation speed
+Action A:
+	If Roll A Die: 2			# \
+		Reverse Direction		# |
+		Posture 04				# | 50% chance of moving left instead of 100% chance of moving right
+		Character Specific 01	# /
+	End If:		
+	Sound Effect: 0x1FA5		# Sound effect for starting to move
+
+
+################################
+
 New to P+ 2.2:
 
 ################################

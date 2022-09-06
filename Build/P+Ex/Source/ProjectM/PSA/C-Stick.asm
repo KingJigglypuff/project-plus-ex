@@ -301,7 +301,7 @@ CODE @ $80546A98
 	word 6; word 0x4F
 	word 6; word 7
 	word 5; LA_Float 35
-	wprd 0; word 4
+	word 0; word 4
 	word 1; scalar 0.6
 	word 6; word 0x80000030 # NOT 0x30
 	word 0; word 2
@@ -359,7 +359,7 @@ CODE @ $80FAD864
 {
 	word 0x00070100; word C_Stick_Off2+0x50
 }
-* 02FAD86C 001F0002
+* 02FAD86C 001F0002 # This really shouldn't work, but the game's script format is robust enough to discard the error.
 
 #######################################
 C-Stick Buffer Jump U-Smash Fix [Magus]
