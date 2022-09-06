@@ -1,1 +1,1 @@
-Download and install this: https://aka.ms/vs/16/release/vc_redist.x64.exe
+Download and install these: https://aka.ms/vs/16/release/vc_redist.x64.exe and https://aka.ms/vs/16/release/vc_redist.x86.exe
