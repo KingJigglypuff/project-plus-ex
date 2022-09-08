@@ -290,7 +290,7 @@ PULSE
 * 38000000 F7FF0800 # if heldInput && 0x800 = 0x800
 * 38000020 FFFE0001 #   if pressedInput && 0x1 = 0x1
 * 86410007 00000001 #     gr7 = gr7 ^ 0x1
-* E2000003 00000000 # endif
+* E2000004 00000000 # endif
                     #endif
 #endofLoop
 * 80100004 00000008 #gr4 += 0x8

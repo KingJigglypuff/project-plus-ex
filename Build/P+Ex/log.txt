@@ -66,6 +66,7 @@ Source/ProjectM/CloneEngine.asm
 	Jigglypuff Clone Rollout Max Charge GFX Fix [Codes, DesiacX]
 	Jigglypuff Clone Rollout SFX Fix [codes, DesiacX]
 	Dedede Clones Fix [MarioDox]
+	Bowser Clone Fire Breath Bone Fix [KingJigglypuff]
 	source/P+Ex/KirbyHatEx.asm
 		[Project+] Kirby CE Hat Prop Fix [ds22]
 		Weapon Data Fix Automatic [ds22, Desi]
@@ -378,7 +379,7 @@ Source/Project+/ResultsMusic.asm
 	Classic and All-Star Results Music Table [DukeItOut]
 Source/Project+/SFXExpand.asm
 	SFX and Music Setting Customizer [DukeItOut]
-	[Project+] SoundBank Expansion System (RSBE.Ver) v2.0 [codes, DukeItOut, JOJI]
+	[Project+] SoundBank Expansion System (RSBE.Ver) (Kirby-cide fix + Voice clips volume fix + CSS Hiccup Fix + Mr. Resetti fix) v1.2 [codes, DukeItOut, JOJI]
 	Hitbox Sound Effect Change System v2.1 [Eon]
 	[Project+] Sawnd Pop Fix V2 [DukeItOut]
 	[Project+] Expansion sawnd characters are mute while metal [DukeItOut]

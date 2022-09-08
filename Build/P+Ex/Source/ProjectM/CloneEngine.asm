@@ -665,6 +665,25 @@ HOOK @ $80890050
   %DededeFix(0x20) //Dedede
 }
 
+##################################################
+Bowser Clone Fire Breath Bone Fix [KingJigglypuff]
+##################################################
+.macro BoneIDFix(<FighterID>, <BoneID>)
+{
+    cmpwi r28, <FighterID>
+    bne- 0x0C
+    li r5, <BoneID>
+    b %END%
+}
+HOOK @ $80A391F8        #Use Register 28, followed by Fighter ID and Bone ID
+{
+    %BoneIDFix(0x69, 0x21)        #Charizard Clone Test
+    li r5, 0x33                   #If not defined, use Bowser
+}
+* 06A391FC 0000000C
+* 809B00d8 38610008
+* 38C10020 00000000
+
 .include source/P+Ex/KirbyHatEx.asm
 
 ###############################################################################################

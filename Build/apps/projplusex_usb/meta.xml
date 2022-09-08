@@ -3,10 +3,10 @@
 	<name>Project+Ex USB Loader</name>
 	<version>1</version>		\\Configurable SD/USB Loader v70r78.11 by oggzee, usptactical, gannon, Dr. Clipper, R2-D2199, FIX94, airline38, Howard, NiTRo THe DeMoN
 	<release_date>20220831</release_date>
-	<coder>Project+ Dev Team</coder>	\\Kirbeast, waffeln, Bird
-	<short_description>Project+ USB Loader</short_description>
+	<coder>Project+Ex Dev Team</coder>	\\Kirbeast, waffeln, Bird
+	<short_description>Project+Ex USB Loader</short_description>
 <long_description>
-Project + v2.3. All changes are not final.
+Project+Ex v1.25.1. All changes are not final.
 
 This is a modified version of CFG USB Loader designed for instantly loading Project+Ex via USB.
 </long_description>
