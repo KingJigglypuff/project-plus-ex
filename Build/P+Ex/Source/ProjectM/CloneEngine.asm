@@ -184,65 +184,68 @@ Lyn Fixes [ds22]
 * 04853A8C 40800014
 * 04853B24 40800014
 
-###################################
-Samus Clone Charge Shot setup [Eon]
-###################################
+#####################################################
+Samus Clone Charge Shot GFX Fix [Eon, KingJigglypuff]
+#####################################################
+.macro GFXFix(<FighterID>, <Effect.pacID>)
+{
+    cmpwi r3, <FighterID>
+    bne 0x0C
+    lis r4, <Effect.pacID>
+    b end
+}
 op cmpwi r3, 5 @ $80A0AA5C
 op beq 0x78 @ $80A0AA60
-#Samus clone gfx pac id changing
 HOOK @ $80A0AAA8
 {
-#get Char ID
-  lwz r3, 0xD8(r31)
-  lwz r3, 0x64(r3)
-  lis r4, 0x1000
-  addi r4, r4, 7
-  lwz r12, 0x0(r3)
-  lwz r12, 0x18(r12)
-  mtctr r12
-  bctrl 
-samusClones:
-  cmpwi r3, -1 #if char id = -1
-  bne 0xC
-  lis r4, 0xFFF #effect pac = 0xFFF
-  b end
-samusDefault:
-  lis r4, 0x0004
-
+	lwz r3, 0xD8(r31)			#\
+	lwz r3, 0x64(r3)			#|
+	lis r4, 0x1000				#|
+	addi r4, r4, 7				#| This entire sequence grabs the Fighter ID.
+	lwz r12, 0x0(r3)			#|
+	lwz r12, 0x18(r12)			#|
+	mtctr r12					#|
+	bctrl 						#/
+FighterIDCheck:
+    %GFXFix(0x69, 0x169)		#Samus Clone Test, ef_custom32
+    lis r4, 0x04				#If not defined, use ef_samus
 end:
-  lwz r12, 0x0(r30)
+	lwz r12, 0x0(r30)
 }
-#kirby samus hat clone gfx pac id changing
+
+##########################################################################
+Kirby Samus Clone Charge Shot GFX Fix [ds22, DesiacX, Eon, KingJigglypuff]
+##########################################################################
+.macro GFXFix(<FighterID>,<Effect.pacID>)
+{
+    cmpwi r3, <FighterID>
+    bne 0xC
+    lis r4, <Effect.pacID>
+    b end
+}
 HOOK @ $80A0AB1C
 {
-#get link parent[3] (aka shooter)
-  lwz r3, 0xD8(r31)
-  lwz r3, 0x54(r3)
-  li r4, 3
-  lwz r12, 0x0(r3)
-  lwz r12, 0x34(r12)
-  mtctr r12
-  bctrl 
-#get Kirby LA-Basic[72] (hat id)
-  lwz r3, 0x60(r3)
-  lwz r3, 0xD8(r3)
-  lwz r3, 0x64(r3)
-  lis r4, 0x1000
-  addi r4, r4, 72
-  lwz r12, 0x0(r3)
-  lwz r12, 0x18(r12)
-  mtctr r12
-  bctrl 
-samusClones:
-  cmpwi r3, 64 #if char id = -1
-  bne 0xC
-  lis r4, 0x95 #effect pac = 0xFFF
-  b end
-samusDefault:
-  lis r4, 0x0108
-
+	lwz r3, 0xD8(r31)				#\
+	lwz r3, 0x54(r3)				#|
+	li r4, 3						#|
+	lwz r12, 0x0(r3)				#| Get Link Parent[3] (IE: Who owns the projectile)
+	lwz r12, 0x34(r12)				#|
+	mtctr r12						#|
+	bctrl 							#/
+	lwz r3, 0x60(r3)				#\
+	lwz r3, 0xD8(r3)				#|
+	lwz r3, 0x64(r3)				#|
+	lis r4, 0x1000					#|
+	addi r4, r4, 72					#| Get Kirby's LA-Basic[72] (Hat ID)
+	lwz r12, 0x0(r3)				#|
+	lwz r12, 0x18(r12)				#|
+	mtctr r12						#|
+	bctrl 							#/
+HatIDCheck:
+    %GFXFix(0x40, 0x95)				#Dark Samus, ef_tautau
+    lis r4, 0x108					#If not defined, use ef_KbSamus
 end:
-  lwz r12, 0x0(r30)
+	lwz r12, 0x0(r30)
 }
 
 ##################################################
@@ -677,7 +680,7 @@ Bowser Clone Fire Breath Bone Fix [KingJigglypuff]
 }
 HOOK @ $80A391F8        #Use Register 28, followed by Fighter ID and Bone ID
 {
-    %BoneIDFix(0x69, 0x21)        #Charizard Clone Test
+    %BoneIDFix(0x69, 0x21)        #Bowser Clone Test
     li r5, 0x33                   #If not defined, use Bowser
 }
 * 06A391FC 0000000C

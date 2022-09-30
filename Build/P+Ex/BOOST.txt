@@ -37,23 +37,23 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/Project+/AirDodge.asm
 .include Source/Project+/Items.asm
 
-.include source/P+Ex/AllStar.asm
-.include source/P+Ex/Angle.asm
-.include source/P+Ex/CustomEnding.asm
-.include source/P+Ex/Maths.asm
-.include source/P+Ex/Misc.asm
-.include source/P+Ex/PlatformIgnore.asm
-.include source/P+Ex/PointerWizardry.asm
-.include source/P+Ex/PSA.asm
-.include source/P+Ex/SoundbankFix.asm
-.include source/P+Ex/Subspace.asm
-.include source/P+Ex/VariableParameter.asm
-.include source/P+Ex/BigHeadMode.asm
-.include source/P+Ex/InputBuffer.asm
-.include source/P+Ex/RandomAngleMode.asm
-.include source/P+Ex/ScaleModifier.asm
-.include source/P+Ex/SpeedModifier.asm
-.include source/P+Ex/WarMode.asm
+.include Source/P+Ex/AllStar.asm
+.include Source/P+Ex/Angle.asm
+.include Source/P+Ex/CustomEnding.asm
+.include Source/P+Ex/Maths.asm
+.include Source/P+Ex/Misc.asm
+.include Source/P+Ex/PlatformIgnore.asm
+.include Source/P+Ex/PointerWizardry.asm
+.include Source/P+Ex/PSA.asm
+.include Source/P+Ex/SoundbankFix.asm
+.include Source/P+Ex/Subspace.asm
+.include Source/P+Ex/VariableParameter.asm
+.include Source/P+Ex/BigHeadMode.asm
+.include Source/P+Ex/InputBuffer.asm
+.include Source/P+Ex/RandomAngleMode.asm
+.include Source/P+Ex/ScaleModifier.asm
+.include Source/P+Ex/SpeedModifier.asm
+.include Source/P+Ex/WarMode.asm
 
 .include Source/Extras/Console.asm	# Only use this on a Wii or Wii U! The codes in this are necessary for the slower specifications of the actual console.
 #.include Source/Extras/Netplay.asm	# Only use this in Dolphin! The codes in this will result in bad behavior on the Wii!

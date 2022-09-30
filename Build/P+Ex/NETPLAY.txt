@@ -2341,74 +2341,74 @@ skip:
   	li r29, 0x0
 }
 
-##########################################################
-[Legacy TE] Melee Random v2 (CSS Expansion) [Sammi Husky]
-##########################################################
-* 0468AE20 60000000
-* C268AE24 0000003F
-* 2C1B0028 408201EC
-* 9421FFE0 7C0802A6
-* 90010024 3D80803F
-* 618C130C 7D8903A6
-* 4E800421 3C60805A
-* 38630420 3D808003
-* 618CFAF8 7D8903A6
-* 4E800421 A078043A
-* 48000129 7C981A14
-* 888404A4 7F83E378
-* 3D808069 618C48D4
-* 7D8903A6 4E800421
-* 7C641B78 7F83E378
-* 3D808069 618C3D18
-* 7D8903A6 4E800421
-* 3C60805A 38630420
-* 3D808003 618CFAF8
-* 7D8903A6 4E800421
-* 807C01B8 3D80800A
-* 618CF8D0 7D8903A6
-* 4E800421 480000C5
-* 907C01BC 3D80803F
-* 618C1358 7D8903A6
-* 4E800421 80010024
-* 7C0803A6 38210020
-* 7F83E378 809C01B8
-* 80BC01B4 80DC01BC
-* 80FC01F4 88E705C8
-* 811C01C0 893C01C4
-* 3D808069 618C742C
-* 7D8903A6 4E800421
-* 807C01B8 3D80800A
-* 618CF82C 7D8903A6
-* 4E800421 3D80800A
-* 618CF6F0 7D8903A6
-* 4E800421 38630001
-* 48000095 807C00B8
-* 3D80800B 618C7900
-* 7D8903A6 4E800421
-* 801F03DC 2C000000
-* 837C01B8 418200AC
-* 809C01B8 7FE3FB78
-* 80BC01BC 3D808069
-* 618C2498 7D8903A6
-* 4E800421 4800008C
-* 9421FFE0 7C0802A6
-* 90010024 6C608000
-* 9001000C 3F40806A
-* C85A0838 3C004330
-* 90010008 C8010008
-* EC001028 EC000072
-* FC00001E D8010010
-* 80610014 80010024
-* 7C0803A6 38210020
-* 4E800020 9421FFE0
-* 7C0802A6 90010024
-* 3C004330 6C638000
-* 3C80806A 9061000C
-* C8240EB8 90010008
-* C8010008 EC200828
-* 80010024 7C0803A6
-* 38210020 4E800020
-* 7FA3EB78 60000000
+#######################################################
+Melee Random Rewrite (CSS Expansion) [Sammi Husky, Eon]
+#######################################################
+op nop @ $8068ae20
+HOOK @ $8068AE24
+{
+  cmpwi r27, 0x28
+  bne end
+  lhz r3, 0x43A(r31)
+  lis r12, 0x8003
+  ori r12, r12, 0xFC7C
+  mtctr r12 
+  bctrl 
+  addi r4, r3, 0x4A4
+  lbzx r4, r31, r4
+  mr r3, r28
+  lis r12, 0x8069
+  ori r12, r12, 0x48D4
+  mtctr r12 
+  bctrl 
+  mr r4, r3
+  mr r3, r28
+  lis r12, 0x8069
+  ori r12, r12, 0x6F60
+  mtctr r12 
+  bctrl
+  lwz r4, 0x1B8(r28)
+  mr r3, r28
+  lis r12, 0x8069
+  ori r12, r12, 0x39BC
+  mtctr r12 
+  bctrl 
+  #getNumCharColour
+  #randi(numOfColours), then increment costume by that number
+  lis r12, 0x8003
+  ori r12, r12, 0xFC7C
+  mtctr r12 
+  bctrl 
+  mr r27, r3
+loop:
+  cmpwi r27, 0
+  beq endLoop 
+  mr r3, r26
+  lis r12, 0x8069
+  ori r12, r12, 0xA22C
+  mtctr r12 
+  bctrl #incCostume
+  subi r27, r27, 1
+  b loop
+endLoop:
+  lwz r27, 0x1B8(r28)
+
+  #tell the game to properly highlight the new char
+  mr r3, r29 
+  lis r12, 0x8069
+  ori r12, r12, 0xECA4
+  mtctr r12 
+  bctrl 
+  mr r5, r3
+  mr r3, r31
+  mr r4, r27 
+  lis r12, 0x8069
+  ori r12, r12, 0x17E8
+  mtctr r12 
+  bctrl 
+end:
+  mr r3, r29
+}
 
 ################################################################################
 [Legacy TE] sc_selmap.pac can be 3 times larger because I said so V2 [DukeItOut]
