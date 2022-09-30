@@ -42,6 +42,7 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/P+Ex/CustomEnding.asm
 .include Source/P+Ex/Maths.asm
 .include Source/P+Ex/Misc.asm
+.include Source/P+Ex/PassiveAnim.asm
 .include Source/P+Ex/PlatformIgnore.asm
 .include Source/P+Ex/PointerWizardry.asm
 .include Source/P+Ex/PSA.asm
