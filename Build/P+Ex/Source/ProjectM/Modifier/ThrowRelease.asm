@@ -100,7 +100,7 @@ float[256] |		# 0x80 * 2
 	0.0,		5.0,	| # Jigglypuff
 	0.2257,		10.3076,| # Mewtwo
 	0.4263,		9.8485, | # Roy
-	0.2257,		8.5516,	| # Waluigi ("MarioD")
+	0.2257,		8.5516,	| # Waluigi
 	0.0,		6.0042, | # Toon Link
 	-0.6,		13.725,	| # Ridley ("ToonZelda")
 	0.2257,		8.5516, | # "ToonSheik"????? Is this leftover Isaac data?
@@ -124,7 +124,7 @@ float[256] |		# 0x80 * 2
 	0.0,		0.0,	| # EXFighter3D
 	0.0,		0.0,	| # EXFighter3E
 	0.0,		0.0,	| # EXFighter3F
-	0.0,		0.0,	| # EXFighter40
+	0,0,	    0,0,	| # EXFighter40
 	0.0,		0.0,	| # EXFighter41
 	0.0,		0.0,	| # EXFighter42
 	0.0,		0.0,	| # EXFighter43
@@ -166,10 +166,10 @@ float[256] |		# 0x80 * 2
 	0.0,		0.0,	| # EXFighter67
 	0.0,		0.0,	| # EXFighter68
 	0.0,		0.0,	| # EXFighter69
-	0.0,		0.0,	| # EXFighter6A
-	0.0,		0.0,	| # EXFighter6B
-	0.0,		0.0,	| # EXFighter6C
-	0.0,		0.0,	| # EXFighter6D
+	-0.4884,	11.3475,| # Red Alloy (EXFighter6A)
+	0.0,		9.4,	| # Blue Alloy (EXFighter6B)
+	0.0, 		7.2672,	| # Yellow Alloy (EXFighter6C)
+	0.0,		5.0,	| # Green Alloy (EXFighter6D)
 	0.0,		0.0,	| # EXFighter6E
 	0.0,		0.0,	| # EXFighter6F
 	0.0,		0.0,	| # EXFighter70

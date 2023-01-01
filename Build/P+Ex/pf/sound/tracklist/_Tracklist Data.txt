@@ -1,5 +1,5 @@
 ################
-Battlefield.tlst - 10 tracks
+Battlefield.tlst - 11 tracks
 
 	Battlefield (Brawl)
 	X04.brstm (0x26FC)
@@ -28,6 +28,11 @@ Battlefield.tlst - 10 tracks
 	Multi-Man Melee 2
 	Melee/Multi-Man Melee 2.brstm
 	Volume: 60
+	Frequency: 40
+
+	Break the Targets (Melee)
+	Melee/Break the Targets.brstm
+	Volume: 100
 	Frequency: 40
 
 	Marionation Gear (Chousoujuu Mecha MG)
@@ -744,7 +749,7 @@ Crateria.tlst - 8 tracks
 	Frequency: 40
 
 ################
-Credits.tlst - 3 tracks
+Credits.tlst - 2 tracks
 
 	<null>
 	Pokemon/Battle! Mewtwo [Stadium].brstm
@@ -755,12 +760,6 @@ Credits.tlst - 3 tracks
 	Sonic/Theme of Knuckles.brstm
 	Volume: 75
 	Frequency: 40
-	
-	<null>
-	Metroid/Vs. Dark Samus [MP3].brstm
-	Volume: 80
-	Frequency: 40
-
 
 ################
 Dead_Line.tlst - 10 tracks
@@ -1493,7 +1492,7 @@ Fourside.tlst - 7 tracks
 	Frequency: 40
 
 ################
-Frigate_Orpheon.tlst - 10 tracks
+Frigate_Orpheon.tlst - 9 tracks
 
 	Vs. Ridley
 	D04.brstm (0x2749)
@@ -1533,11 +1532,6 @@ Frigate_Orpheon.tlst - 10 tracks
 
 	Hunters
 	D10.brstm (0x274F)
-	Frequency: 40
-	
-	Vs. Dark Samus (Metroid Prime 3: Corruption)
-	Metroid/Vs. Dark Samus [MP3].brstm
-	Volume: 80
 	Frequency: 40
 
 ################
@@ -2461,7 +2455,7 @@ Metal_Cavern_64.tlst - 1 track
 	Song delay: -1
 
 ################
-Metroid_Lab.tlst - 12 tracks
+Metroid_Lab.tlst - 9 tracks
 
 	Chozo Laboratory
 	Metroid/Chozo Laboratory.brstm
@@ -2503,21 +2497,6 @@ Metroid_Lab.tlst - 12 tracks
 	Green Brinstar
 	Metroid/Green Brinstar.brstm
 	Volume: 73
-	Frequency: 40
-	
-	Vs. Omega Ridley (Metroid Prime 3: Corruption)
-	Metroid/Vs. Omega Ridley [MP3].brstm
-	Volume: 80
-	Frequency: 40
-	
-	Vs. Nemesis Ridley (Metroid: Other M)
-	Metroid/Vs. Nemesis Ridley [MOM].brstm
-	Volume: 80
-	Frequency: 40
-	
-	Metroid Blast - Ridley Battle (Nintendo Land)
-	Metroid/Metroid Blast - Ridley Battle.brstm
-	Volume: 80
 	Frequency: 40
 
 ################
@@ -2949,6 +2928,27 @@ P+_Stadium.tlst - 12 tracks
 	Frequency: 40
 
 ################
+Papetoon.tlst - 4 tracks
+
+	Frontier Serenade
+	Star Fox/Frontier Serenade.brstm
+	Volume: 80
+	Frequency: 40
+
+	Macbeth
+	Star Fox/MacBeth.brstm
+	Volume: 70
+	Frequency: 40
+
+	Main Theme (Star Fox 64)
+	W28.brstm (0x281A)
+	Frequency: 40
+
+	Area 6
+	G11.brstm (0x276D)
+	Frequency: 40
+
+################
 Peachs_Castle.tlst - 11 tracks
 
 	Overworld (Super Mario Bros.) (SSB ver.)
@@ -3204,7 +3204,7 @@ Pokemon_Stadium.tlst - 3 tracks
 	Song delay: -1
 
 ################
-Pokemon_Stadium_2.tlst - 17 tracks
+Pokemon_Stadium_2.tlst - 18 tracks
 
 	Battle! Champion Blue
 	Pokemon/Battle! Champion Blue (Origins).brstm
@@ -3283,6 +3283,11 @@ Pokemon_Stadium_2.tlst - 17 tracks
 
 	Battle! Wild Pokémon (Black 2 & White 2)
 	Pokemon/Battle! Wild Pokemon (B2W2).brstm
+	Volume: 85
+	Frequency: 40
+
+	Battle! Colress
+	Pokemon/Battle! Colress.brstm
 	Volume: 85
 	Frequency: 40
 
@@ -3563,7 +3568,7 @@ Rest_Area.tlst - 2 tracks
 	Frequency: 40
 
 ################
-Results.tlst - 56 tracks
+Results.tlst - 51 tracks
 
 	Mario
 	Z01.brstm
@@ -3765,8 +3770,8 @@ Results.tlst - 56 tracks
 	Volume: 80
 	Frequency: 40
 
-	Waluigi
-	Z21.brstm
+	0x28
+	Z01.brstm
 	Volume: 80
 	Frequency: 40
 
@@ -3775,8 +3780,8 @@ Results.tlst - 56 tracks
 	Volume: 80
 	Frequency: 40
 
-	Ridley
-	Victory!/Ridley.brstm
+	0x2A
+	Z01.brstm
 	Volume: 80
 	Frequency: 40
 
@@ -3812,31 +3817,6 @@ Results.tlst - 56 tracks
 
 	Wario-Man
 	Z21.brstm
-	Volume: 80
-	Frequency: 40
-	
-	Dark Samus
-	Victory!/Dark Samus.brstm
-	Volume: 80
-	Frequency: 40
-	
-	Red Alloy
-	Victory!/Alloys
-	Volume: 80
-	Frequency: 40
-	
-	Blue Alloy
-	Victory!/Alloys
-	Volume: 80
-	Frequency: 40
-	
-	Yellow Alloy
-	Victory!/Alloys
-	Volume: 80
-	Frequency: 40
-	
-	Green Alloy
-	Victory!/Alloys
 	Volume: 80
 	Frequency: 40
 

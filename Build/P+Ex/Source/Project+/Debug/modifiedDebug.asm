@@ -21,7 +21,7 @@ Debug Start Input v1.2 [Magus, ???, Eon]
 * 38A00004 B0A60000 #writes 4 instead of 0 here to allow pause to be detected cleanly
 * 60000000 00000000
 
-Debug On the Fly Character Switcher v1.4 (Knuckles added by Eon) [Magus, Krisan Thyme, Eon]
+Debug On the Fly Character Switcher v1.4 (Knuckles added by Eon, Ridley added by KingJigglypuff) [Magus, Krisan Thyme, Eon]
 
 HOOK @ $801E6CD8 
 {
@@ -80,14 +80,14 @@ loc_0x9C:
   cmpw r25, r28
   bne+ loc_0xD0
   add r30, r30, r26
-  cmpwi r30, 0x2F 			#if >= 0x2F, return to 0
+  cmpwi r30, 0x30 			#if >= 0x30, return to 0
   blt+ loc_0xB8
-  subi r30, r30, 0x2F 		#0x30 -> 0x1
+  subi r30, r30, 0x30 		#0x31 -> 0x1
 
 loc_0xB8:
-  cmpwi r30, 0x0 			#if < 0, return to 0x2F
+  cmpwi r30, 0x0 			#if < 0, return to 0x30
   bge+ loc_0xC4
-  addi r30, r30, 0x2F 		#-1 -> 0x2E
+  addi r30, r30, 0x30 		#-1 -> 0x2F
 
 loc_0xC4:
   lbzx r25, r27, r30
@@ -100,7 +100,7 @@ loc_0xC4:
   b loc_0x70
 loc_0xD0:
   addi r30, r30, 0x1
-  cmpwi r30, 0x2F 			#0x2F
+  cmpwi r30, 0x30 			#0x30
   beq- loc_0x70
   b loc_0x9C
 
@@ -110,19 +110,19 @@ loc_0xE0:
 }
 
 #char IDs in alphabetical order
-byte[0x2F] |
-0x0A, 0x23, 0x1C, 0x01, |	#Captain Falcon, Dedede (King Dedede), Diddy Kong, Donkey Kong
-0x15, 0x07, 0x14, 0x16, |	#Falco, Fox, GameWatch (Mr. Game and Watch), Ganondorf
-0x25, 0x06, 0x35, 0x0C, |	#Ike, Kirby, Knuckles, Koopa (Bowser)
-0x2C, 0x02, 0x24, 0x1B, |	#GKoopa (Giga Bowser), Link, Lucario, Lucas
-0x09, 0x00, 0x13, 0x18, |	#Luigi, Mario, Marth, Meta Knight
-0x33, 0x0B, 0x0D, 0x08, |	#Mewtwo, Ness, Peach, Pikachu
-0x1A, 0x19, 0x22, 0x1E, |	#Pikmin (Olimar), Pit, PokeFushigisou (Ivysaur), PokeLizardon (Charizard)
-0x20, 0x10, 0x11, 0x27, |	#PokeZenigame (Squirtle), Popo (Ice Climbers), Popo (Sopo), Purin (Jigglypuff)
-0x38, 0x26, 0x32, 0x03, |	#Ridley, Robot (R.O.B.), Roy, Samus
-0x04, 0x2A, 0x2B, 0x28, |	#SZeroSuit (Zero Suit Samus), Snake, Sonic, Toon Link
-0x39, 0x17, 0x2D, 0x29, |	#Waluigi, Wario, Wario Man, Wolf
-0x05, 0x0E, 0x0F  		|   #Yoshi, Zelda, Sheik
+byte[0x30] |
+0x0A, 0x40, 0x23, 0x1C, |	#Captain Falcon, Dark Samus, Dedede (King Dedede), Diddy Kong
+0x01, 0x15, 0x07, 0x14, |	#Donkey Kong, Falco, Fox, GameWatch (Mr. Game and Watch)
+0x16, 0x25, 0x06, 0x35, |	#Ganondorf, Ike, Kirby, Knuckles
+0x0C, 0x2C, 0x02, 0x24, |	#Koopa (Bowser), GKoopa (Giga Bowser), Link, Lucario
+0x1B, 0x09, 0x00, 0x13, |	#Lucas, Luigi, Mario, Marth
+0x18, 0x33, 0x0B, 0x0D, |	#Meta Knight, Mewtwo, Ness, Peach
+0x08, 0x1A, 0x19, 0x22, |	#Pikachu, Pikmin (Olimar), Pit, PokeFushigisou (Ivysaur)
+0x1E, 0x20, 0x10, 0x11, |	#PokeLizardon (Charizard), PokeZenigame (Squirtle), Popo (Ice Climbers), Popo (Sopo)
+0x27, 0x38, 0x26, 0x32, |	#Purin (Jigglypuff), Ridley, Robot (R.O.B.), Roy
+0x03, 0x04, 0x2A, 0x2B, |	#Samus, SZeroSuit (Zero Suit Samus), Snake, Sonic
+0x28, 0x39, 0x17, 0x2D, |	#Toon Link, Waluigi, Wario, Wario Man
+0x29, 0x05, 0x0E, 0x0F  |   #Wolf, Yoshi, Zelda, Sheik
 @ $80583FB0
 
 [Project+] Debug Controls v1.4 (Dolphin Fix v1.1) [Magus, ???, Eon] # comments written with help from fudgepop01

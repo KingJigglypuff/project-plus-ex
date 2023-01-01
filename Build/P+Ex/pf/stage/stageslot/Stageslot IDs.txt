@@ -39,7 +39,7 @@
 2F - Peach Castle
 30 - Corneria
 31 - Big Blue
-32 - Brinstar
+32 - Planet Zebes
 33 - Hyrule Castle
 34 - Home Run (Home Run Contest Stage)
 35 - Edit Stage (Stage Builder Stages)
@@ -53,7 +53,7 @@
 43 - Sky Sanctuary
 44 - Dead Line
 45 - Dinosaur Land
-46 - Oil Drum Alley
+46 - Minecart Madness
 47 - Golden Temple
 48 - Bell Tower
 49 - Metroid Lab

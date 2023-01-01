@@ -182,22 +182,44 @@ exit:
 }
 
 #game start
-* C26DEFD4 0000000F
-* 9421FF80 BC410008
-* 3D809018 898CF37F
-* 2C0C0002 9817009E
-* 40820050 3DC08058
-* 61CE8003 3DE09018
-* 61EF0FB8 826EFFFD
-* 5672463E 2C12003D
-* 40820010 7F6802A6
-* 4BFFFF31 7F6803A6 # break on this line moved 0x8 further to point to correct spot
-* 5673C23E 9A4F0000
-* B26F0005 39CE00A0
-* 39EF005C 3AD60001
-* 2C160007 4082FFC8
-* B8410008 38210080
-* 60000000 00000000
+HOOK @ $806DEFD4 
+{
+loc_0x0:
+  stwu r1, -128(r1)
+  stmw r2, 8(r1)
+  lis r12, 0x9018
+  lbz r12, -3201(r12)
+  cmpwi r12, 0x2
+  stb r0, 158(r23)
+  bne- loc_0x68
+  lis r14, 0x8058
+  ori r14, r14, 0x8003
+  lis r15, 0x9018
+  ori r15, r15, 0xFB8
+
+loc_0x2C:
+  lwz r19, -3(r14)
+  rlwinm r18, r19, 8, 24, 31
+  cmpwi r18, 0x3D
+  bne- loc_0x48
+  mflr r27
+  bl -0xE0  # break on this line moved -0x18 (-4*number of lines added) further to point to correct spot
+  mtlr r27
+
+loc_0x48:
+  rlwinm r19, r19, 24, 8, 31
+  stb r18, 0(r15)
+  sth r19, 5(r15)
+  addi r14, r14, 0xA0
+  addi r15, r15, 0x5C
+  addi r22, r22, 0x1
+  cmpwi r22, 0x7
+  bne+ loc_0x2C
+
+loc_0x68:
+  lmw r2, 8(r1)
+  addi r1, r1, 0x80
+}
 
 * C26DEF94 00000003
 * 3D809018 898CF37F

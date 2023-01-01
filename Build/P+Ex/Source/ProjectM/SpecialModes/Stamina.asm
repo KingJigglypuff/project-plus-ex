@@ -1,5 +1,5 @@
 ##################################
-P+ Stamina 5.0 [wiiztec,DukeitOut]
+P+ Stamina 5.0 [wiiztec,DukeitOut, ReplayFix by Eon]
 ##################################
 HOOK @ $8077FB78
 {
@@ -101,10 +101,39 @@ HOOK @ $80816108
 loc_0x1C:
   	subic. r21, r3, 1
 }
+# HOOK @ $80816588
+# {
+#   cmpwi r20, 0x0
+#   beq %end%
 
-op b 0x80 @ $8083BBA0 #disable stamina death from double counting death (replaces three branches involving r20)
+# loc_0x18:
+#   addi r5, r5, 0x1
 
+# }
 
+# HOOK @ $80816088
+# {
+#   cmpwi r20, 0x0
+#   beq- %end%
+
+# loc_0x18:
+#   addi r4, r4, 0x1
+# }
+
+# HOOK @ $80816794
+# {
+# loc_0x0:
+#   mr r0, r3
+#   cmpwi r20, 0x0
+#   beq- loc_0x20
+
+# loc_0x1C:
+#   addi r0, r3, 0x1
+
+# loc_0x20:
+
+# }
+op b 0x80 @ $8083BBA0 #disable stamina death from double counting death (replaces above three branches involving r20)
 
 
 * C20E1588 00000005

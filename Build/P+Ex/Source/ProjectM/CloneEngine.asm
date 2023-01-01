@@ -821,7 +821,7 @@ ENDINGTABLE:
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1  |  
 
-# Unused slots: 14, 15, 21, 29, 30, 31*, 36*, 39*, 40*, 43*, 45		*= Used by Project+
+# Unused slots: 14, 15, 21, 29, 30, 31*, 36*, 39*, 40*, 43*, 45		*= Used by Project+ or P+Ex
 
 ENDINGTABLESKIP:
 	.RESET

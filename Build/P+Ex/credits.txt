@@ -156,9 +156,10 @@ New Bomb model by SJS
 20 - OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
 21 - Red OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
 22 - Blue OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
-23 - Violet OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
+23 - Black OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
 24 - Lavender OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
-25 - Fierce Diety Link by  Moe, AlGeorgeRomo, additional edits and revamps by Bird of Light, Skillar, SJS, fireball, tyleto, Xenthos, SatoshiKura, Crixler, ledgerewskie, Layell, Aghanim, PizzaDog, Jigglypoof21, Draco, Mach 7, Nanobuds, Theytah, credit to PMDT
+23 - Violet OoT Link by Skilar, SJS, fireball, tyleto, Xenthos, and the P+ Art Team, credit to the PMDT, Moe, LinkTahuterasuSpirit, AlGeorgeRomo
+26 - Fierce Diety Link by  Moe, AlGeorgeRomo, additional edits and revamps by Bird of Light, Skillar, SJS, fireball, tyleto, Xenthos, SatoshiKura, Crixler, ledgerewskie, Layell, Aghanim, PizzaDog, Jigglypoof21, Draco, Mach 7, Nanobuds, Theytah, credit to PMDT
 AltR - Hyrule Warriors Link (Brawlified) by Moblin, iwantgames, Taiko, Satoshi with credit to ManikDX, and Large Leader [edited by MarioDox]
 AltZ - Classic Link by Moe with credit to AlGeorge Romo, PMDT, Ely, LinkTahuterasuSpirit, iwantgames, SJS, Dr., Mach 7, Nanobuds, Ryztiq, Wii, Cosmetic Standarization Project
 
@@ -251,7 +252,7 @@ Pose by davidvkimball, model polish by tryptech, and Xenthos, rendered by CSProj
 31 - Red Casino Luigi 2.0 by Sub, Layell, Kazoomageddon, MetalLegacy, Snoe, credit to Ryztiq for fixing the lighting, KTH for the original model, Wumb0, Pyro, MetalLegacy; revamp by SJ, Xenthos, and StarWaffle
 32 - Blue Casino Luigi 2.0 by Sub, Layell, Kazoomageddon, MetalLegacy, Snoe, credit to Ryztiq for fixing the lighting, KTH for the original model, Wumb0, Pyro, MetalLegacy; revamp by SJ, Xenthos, and StarWaffle
 33 - Purple Casino Luigi 2.0 by Sub, Layell, Kazoomageddon, MetalLegacy, Snoe, credit to Ryztiq for fixing the lighting, KTH for the original model, Wumb0, Pyro, MetalLegacy; revamp by SJ, Xenthos, and StarWaffle
-AltR - Space Land Luigi V2 by Ubergruvin, Tyleto with credit to KorytheMaril, Mansta8, Kuro, Bent 00, Pyro, Draco
+AltR - Space Land Luigi V2 by Ubergruvin, tyleto with credit to KorytheMaril, Mansta8, Kuro, Bent 00, Pyro, Draco
 AltZ - Princess Peach Dress Luigi by AlGeorgeRomo, ShinF 
 
 
@@ -425,16 +426,16 @@ AltZ - Phantom Ganon by HowDoISpaceJam with credit to the PMDT, JoeTE, StupidMar
 META KNIGHT
 Pose by davidvkimball, model polish by tryptech, Spigel, and Layell, rendered by CSProject Backroom
 08 - Galacta Meta Knight by SJS
-09 - Dark Meta Knight by SJS, Tyleto, KingJigglypuff
+09 - Dark Meta Knight by SJS, tyleto, KingJigglypuff
 20 - Morpho Meta Knight by Project + Art team, SJS, tryptech, KingJigglypuff, with credit to the PMDT
 21 - Parallel Morpho Meta Knight by The Project + Art team, SJS, tryptech, KingJigglypuff, with credit to the PMDT
 22 - Green Morpho Meta Knight by The Project + Art team, SJS, tryptech, KingJigglypuff, with credit to the PMDT
 23 - Blue Morpho Meta Knight by The Project + Art team, SJS, tryptech, KingJigglypuff, with credit to the PMDT
-30 - Samurai Meta Knight by The Project + Art team, Dapperman, and SJS
-31 - Takamaru Samurai Meta Knight by The Project + Art team, Dapperman, and SJS
-32 - Green Samurai Meta Knight by The Project + Art team, Dapperman, and SJS
-33 - Gold Samurai Meta Knight by The Project + Art team, Dapperman, and SJS
-AltR - Galacta Knight by The Project + Art team, SJS, tyleo, and KingJigglypuff
+30 - Samurai Meta Knight by The Project + Art team, Dapperman, SJS and tyleto
+31 - Takamaru Samurai Meta Knight by The Project + Art team, Dapperman, SJS and tyleto
+32 - Green Samurai Meta Knight by The Project + Art team, Dapperman, SJS and tyleto
+33 - Gold Samurai Meta Knight by The Project + Art team, Dapperman, SJS and tyleto
+AltR - Galacta Knight by The Project + Art team, SJS, tyleto, and KingJigglypuff
 AltZ - NES Meta Knight by Dapperman
 
 
@@ -592,7 +593,7 @@ Pose by davidvkimball, model polish by tryptech, rendered by CSProject Backroom
 23 - Golden Shogun Dedede by LnktheWolf with credit to the PMDT
 24 - Black Shogun Dedede by Dapperman, Layell, with credit to the PMDT
 AltR - Shadow Dedede by L K Boost, JoeTE, with fixes by Kirbeast and Layell
-AltZ - Masked Dedede by StarWaffle with credit to JoeTE
+AltZ - Kirby 64 Dedede by Ubergruvin and Dapperman
 
 
 LUCARIO

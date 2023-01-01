@@ -251,22 +251,44 @@ HOOK @ $8083634C
   mr r5, r31
 }
 
-###############################################################
-Pause Set to Off -> Hold Start to Pause v2 [standardtoaster]
-###############################################################
-* C21E6D24 0000000C
-* 3D608058 616B4080
-* 818B0004 2C0C0002
-* 40820048 3D808049
-* 618C55BC 818C0000
-* 2C0C0000 4182002C
-* 540C00C7 41820024
-* 7D8B202E 2C0C0032
-* 40800020 398C0001
-* 7D8B212E 3D801000
-* 7C0C0050 4800000C
-* 39800000 7D8B212E
-* 901E0000 00000000
+#######################################################################
+Pause Set to Off -> Hold Start to Pause v3 [standardtoaster, DukeItOut]
+#
+# v3: Made hold pause more stable by checking the pause status directly
+#######################################################################
+HOOK @ $801E6D24
+{
+	lis r11, 0x8058
+	ori r11, r11, 0x4080
+	lwz r12, 4(r11)
+	cmpwi r12, 0x2		# Todo: Find custom code setting 80584084 and make it just read menu settings
+	bne- Finish
+
+	lwz r12, -0x4350(r13)# \
+	lwz r12, 0x18(r12)	 # | Get pause status
+	lwz r12, 0x3C(r12)	 # /
+	cmpwi r12, 1		# If paused, do not rely on hold status. We want to unpause normally!
+	beq- Clear			#
+
+	rlwinm. r12, r0, 0, 3, 3
+	beq- Clear
+	lwzx r12, r11, r4	# \
+	cmpwi r12, 50		# | Pause hold timer is 50 frames. If held for that much,
+	bge- Finish			# / THEN act like a normal pause.
+
+	addi r12, r12, 0x1	# \ Increment hold timer
+	stwx r12, r11, r4	# /
+	lis r12, 0x1000		# \ Filter out Start/Pause button
+	sub r0, r0, r12		# / Kind of a risky way to do it but probably safe in this context.
+	b Finish
+
+Clear:
+	li r12, 0x0			# Clear hold timer
+	stwx r12, r11, r4	#
+
+Finish:
+	stw r0, 0(r30)	# Original operation
+}
 
 #############################################
 Allow 2x Speed Setting in Training [Magus]
@@ -2176,6 +2198,15 @@ All Stages Selectable on Random Stage Switch without Unlocking [Magus]
 op li r0, 0xFFF @ $806AB860
 op li r0, 0xFFF @ $806AB8DC
 
+######################################################
+All-Star Mode is Selectable without Unlocking [Spigel]
+######################################################
+op li, r3, 1 @ $8004E7D0
+
+##########################################################
+Boss Battles Mode is Selectable without Unlocking [Spigel]
+##########################################################
+op li, r3, 1 @ $8004E7F4
 
 #########################################
 Use Custom CLR ID on Anchored GFX [Magus]

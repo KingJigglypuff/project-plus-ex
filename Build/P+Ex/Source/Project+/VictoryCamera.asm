@@ -10,7 +10,7 @@ Victory Camera Modifier Engine [DukeItOut]
 	.GOTO->VICTORYTABLE_SKIP	
 VICTORYTABLE:					# Character Slot, Win ID, Scene ID 1, Scene ID 2
 # Size of below table in 4-byte blocks (i.e. 16 bytes = 4)
-	int 5						# Make sure to update this when adding entries!
+	int 8						# Make sure to update this when adding entries!
 #################################
 								# Win1/Up = 0, Win2/Left = 1, Win3/Right = 2	
 	byte[4] 0x15, 1, 13, 14		# Falco, 	Win2, 	[13] StgResult_A_falco2, 		[14] StgResult_B_falco2
@@ -18,6 +18,9 @@ VICTORYTABLE:					# Character Slot, Win ID, Scene ID 1, Scene ID 2
 	byte[4] 0x25, 2, 17, 18		# Ike, 		Win3, 	[17] StgResult_A_Ike3, 			[18] StgResult_B_Ike3
 	byte[4] 0x2A, 2, 19, 20		# Snake, 	Win3, 	[19] StgResult_A_Snake3,		[20] StgResult_B_Snake3
 	byte[4] 0x22, 2,  4, 10		# Ivysaur, 	Win3		# Forces it to use only one of the 6 pairs available to most victories.
+	byte[4] 0x40, 0,  2,  8   	    # Dark Samus, Win1
+	byte[4] 0x40, 1,  6, 12   	    # Dark Samus, Win2
+	byte[4] 0x40, 2,  26, 27  	    # Dark Samus, Win3, [26] StgResult_A_DarkSamus3,	[27] StgResult_B_DarkSamus3
 #################################	
 # Default cameras: Characters normally choose randomly from 5 different pairs, and then choose one from the pair.
 # 1/7  - Zooms out slowly
