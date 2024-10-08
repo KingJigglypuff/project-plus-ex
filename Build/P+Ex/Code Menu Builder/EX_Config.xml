@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--PowerPC Assembly Functions (Code Menu Building Utility) Feature Configuration Document-->
+<!--Use this document to configure the features offered by the Code Menu! See README.md for further details.-->
+<codeMenuConfig>
+    <!--To alter some miscellaneous properties of the menu, edit the contents of this block!-->
+    <menuProperties>
+        <!--Specifies what folder on the SD Card the menu will expect to be in. Must be 8 characters long!-->
+        <!--Leave this blank to use the default folder.-->
+        <buildBaseFolder name="P+EX/./." />
+        <!--Specify a replacement for the text that usually sits at the top of the menu.-->
+        <!--Leave this blank to leave the original title text in place.-->
+        <menuTitle text="Project+Ex Code Menu" />
+        <!--Specify additional comment text to add to the top of the menu!-->
+        <!--Note: By default, comments specified here are included beneath the usual comments outlining the menu's controls.-->
+        <!--To delete those comments on the controls, set the "deleteControlsComments" argument to "true"!-->
+        <menuComments deleteControlsComments="false">
+            <!--
+            <comment text="YOUR_COMMENT_HERE" />
+            -->
+        </menuComments>
+    </menuProperties>
+
+    <!--To modify the menu's line colors, add new entries into this block!-->
+    <menuLineColors>
+        <!--Add entries in the following format:
+        <lineColor lineKind="0" colorHex="0xRRGGBBAA" />
+        -->
+        <!--Where "lineKind" corresponds to the type of line whose color you're modifying.-->
+        <!--0: Normal, 1: Selected, 2: Changed, 3: Changed & Selected, 4: Comment, 5: Locked-->
+    </menuLineColors>
+
+    <!--To add characters to the code menu, add entries for them into this block!-->
+    <!--Note: the "baseListVersion" field determines the base character list your declarations will be added to!-->
+    <!--0: vBrawl, 1: vBrawl & Playable Sopo/GBowser/WarioMan, 2: Project M, 3: Project+, 4: P+EX 1.0, 5: P+EX 1.2-->
+    <characterList baseListVersion="6">
+        <!--Add characters in the following format:
+        <character name="YOUR_NAME_HERE" slotID="SLOT_ID_HERE"/>
+        -->
+		<character name="Sceptile" slotID="0x62"/>
+    </characterList>
+
+    <!--Use this block to register Addons for inclusion in the menu!-->
+    <!--To define entries manually, you may add entries to this block!-->
+    <!--Additionally, to automatically include any Addons present in the "./Addons/" folder, set the "doAutoDetect" argument to "true".-->
+    <addonIncludes doAutoDetect="true">
+        <!--Add entries in the following format:
+        <addon path="./Addons/Example Addon/" />
+        -->
+        <!--Where "path" is a valid filepath which points to the targeted Addon's directory.-->
+        <!--Note: Paths may be given relative to this folder using "./" syntax, as seen above!-->
+    </addonIncludes>
+
+    <codeSettings>
+        <!--To declare new rosters, add new entries into this block! Valid for EX builds only!-->
+        <rosterChanger enabled="true">
+            <!--Add rosters in the following format:
+            <roster name="YOUR_NAME_HERE" filename="FILENAME_HERE"/>
+            -->
+        </rosterChanger>
+
+        <!--To declare new themes, add new entries into this block!-->
+        <themeChanger enabled="true">
+            <!--Add new themes in the following format:
+            <menuTheme name="YOUR_NAME_HERE!">
+                <themeFile name="sc_selcharacter.pac" replacementPrefix="ex_"/>
+            </menuTheme>
+            -->
+        </themeChanger>
+
+        <!--Adds a toggle for enabling/disabling grabbing items with aerials and dash attacks to the "Gameplay Modifiers" menu!-->
+        <vBrawlItemGrab enabled="true" />
+
+        <!--Adds lines for manipulating how many frames of jumpsquat characters go through to the "Gameplay Modifiers" menu!-->
+        <jumpsquatModifier enabled="true" />
+
+        <!--Controls the behavior of the Player Slot Color Changer Code!-->
+        <slotColorChanger enabled="true">
+            <colorDefinitions>
+                <color name="Pink" hue="317.5" saturation="1.00" luminance="0.55" />
+                <color name="Purple" hue="278.5" saturation="0.85" luminance="0.45">
+                    <flag name="DisableHueMod" />
+                </color>
+                <color name="Orange" hue="33.3" saturation="1.00" luminance="0.52"/>
+                <color name="Cyan" hue="165.0" saturation="1.00" luminance="0.50"/>
+                <color name="Gray" hue="0.0" saturation="0.00" luminance="0.50">
+                    <flag name="DisableSatModUp" /> <flag name="DisableSatModDown" />
+                </color>
+                <color name="Light Gray" hue="0.0" saturation="0.00" luminance="0.65">
+                    <flag name="DisableSatModUp" /> <flag name="DisableSatModDown" />
+                </color>
+                <color name="Black" hue="0.0" saturation="0.00" luminance="0.08">
+                    <flag name="DisableSatModUp" /> <flag name="DisableSatModDown" />
+                    <flag name="DisableLumModUp" /> <flag name="DisableLumModDown" />
+                </color>
+                <color name="Black_IG" hue="0.0" saturation="0.00" luminance="0.00">
+                    <flag name="DisableSatModUp" /> <flag name="DisableSatModDown" />
+                    <flag name="DisableLumModUp" /> <flag name="DisableLumModDown" />
+                </color>
+                <color name="White" hue="0.0" saturation="0.00" luminance="1.00">
+                    <flag name="DisableSatModUp" /> <flag name="DisableSatModDown" />
+                </color>
+            </colorDefinitions>
+            <schemeDefinitions>
+                <scheme name="Pink" menuColor1="Pink" ingameColor1="Pink" />
+                <scheme name="Purple" menuColor1="Purple" ingameColor1="Purple" />
+                <scheme name="Orange" menuColor1="Orange" ingameColor1="Orange" />
+                <scheme name="Cyan" menuColor1="Cyan" ingameColor1="Cyan" />
+                <scheme name="Gray" menuColor1="Gray" menuColor2="Light Gray" ingameColor1="Gray" ingameColor2="Light Gray"/>
+                <scheme name="Black" menuColor1="Black" ingameColor1="Black_IG" menuColor2="White" ingameColor2="White" />
+                <scheme name="White" menuColor1="White" ingameColor1="White" />
+                <scheme name="RGB" menuColor1="pd_RGB" ingameColor1="pd_RGB" />
+                <scheme name="DarkRGB" menuColor1="Black" ingameColor1="Black_IG" menuColor2="pd_RGB" ingameColor2="pd_RGB" />
+            </schemeDefinitions>
+        </slotColorChanger>
+    </codeSettings>
+</codeMenuConfig>

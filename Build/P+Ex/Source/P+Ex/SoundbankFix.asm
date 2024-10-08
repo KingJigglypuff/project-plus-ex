@@ -26,11 +26,11 @@ START:
 	cmpw  r0,r4
 	beq-  EXIT  	#Skip if instance IDs match
 
-#Insert Manual Unload Fixes here. vPM example below.
-	#%ManualUnloadFix(0x27, 0x11)	#Roy/Marth
-	#%ManualUnloadFix(0x26, 0x21)	#Mewtwo/Lucario
-#Common EX Example below	
-	#%ManualUnloadFix(0x41, 0x07)	#Pichu/Pikachu
+#Insert Manual Unload Fixes here.
+	ManualUnloadFix(0x6A, 0x09)		#Red Alloy Ex/Captain Falcon
+	ManualUnloadFix(0x6B, 0x0D)		#Blue Alloy Ex/Zelda
+	ManualUnloadFix(0x6C, 0x00)		#Yellow Alloy Ex/Mario
+	ManualUnloadFix(0x6D, 0x05)		#Green Alloy Ex/Kirby
 
 
     b EXIT
@@ -52,11 +52,11 @@ START:
 	cmpw  r0,r4
 	beq-  EXIT  	#Skip if instance IDs match
 
-#Insert Manual Unload Fixes here. vPM example below.
-	#%ManualUnloadFix(0x27, 0x11)	#Roy/Marth
-	#%ManualUnloadFix(0x26, 0x21)	#Mewtwo/Lucario
-#Common EX Example below
-	#%ManualUnloadFix(0x41, 0x07)	#Pichu/Pikachu
+#Insert Manual Unload Fixes here.
+	ManualUnloadFix(0x6A, 0x09)		#Red Alloy Ex/Captain Falcon
+	ManualUnloadFix(0x6B, 0x0D)		#Blue Alloy Ex/Zelda
+	ManualUnloadFix(0x6C, 0x00)		#Yellow Alloy Ex/Mario
+	ManualUnloadFix(0x6D, 0x05)		#Green Alloy Ex/Kirby
 
     b EXIT
 

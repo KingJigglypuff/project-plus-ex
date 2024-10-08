@@ -140,9 +140,11 @@ HOOK @ $80105fe8
 }
 
 
-#######################################################################################
-[Project+] Custom Training Mode AI Options based on Stop + Random DI [Eon, PyotrLuzhin]
-#######################################################################################
+#######################################################################################################
+[Project+] Custom Training Mode AI Options based on Stop + Random DI v1.1 [Eon, PyotrLuzhin, QuickLava]
+# v1.1: Training Mode AI Setting is now pulled via gf_IfMgr instead of a hard-coded address.
+#       Prevents the code from breaking with changes in heap layouts.
+#######################################################################################################
 .alias totalOptions = 14
 .alias lastOption = totalOptions-1
 #Based on code by PyotrLuzhin
@@ -191,10 +193,10 @@ HOOK @ $809031B4
   cmpw r3, r12 				#if not training mode, stores 0 as selected option 
   bne end
 
-  lis r3, 0x8167 			# \
-  ori r3, r3, 0xE324 		# | stores current training mode cpu option
-  lwz r12, 0x0(r3) 			# |
-
+  lis r3, 0x805A            # \
+  lwz r3, 0x02D0(r3)        # / Load g_IfMgr
+  lwz r3, 0x78(r3)          # Load ifMinigameTraining pointer
+  lwz r12, 0x24(r3) 		# Load current CPU Setting.
 
 trainingModeOptions:
   cmpwi r12, 6
@@ -313,10 +315,11 @@ getKnockback:
   cmpw r4, r12        #if not training mode, does random DI
   bne normalRNG
 
-  lis r4, 0x8167      # \
-  ori r4, r4, 0xE324  # | loads current training mode cpu option
-  lwz r4, 0x0(r4)    # /
-  #GetTrainingModeSetting
+  #Get Training Mode Setting
+  lis r4, 0x805A      # \
+  lwz r4, 0x02D0(r4)  # / Load g_IfMgr
+  lwz r4, 0x78(r4)    # Load ifMinigameTraining pointer
+  lwz r4, 0x24(r4) 	  # Load current CPU Setting.
   cmpwi r4, 0x8
   blt 0x14
   cmpwi r4, 0xD
@@ -460,4 +463,20 @@ found:
     addi r3, r3, 1
 end: 
     mr r0, r3
+}
+
+####################################################################
+[Project+] 1-P Battles Guarantee Infinite Time [DukeItOut, Kapedani]
+#
+# Allows players to practice solo in "VS." without altering time
+####################################################################
+HOOK @ $806dd018  # sqVsMelee::setupMelee
+{
+  lhz    r3, 0x1A(r31) # Original operation
+  lbz r12,0x9(r31)          # \
+  rlwinm r12,r12,0,27,29    # | check if globalModeMelee->meleeInitData.numPlayers == 1
+  cmpwi r12,4               # |
+  bne+ %end%                # /
+  li r12, 0x0         # \ globalModeMelee->meleeInitData.timeLimitFrames = 0
+  stw r12, 0x20(r31)  # /
 }

@@ -270,17 +270,6 @@ Super Spicy Curry has no SFX [standardtoaster]
 ##############################################
 op nop @ $80843540
 
-###########################################
-The Turbo item is not delicious [DukeItOut]
-###########################################
-HOOK @ $809BD028
-{
-	cmpwi r29, 0x10		# Is this a Superspicy Curry / Turbo item?
-	lwzx r29, r4, r0	# Get pointer to item parameter, original operation
-	bne+ %END%			# if not curry/turbo, do not change anything!
-	li r12, 0xA0		# \ Set item behavior type to disappear
-	stw r12, 0xB4(r29)	# / on grab instead of triggering eating animation! Do not eat the giant electric sign!
-}
 ###########################################################
 Turbo Boost makes Power Up Noise on Acquisition [DukeItOut]
 ###########################################################

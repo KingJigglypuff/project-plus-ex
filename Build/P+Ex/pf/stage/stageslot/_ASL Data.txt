@@ -1,0 +1,641 @@
+################
+01.asl - 5 entries
+
+Base: Battlefield.param
+R: Battlefield_R.param
+L: Battlefield_L.param
+Z: Battlefield_Z.param
+0x8000: Battlefield_ML_00.param
+
+
+################
+02.asl - 7 entries
+
+Base: Final_Destination.param
+R: Final_Destination_R.param
+L: Final_Destination_L.param
+Z: Final_Destination_Z.param
+0x8000: Final_Destination_ML_00.param
+0x8001: Final_Destination_ML_01.param
+0x4000: Final_Destination_MR_00.param
+
+
+################
+03.asl - 4 entries
+
+Base: Delfino_Secret.param
+R: Delfino_Secret_R.param
+L: Delfino_Secret_L.param
+Z: Delfino_Secret_Z.param
+
+
+################
+04.asl - 4 entries
+
+Base: Luigis_Mansion.param
+R: Luigis_Mansion_R.param
+L: Luigis_Mansion_L.param
+Z: Luigis_Mansion_Z.param
+
+
+################
+05.asl - 6 entries
+
+Base: Metal_Cavern.param
+R: Metal_Cavern_R.param
+L: Metal_Cavern_L.param
+Z: Metal_Cavern_Z.param
+0x4000: Metal_Cavern_MR_00.param
+0x8000: Metal_Cavern_ML_00.param
+
+
+################
+06.asl - 5 entries
+
+Base: Bowser_Castle.param
+R: Bowser_Castle_R.param
+L: Bowser_Castle_L.param
+Z: Bowser_Castle_Z.param
+0x4000: Bowser_Castle_MR_00.param
+
+
+################
+07.asl - 5 entries
+
+Base: Kongo_Jungle.param
+R: Kongo_Jungle_R.param
+L: Kongo_Jungle_L.param
+Z: Kongo_Jungle_Z.param
+0x4000: Kongo_Jungle_MR_00.param
+
+
+################
+08.asl - 6 entries
+
+Base: Rumble_Falls.param
+R: Rumble_Falls_R.param
+L: Rumble_Falls_L.param
+Z: Rumble_Falls_Z.param
+0x8000: Rumble_Falls_ML_00.param
+0x8001: Rumble_Falls_ML_01.param
+
+
+################
+09.asl - 6 entries
+
+Base: Temple_of_Time.param
+R: Temple_of_Time_R.param
+L: Temple_of_Time_L.param
+Z: Temple_of_Time_Z.param
+0x8000: Temple_of_Time_ML_00.param
+0xC000: Event_31.param
+
+
+################
+0B.asl - 4 entries
+
+Base: Norfair.param
+R: Norfair_R.param
+L: Norfair_L.param
+Z: Norfair_Z.param
+
+
+################
+0C.asl - 5 entries
+
+Base: Frigate_Husk.param
+R: Frigate_Husk_R.param
+L: Frigate_Husk_L.param
+Z: Frigate_Husk_Z.param
+0x8000: Frigate_Husk_ML_00.param
+
+
+################
+0D.asl - 5 entries
+
+Base: Yoshis_Island.param
+R: Yoshis_Island_R.param
+L: Yoshis_Island_L.param
+Z: Yoshis_Island_Z.param
+0x8000: Yoshis_Island_ML_00.param
+
+
+################
+0E.asl - 5 entries
+
+Base: Halberd.param
+R: Halberd_R.param
+L: Halberd_L.param
+Z: Halberd_Z.param
+0x8000: Halberd_ML_00.param
+
+
+################
+13.asl - 5 entries
+
+Base: Lylat_Cruise.param
+R: Lylat_Cruise_R.param
+L: Lylat_Cruise_L.param
+Z: Lylat_Cruise_Z.param
+0x8000: Lylat_Cruise_ML_00.param
+
+
+################
+14.asl - 5 entries
+
+Base: Saffron_City.param
+R: Saffron_City_R.param
+L: Saffron_City_L.param
+Z: Saffron_City_Z.param
+0x4000: Saffron_City_MR_00.param
+
+
+################
+15.asl - 4 entries
+
+Base: Spear_Pillar.param
+R: Spear_Pillar_R.param
+L: Spear_Pillar_L.param
+Z: Spear_Pillar_Z.param
+
+
+################
+16.asl - 5 entries
+
+Base: Port_Town.param
+R: Port_Town_R.param
+L: Port_Town_L.param
+Z: Port_Town_Z.param
+0x8000: Port_Town_ML_00.param
+
+
+################
+17.asl - 4 entries
+
+Base: Infinite_Glacier.param
+R: Infinite_Glacier_R.param
+L: Infinite_Glacier_L.param
+Z: Infinite_Glacier_Z.param
+
+
+################
+18.asl - 4 entries
+
+Base: Flat_Zone.param
+R: Flat_Zone_R.param
+L: Flat_Zone_L.param
+Z: Flat_Zone_Z.param
+
+
+################
+19.asl - 8 entries
+
+Base: Castle_Siege.param
+R: Castle_Siege_R.param
+L: Castle_Siege_L.param
+Z: Castle_Siege_Z.param
+X: Castle_Siege_X.param
+0x4000: Castle_Siege_MR_00.param
+0x8000: Castle_Siege_ML_00.param
+0x8001: Castle_Siege_ML_01.param
+
+
+################
+1C.asl - 4 entries
+
+Base: Wario_Land.param
+R: Wario_Land_R.param
+L: Wario_Land_L.param
+Z: Wario_Land_Z.param
+
+
+################
+1D.asl - 4 entries
+
+Base: Distant_Planet.param
+R: Distant_Planet_R.param
+L: Distant_Planet_L.param
+Z: Distant_Planet_Z.param
+
+
+################
+1E.asl - 4 entries
+
+Base: Skyworld.param
+R: Skyworld_R.param
+L: Skyworld_L.param
+Z: Skyworld_Z.param
+
+
+################
+1F.asl - 4 entries
+
+Base: Fountain_of_Dreams.param
+R: Fountain_of_Dreams_R.param
+L: Fountain_of_Dreams_L.param
+Z: Fountain_of_Dreams_Z.param
+
+
+################
+20.asl - 5 entries
+
+Base: Fourside.param
+R: Fourside_R.param
+L: Fourside_L.param
+Z: Fourside_Z.param
+0x8000: Fourside_ML_00.param
+
+
+################
+21.asl - 8 entries
+
+Base: Smashville.param
+Y: Smashville_Y.param
+R: Smashville_R.param
+Y+R: Smashville_YR.param
+L: Smashville_L.param
+Y+L: Smashville_YL.param
+Z: Smashville_Z.param
+Y+Z: Smashville_YZ.param
+
+
+################
+22.asl - 4 entries
+
+Base: Shadow_Moses.param
+R: Shadow_Moses_R.param
+L: Shadow_Moses_L.param
+Z: Shadow_Moses_Z.param
+
+
+################
+23.asl - 6 entries
+
+Base: Green_Hill_Zone.param
+R: Green_Hill_Zone_R.param
+L: Green_Hill_Zone_L.param
+Z: Green_Hill_Zone_Z.param
+0x4000: Green_Hill_Zone_MR_00.param
+0x8000: Green_Hill_Zone_ML_00.param
+
+
+################
+24.asl - 5 entries
+
+Base: PictoChat.param
+R: PictoChat_R.param
+L: PictoChat_L.param
+Z: PictoChat_Z.param
+0x8000: PictoChat_ML_00.param
+
+
+################
+25.asl - 4 entries
+
+Base: Hanenbow.param
+R: Hanenbow_R.param
+L: Hanenbow_L.param
+Z: Hanenbow_Z.param
+
+
+################
+26.asl - 1 alt stage
+
+Base: Config.param
+
+
+################
+28.asl - 1 alt stage
+
+Base: Results.param
+
+
+################
+29.asl - 4 entries
+
+Base: Temple.param
+R: Temple_R.param
+L: Temple_L.param
+Z: Temple_Z.param
+
+
+################
+2A.asl - 4 entries
+
+Base: Yoshis_Story.param
+R: Yoshis_Story_R.param
+L: Yoshis_Story_L.param
+Z: Yoshis_Story_Z.param
+
+
+################
+2B.asl - 4 entries
+
+Base: Jungle_Japes.param
+R: Jungle_Japes_R.param
+L: Jungle_Japes_L.param
+Z: Jungle_Japes_Z.param
+
+
+################
+2C.asl - 4 entries
+
+Base: Onett.param
+R: Onett_R.param
+L: Onett_L.param
+Z: Onett_Z.param
+
+
+################
+2D.asl - 5 entries
+
+Base: Dream_Land.param
+R: Dream_Land_R.param
+L: Dream_Land_L.param
+Z: Dream_Land_Z.param
+0x4000: Dream_Land_MR_00.param
+
+
+################
+2E.asl - 5 entries
+
+Base: Pokemon_Stadium_2.param
+R: Pokemon_Stadium_2_R.param
+L: Pokemon_Stadium_2_L.param
+Z: Pokemon_Stadium_2_Z.param
+0x8000: Pokemon_Stadium_2_ML_00.param
+
+
+################
+2F.asl - 5 entries
+
+Base: Peach_Castle.param
+R: Peach_Castle_R.param
+L: Peach_Castle_L.param
+Z: Peach_Castle_Z.param
+0x8000: Peach_Castle_ML_00.param
+
+
+################
+30.asl - 5 entries
+
+Base: Corneria.param
+R: Corneria_R.param
+L: Corneria_L.param
+Z: Corneria_Z.param
+0x8000: Corneria_ML_00.param
+
+
+################
+31.asl - 4 entries
+
+Base: Big_Blue.param
+R: Big_Blue_R.param
+L: Big_Blue_L.param
+Z: Big_Blue_Z.param
+
+
+################
+32.asl - 6 entries
+
+Base: Planet_Zebes.param
+R: Planet_Zebes_R.param
+L: Planet_Zebes_L.param
+Z: Planet_Zebes_Z.param
+0x8000: Planet_Zebes_ML_00.param
+0x8001: Planet_Zebes_ML_01.param
+
+
+################
+33.asl - 5 entries
+
+Base: Hyrule_Castle.param
+R: Hyrule_Castle_R.param
+L: Hyrule_Castle_L.param
+Z: Hyrule_Castle_Z.param
+0x8000: Hyrule_Castle_ML_00.param
+
+
+################
+34.asl - 1 alt stage
+
+Base: Home_Run.param
+
+
+################
+35.asl - 1 alt stage
+
+Base: Edit_Stage.param
+
+
+################
+36.asl - 1 alt stage
+
+Base: Rest_Area.param
+
+
+################
+37.asl - 8 entries
+
+Base: Training.param
+R: Training_R.param
+L: Training_L.param
+Z: Training_Z.param
+0x4000: Training_MR_00.param
+0x4001: Training_MR_01.param
+0x8000: Training_ML_00.param
+0x8001: Training_ML_01.param
+
+
+################
+38.asl - 1 alt stage
+
+Base: Break_the_Targets.param
+
+
+################
+39.asl - 1 alt stage
+
+Base: Staff_Roll.param
+
+
+################
+40.asl - 4 entries
+
+Base: Draculas_Castle.param
+R: Draculas_Castle_R.param
+L: Draculas_Castle_L.param
+Z: Draculas_Castle_Z.param
+
+
+################
+41.asl - 4 entries
+
+Base: Mario_Circuit.param
+R: Mario_Circuit_R.param
+L: Mario_Circuit_L.param
+Z: Mario_Circuit_Z.param
+
+
+################
+42.asl - 5 entries
+
+Base: Clock_Town.param
+R: Clock_Town_R.param
+L: Clock_Town_L.param
+Z: Clock_Town_Z.param
+0x8000: Clock_Town_ML_00.param
+
+
+################
+43.asl - 5 entries
+
+Base: Sky_Sanctuary.param
+R: Sky_Sanctuary_R.param
+L: Sky_Sanctuary_L.param
+Z: Sky_Sanctuary_Z.param
+0x4000: Sky_Sanctuary_MR_00.param
+
+
+################
+44.asl - 4 entries
+
+Base: Dead_Line.param
+R: Dead_Line_R.param
+L: Dead_Line_L.param
+Z: Dead_Line_Z.param
+
+
+################
+45.asl - 4 entries
+
+Base: Dinosaur_Land.param
+R: Dinosaur_Land_R.param
+L: Dinosaur_Land_L.param
+Z: Dinosaur_Land_Z.param
+
+
+################
+46.asl - 4 entries
+
+Base: Minecart_Madness.param
+R: Minecart_Madness_R.param
+L: Minecart_Madness_L.param
+Z: Minecart_Madness_Z.param
+
+
+################
+47.asl - 4 entries
+
+Base: Golden_Temple.param
+R: Golden_Temple_R.param
+L: Golden_Temple_L.param
+Z: Golden_Temple_Z.param
+
+
+################
+48.asl - 4 entries
+
+Base: Bell_Tower.param
+R: Bell_Tower_R.param
+L: Bell_Tower_L.param
+Z: Bell_Tower_Z.param
+
+
+################
+49.asl - 4 entries
+
+Base: Ceres_Space_Colony.param
+R: Ceres_Space_Colony_R.param
+L: Ceres_Space_Colony_L.param
+Z: Ceres_Space_Colony_Z.param
+
+
+################
+4A.asl - 4 entries
+
+Base: Cookie_Country.param
+R: Cookie_Country_R.param
+L: Cookie_Country_L.param
+Z: Cookie_Country_Z.param
+
+
+################
+4B.asl - 4 entries
+
+Base: Venus_Lighthouse.param
+R: Venus_Lighthouse_R.param
+L: Venus_Lighthouse_L.param
+Z: Venus_Lighthouse_Z.param
+
+
+################
+4C.asl - 6 entries
+
+Base: Mushroom_Kingdom.param
+R: Mushroom_Kingdom_R.param
+L: Mushroom_Kingdom_L.param
+Z: Mushroom_Kingdom_Z.param
+0x8000: Mushroom_Kingdom_ML_00.param
+0x8001: Mushroom_Kingdom_ML_01.param
+
+
+################
+4D.asl - 8 entries
+
+Base: WarioWare.param
+R: WarioWare_R.param
+L: WarioWare_L.param
+Z: WarioWare_Z.param
+0x8000: WarioWare_ML_00.param
+0x8001: WarioWare_ML_01.param
+0x8002: WarioWare_ML_02.param
+0xC000: Event_30.param
+
+
+################
+4E.asl - 4 entries
+
+Base: Subspace.param
+R: Subspace_R.param
+L: Subspace_L.param
+Z: Subspace_Z.param
+
+
+################
+4F.asl - 5 entries
+
+Base: Rainbow_Cruise.param
+R: Rainbow_Cruise_R.param
+L: Rainbow_Cruise_L.param
+Z: Rainbow_Cruise_Z.param
+0x8000: Rainbow_Cruise_ML_00.param
+
+
+################
+50.asl - 4 entries
+
+Base: Poke_Floats.param
+R: Poke_Floats_R.param
+L: Poke_Floats_L.param
+Z: Poke_Floats_Z.param
+
+
+################
+51.asl - 4 entries
+
+Base: Pirate_Ship.param
+R: Pirate_Ship_R.param
+L: Pirate_Ship_L.param
+Z: Pirate_Ship_Z.param
+
+
+################
+52.asl - 4 entries
+
+Base: Venom.param
+R: Venom_R.param
+L: Venom_L.param
+Z: Venom_Z.param
+
+

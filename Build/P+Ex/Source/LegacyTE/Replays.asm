@@ -1,379 +1,866 @@
-PM Replay Fix [Fracture, Stage Reload Fix by Kapedani]
-* C204BB04 0000000D
-* 3CA09134 60A5C9D8
-* 93E50000 93A50004
-* 3CA09134 60A5C90C
-* 3BE00000 93E50000
-* 3CA09134 60A5C9A4
-* 93E50000 80BE0028
-* 3FE09134 63FFC9D4
-* 90BF0000 3FE09134
-* 63FFC9CC 38A50002
-* 90BF0000 3CA09134
-* 60A5C9D8 83E50000
-* 83A50004 881E007A
-* 60000000 00000000
-* C204BB18 00000007
-* 3C609135 8063C9D4
-* 38A00006 98A30001
-* 3CA00600 90A30002
-* 540515BA 3C609134
-* 6063C9A4 90A30000
-* 3C609134 6063C9A8
-* 7F65D850 00000000
-* C204BA84 00000004
-* 38000000 3C809134
-* 6084C908 90040000
-* 3C809134 6084C7FC
-* 7C002214 00000000
-* C204BA9C 00000003
-* 38000001 3C809134
-* 6084C908 90040000
-* 60000000 00000000
-* C2764F18 0000004C
-* 3D809134 618CC9D8
-* 93EC0000 93CC0004
-* 93AC0008 934C000C
-* 932C0010 930C0014
-* D80C0018 D82C0020
-* 3D80805C 818CBFC0
-* 2C0C0002 408201FC
-* 3D809135 818CC900
-* 3FE09130 63FF1F4A
-* B19F0000 3D809135
-* 818CC908 2C0C0000
-* 408201D8 3D809134
-* 618CC954 3FE09135
-* 83FFC90C 7D8CFA14
-* 579F0630 2C1F0000
-* 40820028 8BFC000B
-* 2C1F00FF 4182001C
-* 3FC0805B 63DEC068
-* 57FF1040 7FFFF214
-* 83DF0000 93CC0000
-* 83FB0078 B3EC0004
-* 83FB002C 83FF0070
-* 83FF0020 83FF0014
-* 3FC09134 63DEC99C
-* 3FA042AA 93BE0000
-* C01E0000 3F409134
-* 635AC99C C03F0088
-* FC210032 FC20081C
-* D83A0000 8BDA0007
-* 9BCC0006 C03F008C
-* FC210032 FC20081C
-* D83A0000 8BDA0007
-* 9BCC0007 83DFFFA4
-* 9BCC0008 3FC09135
-* 83DEC90C 3D809134
-* 618CC954 3FE09134
-* 63FFC910 7D8CF214
-* 7FFFF214 3F009135
-* 8318C9CC 3FA09018
-* 83BD12A4 2C1D0070
-* 40800028 3B2000FF
-* 83AC0000 93B80001
-* 93BF0000 83AC0004
-* 93B80005 93BF0004
-* 3B180008 42940040
-* 3BC00000 3B200000
-* 2C1E0008 40800030
-* 57390840 7FACF0AE
-* 7F5FF0AE 7C1DD000
-* 41820010 9FB80001
-* 7FBFF1AE 63390001
-* 3BDE0001 2C1E0008
-* 4180FFD8 8BCC0008
-* 9FD80001 3D809135
-* 818CC9CC 9B2C0000
-* 3B180001 3FC09134
-* 63DEC90C 83BE0000
-* 3BBD0008 93BE0000
-* 3FC09135 83DEC9A4
-* 3FA09134 63BDC9A8
-* 3B380000 2C1E0000
-* 40810020 835D0000
-* 93590000 3BBD0004
-* 3B390004 3BDEFFFC
-* 2C1E0000 4181FFE8
-* 3FC0805B 63DEBFE8
-* 933E0000 3FC09135
-* 83DEC9D4 7F3EC850
-* 9B3E0001 3FE09134
-* 63FFC9CC 931F0000
-* 3D809134 618CC9D8
-* 83EC0000 83CC0004
-* 83AC0008 834C000C
-* 832C0010 830C0014
-* C80C0018 C82C0020
-* 819C0004 00000000
-* C204B1D4 00000003 #
-* 39600052 3D808053 # Writes R to P+'s stage system to signify load stage at getStageData
-* 618CF003 996C0000 #
-* A0030EE3 00000000 #
-* C204BD6C 0000000B
-* 3E809134 6294C90C
-* 38000000 90140000
-* 3E809134 6294C9C4
-* 90140000 3E809134
-* 6294C9CC 80140004
-* 90140000 381E0002
-* 90140004 80140000
-* 3E809134 6294C9C8
-* 90140000 8A9E0001
-* 7E94F214 57E01040
-* 7E80A050 00000000
-* C204BE50 00000005
-* 3C609135 8063C8FC
-* 3D009018 810812A4
-* 7C634378 2C030000
-* 41820008 88860001
-* 60000000 00000000
-* C291319C 0000004A
-* 3D809134 618CC9D8
-* 93EC0000 93CC0004
-* 93AC0008 934C000C
-* 932C0010 D80C0014
-* D82C001C 3D80805C
-* 818CBFC0 2C0C0001
-* 408201F0 3D809135
-* 818CC9C8 83F50070
-* 83FF0020 83FF0014
-* 3BA00000 3B400001
-* 8BCC0000 2C1D0006
-* 40800024 73D90080
-* 2C190000 41820008
-* 3B5A0001 57DE0840
-* 3BBD0001 2C1D0006
-* 4180FFE4 73D90080
-* 2C190000 41820010
-* 7FACD0AE 3B5A0001
-* 42940020 3FA09134
-* 63BDC954 3F209135
-* 8339C9C4 57391840
-* 7FBDCA14 8BBD0006
-* 57DE0840 73D90080
-* 2C190000 41820010
-* 7FCCD0AE 3B5A0001
-* 42940020 3FC09134
-* 63DEC954 3F209135
-* 8339C9C4 57391840
-* 7FDECA14 8BDE0007
-* 7D8CD214 398C0001
-* 3F209134 6339C9C8
-* 91990000 3F209134
-* 6339C9C4 81990000
-* 398C0001 91990000
-* 3D809134 618CC99C
-* 3F203C40 6339EBEE
-* 932C0000 C00C0000
-* 3F209134 6339C99C
-* 2C1D0055 40820010
-* 3FA03F80 93BF0088
-* 42940068 2C1D00AB
-* 40820010 3FA0BF80
-* 93BF0088 42940054
-* 7FBD0774 3B400000
-* 2C1D0000 41820034
-* 2C1D0000 4080000C
-* 3F408000 7FBD00D0
-* 7FAC0034 398CFFF8
-* 5FBD627E 7F5AEB78
-* 398CFF6A 7D8C00D0
-* 558CB840 7F5A6378
-* 93590000 C0390000
-* FC210032 D03F0088
-* 2C1E0055 40820010
-* 3FC03F80 93DF008C
-* 42940068 2C1E00AB
-* 40820010 3FC0BF80
-* 93DF008C 42940054
-* 7FDE0774 3B400000
-* 2C1E0000 41820034
-* 2C1E0000 4080000C
-* 3F408000 7FDE00D0
-* 7FDD0034 3BBDFFF8
-* 5FDEEA7E 7F5AF378
-* 3BBDFF6A 7FBD00D0
-* 57BDB840 7F5AEB78
-* 93590000 C0390000
-* FC210032 D03F008C
-* 3D809134 618CC9D8
-* 83EC0000 83CC0004
-* 83AC0008 834C000C
-* 832C0010 C80C0014
-* C82C001C 81940000
-* 60000000 00000000
-* C204ACC8 00000008
-* 3C609134 6063C9D8
-* 93E30000 3C60805B
-* 60638A08 3BE00000
-* 93E30000 38600021 #
-* 3FE08054 987FF003 # Added writing ! to P+'s stage system to signify load stage
-* 3C609134 6063C9D8
-* 83E30000 7C030378
-* 60000000 00000000
-* C2764E8C 00000041
-* 3C609134 6063C9D8
-* 93E30000 93C30004
-* 93A30008 9343000C
-* 93230010 D8030014
-* D823001C 3C60805C
-* 8063BFC0 2C030001
-* 408201AC 3FA09135
-* 83BDC90C 3C609135
-* 8063C9CC 3FE09134
-* 63FFC954 7FFFEA14
-* 8BC30000 3BA00000
-* 2C1D0008 40800028
-* 73DA0080 2C1A0000
-* 4182000C 8F430001
-* 7F5FE9AE 3BBD0001
-* 57DE0840 2C1D0008
-* 4180FFE0 8BC30001
-* 3FA09134 63BDC998
-* 93DD0000 3FC09134
-* 63DEC9CC 38630002
-* 907E0000 3FC09134
-* 63DEC90C 83BE0000
-* 3BBD0008 93BE0000
-* 387F0000 579F0630
-* 2C1F0000 4082002C
-* 8BFC000B 2C1F00FF
-* 41820020 57FF077E
-* 3FC0805B 63DEC068
-* 57FF1040 7FFFF214
-* 83C30000 93DF0000
-* A3E30004 93FB0078
-* 83FB002C 83FF0070
-* 83FF0020 83FF0014
-* 3FC09134 63DEC99C
-* 3FA03C40 63BDEBEE
-* 93BE0000 C01E0000
-* 3F209134 6339C99C
-* 8BC30006 7FDE0774
-* 3B400000 2C1E0000
-* 41820034 2C1E0000
-* 4080000C 3F408000
-* 7FDE00D0 7FDD0034
-* 3BBDFFF8 5FDEEA7E
-* 7F5AF378 3BBDFF6A
-* 7FBD00D0 57BDB840
-* 7F5AEB78 93590000
-* C0390000 FC210032
-* D03F0088 8BC30007
-* 7FDE0774 3B400000
-* 2C1E0000 41820034
-* 2C1E0000 4080000C
-* 3F408000 7FDE00D0
-* 7FDD0034 3BBDFFF8
-* 5FDEEA7E 7F5AF378
-* 3BBDFF6A 7FBD00D0
-* 57BDB840 7F5AEB78
-* 93590000 C0390000
-* FC210032 D03F008C
-* 3FC09135 83DEC998
-* 93DFFFA4 3C609134
-* 6063C9D8 83E30000
-* 83C30004 83A30008
-* 8343000C 83230010
-* C8030014 C823001C
-* 7F83E378 00000000
-* C2152C64 00000004
-* 3CA09135 80A5C9CC
-* 38A5000A 3FC09130
-* 63DE1C00 7CBE2850
-* 7CBE2B78 00000000
-#* C294A16C 00000009
-#* 3CE0800B 60E79EA2
-#* A0A70000 2C050000 # change to LHZ(5, 7, 0)
-#* 40800010 3CE0800B
-#* 60E79EA2 A0A70000
-#* 3C609130 A0631F4A
-#* 7C632B78 B0670000
-#* 3CE09134 60E7C900
-#* 90670000 38610008
-#* 60000000 00000000
-* C23E16C8 00000002
-* 38600000 4E800020
-* 60000000 00000000
-* C201EFDC 00000001
-* 3B600539 00000000
-* C2017388 00000011
-* 2C030001 4082007C
-* 3C60805C 8063BFC0
-* 68630001 2C030000
-* 40820068 3C609134
-* 6063C9D8 93E30000
-* 93C30004 3C60805B
-* 6063AD04 83E30000
-* 83C30040 7FFFF378
-* 83C30080 7FFFF378
-* 83C300C0 7FFFF378
-* 57FF05EE 2C1F0000
-* 41820008 3BC00002
-* 38600001 7C13F000
-* 40800008 38600000
-* 3FC09134 63DEC9D8
-* 93FE0000 93DE0004
-* 2C030000 00000000
-* C204B9E0 00000006
-* 3FC0805C 8BDE8A0A#\
-* 2C1E0000 4082001C#| case added for new frame advance
-* 3FC0805C 8BDE8A0B#|
-* 2C1E0000 41A2000C#/
-* 38000000 48000008
-* 80030000 00000000
-* C204BCB8 00000021 #size changed
-* 3F009134 6318C9D8
-* 93F80000 93D80004
-* 3F00805B 6318AD04
-* 83F80000 83D80040
-* 7FFFF378 83D80080
-* 7FFFF378 83D800C0
-* 7FFFF378 73F80200
-* 2C180200 40820054
-* 3F009135 A318C904
-* 731F0100 2C1F0100
-* 4182001C 3FE0805C
-* A3FF8A0A 3FC09134
-* 63DEC906 B3FE0000
-* 3B000100 73180103
-* 2C180100 40820014
-* 3FE0805B 63FF8A08
-* 3BC00102 B3DF0002 #changed to load the fact the game is paused to the state too
-* 3B180001 42940030
-* 3F009135 8B18C904
-* 2C180001 4082001C
-* 3FC09134 63DEC904
-* A31E0002 3FE0805B
-* 63FF8A08 B31F0002
-* 3B000000 3FE09134
-* 63FFC904 B31F0000
-* 3F00805C 8B188A0A #\added check for frame advance state
-* 2C180000 4082001C #/
-* 3F00805C 8B188A0B
-* 2C180000 4182000C #\ updated pause check to detect all IDs
-* 38000000 42940008 #/
-* 80030000 3F009134
-* 6318C9D8 83F80000
-* 83D80004 00000000
-* C204AB7C 00000001
-* 60000000 00000000
-* C204C11C 00000001
-* 38A00000 00000000
-* C26F14C8 0000000A
-* 9001FFFC 7C0802A6
-* 90010004 7C0902A6
-* 9001FFF8 9421FF7C
-* BC610008 3FE09130
-* 63FF1F4A 3BC00000
-* B3DF0000 B8610008
-* 38210084 8001FFF8
-* 7C0903A6 80010004
-* 7C0803A6 8001FFFC
-* 7C7F1B78 00000000
-* C209C984 00000003
-* 3FC09134 63DEC8FC
-* 909E0000 7C7E1B78
-* 60000000 00000000
+################################################################################
+PM Replay Fix V2.3 [Fracture, Stage Reload Fix by Kapedani, Recode by DukeItOut]
+#
+# 1.1: 
+# Updated to account for ASL
+#
+# 1.2:
+# Updated to not use rigid pointers, as this affected memory allocation
+# Require's Eon's bla function support to work.
+#
+# 2.0:
+# Fixed issue where Wiimote controllers could not record replays.
+#
+# 2.0b:
+# Got ASL value from a new pointer location for more stability.
+#
+# 2.1:
+# Fixed issue where controllers in unexpected arrangements could influence 
+# Wiimotes or CPUs
+#
+# 2.1b:
+# Adjusted based on an oversight where player slots were always assumed to be in
+# a specific order
+#
+# 2.2:
+# Fixed issue where sharing stocks was never recognized during a replay
+#
+# 2.3:
+# Handled oversight in custom replay system that misinterpreted a special command
+# as a command size instead, causing cinematic freezes to skip over copious
+# amounts of bytes in the replay.
+######################################################################################
+HOOK @ $8004BB04
+{
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap
+	
+	li r5, 0
+	stw r5, -0x2F4(r4) # previously 9134C90C
+	stw r5, -0x25C(r4)	# previously 9134C9A4
+	lwz r5, 0x28(r30)
+	stw r5, -0x22C(r4)	# previously 9134C9D4
+	addi r5, r5, 2
+	stw r5, -0x234(r4)	# previously 9134C9CC
+  
+	lbz r0, 0x7A(r30)	# Original operation
+}
+
+HOOK @ $8004BB18
+{
+	mr r11, r0				# preserve for below
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap
+	lwz r3, -0x22C(r4)		# previously 9134C9D4
+	
+  li r5, 0x6
+  stb r5, 1(r3)
+  lis r5, 0x600
+  stw r5, 2(r3)
+  rlwinm r5, r11, 2, 22, 29	# Modification of Original operation rlwinm r5, r0, 2, 22, 29
+  stw r5, -0x25C(r4)	# previously 9134C9A4
+  subi r3, r4, 0x258	# prevuiusly 9134C9A8
+  sub r27, r27, r5
+  # why is r3 not matching r27 here? It normally does via mr r3, r27
+  addi r4, r30, 94 # needed restored value, previous operation before hook
+}
+
+HOOK @ $8004BA84
+{
+	mr r12, r3
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap
+	li r0, 0
+	stw r0, -0x2F8(r4)		# previously 9134C908
+	subi r0, r4, 0x404		# previously 9134C7FC
+	mr r3, r12				# restore r3
+}
+HOOK @ $8004BA9C
+{
+	mr r12, r3
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap
+	li r0, 1
+	stw r0, -0x2F8(r4)		# previously 9134C908
+	mr r3, r12
+}
+
+
+HOOK @ $80764F18
+{
+#PRESERVE
+
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap    
+  
+  stwu r1, -0x30(r1)
+  stw r31, 0x8(r1)
+  stw r30, 0xC(r1)
+  stw r29, 0x10(r1)
+  stw r26, 0x14(r1)
+  stw r25, 0x18(r1)
+  stw r24, 0x1C(r1)
+    
+  
+  lis r12, 0x805C;  lwz r12, -0x4040(r12);  cmpwi r12, 0x2;  bne- loc_0x230
+  # 2 = Battles
+  # 1 = Replay
+  
+  	lis r12, 0x8054			#
+	lhz r12, -0x1046(r12)   # Get ASL input from 8053EFBA (copied from 800B9EA2)
+	
+	sth r12,  0x44A(r3) # previously 91301F4A. Sets replay ASL input.
+	lwz r12, -0x2F8(r4) # previously 9134C908
+	cmpwi r12, 0
+	bne- loc_0x230			# Only activate if it went through hook 8004BA84 and not 8004BA9C?
+
+	subi r12, r4, 0x2AC	# previously 9134C954
+	lwz r31, -0x2F4(r4) # previously 9134C90C
+	add r12, r12, r31
+	
+	
+	li r31, 0		   # \
+	stw r31, 0x00(r12) # |
+	stw r31, 0x04(r12) # | Reset replay values so that they can't be uninitialized
+	stb r31, 0x08(r12) # /
+	
+  addi r4, r28, 0x42    # \
+  lis r3, 0x80B9        # | Check if a CPU
+  lwz r3, -0x5D28(r3)   # |
+  bla 0x8FC8A4          # |
+  cmpwi r3, 0           # |
+  beq is_CPU            # /
+  
+  lbz r31, 0x42(r28) # Which player slot this is.
+  lis r30, 0x805B;  ori r30, r30, 0xC068	# Something related to the Code Menu?
+  rlwinm r31, r31, 2, 28, 29		# was previously rlwinm r31, r31, 2, 0, 1, which broke it
+  add r31, r31, r30
+  lwz r30, 0(r31)
+  stw r30, 0(r12)
+
+loc_0xA0:
+is_CPU:
+  lwz r31, 0x78(r27)
+  sth r31, 0x04(r12)
+  
+  lwz r31, 0x2C(r27)		#
+  lwz r31, 0x70(r31)		#
+  lwz r31, 0x20(r31)		# LA
+  lwz r31, 0x14(r31)		# Float
+  
+ 
+  lis r29, 0x42AA;  	# 85.0
+  stw r29, 0x20(r1) # previously 9134C99C
+  lfs f0, 0x20(r1)
+
+  lfs f1, 0x88(r31)			# LA-Float[34] (C-Stick X)
+  fmul f1, f1, f0
+  fctiw f1, f1
+  stfd f1, 0x20(r1) # previously 9134C99C
+  lbz r30, 0x27(r1) # previously 9134C99C+7
+  stb r30, 6(r12)
+  
+  lfs f1, 0x8C(r31)			# LA-Float[35] (C-Stick Y)
+  fmul f1, f1, f0
+  fctiw f1, f1
+  stfd f1, 0x20(r1) # previously 9134C99C
+  lbz r30, 0x27(r1) # previously 9134C99C+7
+  stb r30, 7(r12)
+  lwz r30, -0x5C(r31)		# LA-Basic[77]
+  stb r30, 8(r12)
+   
+  # r12 = address at 9134C954 + offset pointed to by 9134C90C
+  # (word) 0x0(r12) = Button Inputs (half) + Control X (byte) + Control Y (byte)
+  # (half) 0x4(r12) = Previous Button Inputs
+  # (byte) 0x6(r12) = LA-Float[34] (C-Stick X as an integer)
+  # (byte) 0x7(r12) = LA-Float[35] (C-Stick Y as an integer)
+  # (byte) 0x8(r12) = LA-Basic[77] (L/R analog status)
+  
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r4, 0x8(r3)			# Get end of replay heap     
+  
+  
+  lwz r30, -0x2F4(r4) # previously 9134C90C
+  subi r12, r4, 0x2AC  # previously 9134C954
+  subi r31, r4, 0x2F0  # previously 9134C910
+  
+  add r12, r12, r30
+  add r31, r31, r30
+  
+  lwz r24, -0x234(r4) # previously 9134C9CC
+
+  #lwz r29, -0x4340(r13)	# Match timer alt way to get it 
+  #lwz r29, 0(r29)
+  #lwz r29, 4(r29)		# Get current frame 
+  
+  lis r29, 0x9018
+  lwz r29, 0x12A4(r29)  # Get current frame
+
+###
+# The below was supposed to be a new check 
+# for 1-P matches, but something else is
+# breaking it as well.
+#
+# For now, it is left in the comments for
+# when someone can figure out why it 
+# is incompatble with replays.
+#
+# In the meanwhile, it is recommended to
+# have disabled the quick start code
+# that skips the countdown for 1-P
+# matches.
+###
+  
+#  lis r25, 0x805C
+#  lwz r25, -0x745C(r25)	# 805B8BA4
+#  lwz r25, 0x48(r25)
+#  lbz r25, 0x54(r25)	# Get game start status
+#  andi. r25, r25, 0x70	# 0x70 is set if it is a normal match. (0x40 for 3, 0x20 for 2, 0x10 for 1)
+						# 0x4 and 0x8 set for "Ready GO!"
+#  li r25, 64		# 66 frames before a quick start for "Ready. GO!" 2-frame leniency.
+#  beq QuickStart
+  li r25, 212		# 214 frames before normal match starts. 2-frame leniency.
+QuickStart:
+  cmpw r29, r25; bge+ GameReady
+  
+  li r25, 0xFF
+  lwz r29, 0(r12)
+  stw r29, 1(r24)
+  stw r29, 0(r31)
+  lwz r29, 4(r12)
+  stw r29, 5(r24)
+  stw r29, 4(r31)
+  addi r24, r24, 8
+  b loc_0x1A4
+  
+GameReady:
+loc_0x168:
+  li r30, 0x0
+  li r25, 0x0
+
+loc_0x178:
+  rlwinm r25, r25, 1, 1, 0
+  lbzx r29, r12, r30
+  lbzx r26, r31, r30
+  cmpw r29, r26
+  beq- loc_0x198
+  stbu r29, 1(r24)
+  stbx r29, r31, r30
+  ori r25, r25, 0x1
+
+loc_0x198:
+  addi r30, r30, 1
+  cmpwi r30, 8
+  blt+ loc_0x178
+
+loc_0x1A4:
+  lbz r30, 8(r12)
+  stbu r30, 1(r24)
+  
+  lwz r12, -0x234(r4) # previously 9134C9CC
+  stb r25, 0(r12)
+  addi r24, r24, 1
+  lwz r29, -0x2F4(r4) # previously 9134C90C
+  addi r29, r29, 8
+  stw r29, -0x2F4(r4) # previously 9134C90C
+  
+  lwz r30, -0x25C(r4) # previously 9134C9A4
+  subi r29, r4, 0x258 # previously 9134C9A8 
+  
+  mr r25, r24
+  cmpwi r30, 0x0;  ble- loc_0x208
+
+loc_0x1EC:
+  lwz r26, 0(r29)
+  stw r26, 0(r25)
+  addi r29, r29, 4
+  addi r25, r25, 4
+  subi r30, r30, 4
+  cmpwi r30, 0x0;  bgt+ loc_0x1EC
+
+loc_0x208:
+  lis r30, 0x805B;  ori r30, r30, 0xBFE8
+  stw r25, 0(r30)
+  lwz r30, -0x22C(r4) # previously 9134C9D4
+  sub r25, r25, r30
+  stb r25, 1(r30)
+  stw r24, -0x234(r4) # previously 9134C9CC
+
+loc_0x230:
+# RESTORE
+  lwz r31, 0x8(r1)
+  lwz r30, 0xC(r1)
+  lwz r29, 0x10(r1)
+  lwz r26, 0x14(r1)
+  lwz r25, 0x18(r1)
+  lwz r24, 0x1C(r1)
+  addi r1, r1, 0x30
+  
+  mr r3, r28		# previous operation
+  lwz r12, 4(r28)	# Original operation
+
+}
+
+
+
+
+
+HOOK @ $8004BD6C
+{
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r3, 0x8(r3)		# Get end of replay heap  
+	
+	li r0, 0
+	stw r0, -0x2F4(r3)	# previously 9134C90C
+	stw r0, -0x23C(r3)	# previously 9134C9C4
+	lwz r0, -0x230(r3)	# previously 9134C9D0
+	stw r0, -0x234(r3)  # previously 9134C9CC
+	addi r0, r30, 2
+	stw r0, -0x230(r3)	# previously 9134C9D0
+	lwz r0, -0x234(r3)	# previously 9134C9CC
+	stw r0, -0x238(r3)	# previously 9134C9C8
+	lbz r20, 1(r30)
+	add r20, r20, r30
+	rlwinm 0, 31, 2, 1, 0
+	sub r20, r20, r0
+}
+HOOK @ $8004BE50
+{
+    mr r12, r4				# r4 is needed
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r3, 0x8(r3)			# Get end of replay heap  
+    mr r4, r12
+	lwz r0, 0x2C(r24)		# previous command 
+	lwz r3, -0x304(r3)	# previously 9134C8FC
+	
+  lis r8, 0x9018
+  lwz r8, 0x12A4(r8)
+  or. r3, r3, r8;  beq- %END%	# Skip if this is in a replay viewing or not frame 0.
+  lbz r4, 1(r6)
+  cmpwi r4, 0x80		# Typically if frozen for a cinematic this is 0x80, 
+  bne %END%				# but this will mess up calculations! We don't want that!
+  li r4, 5				# Frozen gameplay uses 5 bytes to calculate!
+						# For Fracture replay info, non-frozen is typically 4+2*playercount
+  
+  # Normally the operation here is add r4, r4, r3. Why is it not included?
+}
+
+# Used for share stock during team battles
+HOOK @ $80958558
+{
+	lhz r0, 0x8(r1)			# Original operation. Gets button inputs
+	lis r12, 0x805C;  lwz r12, -0x4040(r12);  cmpwi r12, 0x1;  bne- %END%
+  # 2 = Battles
+  # 1 = Replay (we need to make sure that the replay uses the information correctly)
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r3, 0x8(r3)			# Get end of replay heap
+	subi r4, r3, 0x2AC 	# previously 9134C954
+	lwz r5, -0x23C(r3) 	# previously 9134C9C4
+	rlwinm r5, r5, 3, 1, 0
+	add r3, r4, r5
+	lhz r0, 0(r3)		# Get normal button info
+}
+
+# Used for reading replay info
+HOOK @ $8091319C
+{  
+# PRESERVE  
+
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	stw r3, 0x8(r1)
+	stw r4, 0xC(r1)
+	stw r31, 0x10(r1)
+	stw r30, 0x14(r1)
+	stw r29, 0x18(r1)
+	stw r26, 0x1C(r1)
+	stw r25, 0x20(r1)
+
+  
+  lis r12, 0x805C;  lwz r12, -0x4040(r12);  cmpwi r12, 0x1;  bne- loc_0x220
+  
+	lis r3, 0x805A			# \
+	lwz r3, 0x60(r3)		# |
+	lwz r3, 4(r3)			# | Force replays to check for share stock a frame earlier
+	lwz r3, 0x54(r3)		# | than normal
+	bla 0x9583EC			# /
+  
+	li r3, 11				# \
+	bla 0x0249CC			# / Get replay heap offset
+	lwz r3, 0x8(r3)		# Get end of replay heap   
+    lwz r12, -0x238(r3)	# previously 9134C9C8
+  
+  lwz r31, 112(r21)
+  lwz r31, 32(r31)
+  lwz r31, 20(r31)
+  li r29, 0x0
+  li r26, 0x1
+  lbz r30, 0(r12)
+
+loc_0x5C:
+  andi. r25, r30, 0x80;  beq- loc_0x6C
+  addi r26, r26, 0x1
+
+loc_0x6C:
+  rlwinm r30, r30, 1, 1, 0
+  addi r29, r29, 0x1
+  cmpwi r29, 6;  blt+ loc_0x5C		# Loop 6 times
+
+loc_0x7C:
+  andi. r25, r30, 0x80;    beq- loc_0x94
+  lbzx r29, r12, r26
+  addi r26, r26, 0x1
+  b loc_0xB0
+
+loc_0x94:
+  subi r29, r3, 0x2AC # previously 9134C954
+  lwz r25, -0x23C(r3) # previously 9134C9C4
+  rlwinm r25, r25, 3, 1, 0
+  add r29, r29, r25		# C-Stick X Replay Data
+  lbz r29, 6(r29)
+loc_0xB0:  
+  rlwinm r30, r30, 1, 1, 0
+  andi. r25, r30, 0x80;  beq- loc_0xCC
+  lbzx r30, r12, r26
+  addi r26, r26, 0x1
+  b loc_0xE8
+
+loc_0xCC:
+  subi r30, r3, 0x2AC # previously 9134C954
+  lwz r25, -0x23C(r3) # previously 9134C9C4
+  rlwinm r25, r25, 3, 1, 0
+  add r30, r30, r25	# C-Stick Y Replay Data
+  lbz r30, 7(r30)
+loc_0xE8: 
+  add r12, r12, r26
+  addi r12, r12, 0x1
+  stw r12, -0x238(r3) # previously 9134C9C8
+  lwz r12, -0x23C(r3) # previously 9134C9C4
+  addi r12, r12, 1
+  stw r12, -0x23C(r3) # previously 9134C9C4
+  
+  lis r25, 0x3C40; ori r25, r25, 0xEBEE   	# 0.011775  # C-Stick Multiplier
+  stw r25, 0x24(r1) # previously 9134C99C
+  lfs f0, 0x24(r1)
+
+  cmpwi r29, 85;  bne- loc_0x144
+  lis r29, 0x3F80	# 1.0
+  stw r29, 0x88(r31)	# LA-Float[34] C-Stick X Relative
+  b loc_0x1A8
+
+loc_0x144:
+  cmpwi r29, 171;  bne- loc_0x158
+  lis r29, 0xBF80	# -1.0
+  stw r29, 0x88(r31)	# LA-Float[34] C-Stick X Relative
+  b loc_0x1A8
+
+loc_0x158:
+  extsb r29, r29
+  li r26, 0x0		# 0.0
+  cmpwi r29, 0x0;  	beq- loc_0x198
+					bge- loc_0x178
+  lis r26, 0x8000	# -0.0?	(Left 0)
+  neg r29, r29
+
+loc_0x178:
+  cntlzw r12, r29
+  subi r12, r12, 0x8
+  rlwnm r29, r29, r12, 9, 31
+  or r26, r26, r29
+  subi r12, r12, 150
+  neg r12, r12
+  rlwinm r12, r12, 23, 1, 0
+  or r26, r26, r12
+
+loc_0x198:
+  stw r26, 0x24(r1) # previously 9134C99C
+  lfs f1, 0x24(r1)
+
+  fmul f1, f1, f0
+  stfs f1, 0x88(r31)	# LA-Float[34] C-Stick X Relative
+loc_0x1A8: 
+  cmpwi r30, 85; bne- loc_0x1BC
+  lis r30, 0x3F80	# 1.0
+  stw r30, 0x8C(r31)	# LA-Float[35] C-Stick Y
+  b loc_0x220
+
+loc_0x1BC:
+  cmpwi r30, 171;  bne- loc_0x1D0
+  lis r30, 0xBF80	# -1.0
+  stw r30, 0x8C(r31)	# LA-Float[35] C-Stick Y
+  b loc_0x220
+
+loc_0x1D0:
+  extsb r30, r30
+  li r26, 0x0
+  cmpwi r30, 0x0;  	beq- loc_0x210
+					bge- loc_0x1F0
+  lis r26, 0x8000	# -0.0?
+  neg r30, r30
+
+loc_0x1F0:
+  cntlzw r29, r30
+  subi r29, r29, 8
+  rlwnm r30, r30, r29, 9, 31
+  or r26, r26, r30
+  subi r29, r29, 150		
+  neg r29, r29
+  rlwinm r29, r29, 23, 1, 0
+  or r26, r26, r29
+
+loc_0x210:
+  stw r26, 0x24(r1) # previously 9134C99C
+  lfs f1, 0x24(r1)
+  fmul f1, f1, f0
+  stfs f1, 0x8C(r31)	# LA-Float[35] C-Stick Y
+
+loc_0x220:
+# RESTORE 
+	lwz r0, 0x34(r1)
+	mtlr r0
+	lwz r3, 0x8(r1)
+	lwz r4, 0xC(r1)
+	lwz r31, 0x10(r1)
+	lwz r30, 0x14(r1)
+	lwz r29, 0x18(r1)
+	lwz r26, 0x1C(r1)
+	lwz r25, 0x20(r1)
+	addi r1, r1, 0x30
+	
+  lwz r12, 0(r20)	# Original operation
+}
+
+HOOK @ $8004B1D4
+{
+  	li r11, 0x52			    # \ Added writing R to P+'s stage system to signify load stage
+	lis r12, 0x8054 	    # |
+	stb r11, -0xFFD(r12)  # / 8053F003 
+  	lhz r0, 0xEE3(r3)
+}
+
+HOOK @ $8004ACC8
+{
+	li r3, 0
+	lis r12, 0x805C
+	stw r3, -0x75F8(r12) # 805B8A08
+	mr r3, r0		# Original operation
+}
+HOOK @ $80764E88
+{
+	li r3, 11			# \
+	bla 0x0249CC		# / Get replay heap offset
+	lwz r12, 0x8(r3)	# Get end of replay heap 
+    
+  stwu r1, -0x30(r1)
+  # PRESERVE
+  stw r31, 0x8(r1)
+  stw r30, 0xC(r1)
+  stw r29, 0x10(r1)
+  stw r26, 0x14(r1)
+  stw r25, 0x18(r1)
+  
+  
+  
+  
+  lis r3, 0x805C;  lwz r3, -0x4040(r3);  cmpwi r3, 0x1;  bne- Not_Replay
+  # 2 for Battles
+  # 1 for Replays
+  
+  lwz r29, -0x2F4(r12) # previously 9134C90C
+  lwz r3,  -0x234(r12) # previously 9134C9CC
+  subi r31, r12, 0x2AC # previously 9134C954
+  add r31, r31, r29 
+  lbz r30, 0(r3)
+  li r29, 0
+
+loc_0x60:
+  andi. r26, r30, 0x80;  beq- loc_0x74		# check if 80 is set?
+  lbzu r26, 1(r3)
+  stbx r26, r31, r29
+
+loc_0x74:
+  addi r29, r29, 0x1
+  rlwinm r30, r30, 1, 1, 0
+  cmpwi r29, 0x8 
+  blt+ loc_0x60
+
+loc_0x84:
+  lbz r30, 1(r3)
+  stw r30, 0x1C(r1)	   # previously 9134C998
+  addi r3, r3, 2
+  stw r3,  -0x234(r12) # previously 9134C9CC
+  lwz r29, -0x2F4(r12) # previously 9134C90C
+  addi r29, r29, 8
+  stw r29, -0x2F4(r12) # previously 9134C90C 
+  mr r3, r31
+  rlwinm. r31, r28, 0, 24, 24; bne- loc_0xF0		# Odd operation?
+  
+  lbz r31, 0xB(r28);  cmpwi r31, 0xFF;  beq- loc_0xF0 # Check if this is an AI 
+ 
+  rlwinm r31, r31, 0, 29, 31
+  lis r30, 0x805B;  ori r30, r30, 0xC068
+  rlwinm r31, r31, 2, 1, 0
+  add r31, r31, r30
+  lwz r30, 0(r3)
+  stw r30, 0(r31)
+
+loc_0xF0:
+  lhz r31, 4(r3)
+  stw r31, 0x78(r27)
+  
+  lwz r31, 0x2C(r27)
+  lwz r31, 0x70(r31)
+  lwz r31, 0x20(r31)	# LA
+  lwz r31, 0x14(r31)	# Float
+  
+  lis r29, 0x3C40;  ori r29, r29, 0xEBEE	# 0.011775	# Minimum detectable. C-Stick Multiplier
+  
+  stw r29, 0x20(r1) # previously 9134C99C
+  lfs f0, 0x20(r1)
+  
+  lbz r30, 6(r3)
+  extsb r30, r30
+  li r26, 0x0	# 0?
+  cmpwi r30, 0x0;  	beq- loc_0x16C
+					bge- loc_0x14C
+  lis r26, 0x8000 # -0.0?	(Left 0)
+  neg r30, r30
+
+loc_0x14C:
+  cntlzw r29, r30
+  subi r29, r29, 0x8
+  rlwnm r30, r30, r29, 9, 31
+  or r26, r26, r30
+  subi r29, r29, 0x96
+  neg r29, r29
+  rlwinm r29, r29, 23, 1, 0
+  or r26, r26, r29
+
+loc_0x16C:
+  stw r26, 0x20(r1)		# previously 9134C99C
+  lfs f1, 0x20(r1)		#
+  
+  
+  fmul f1, f1, f0
+  stfs f1, 0x88(r31)	# LA-Float[34] C-Stick X Relative
+  lbz r30, 7(r3)
+  extsb r30, r30
+  li r26, 0x0
+  cmpwi r30, 0x0;  beq- loc_0x1C0
+  cmpwi r30, 0x0;  bge- loc_0x1A0
+  lis r26, 0x8000
+  neg r30, r30
+
+loc_0x1A0:
+  cntlzw r29, r30
+  subi r29, r29, 0x8
+  rlwnm r30, r30, r29, 9, 31
+  or r26, r26, r30
+  subi r29, r29, 0x96
+  neg r29, r29
+  rlwinm r29, r29, 23, 1, 0
+  or r26, r26, r29
+
+loc_0x1C0:
+  stw r26, 0x20(r1)		# previously 9134C99C
+  lfs f1, 0x20(r1)		#
+
+  fmul f1, f1, f0
+  stfs f1, 0x8C(r31)   # LA-Float[35] C-Stick Y
+  
+  lwz r30, 0x1C(r1)		# previously 9134C998
+  stw r30, -0x5C(r31)  	# Awkward way of saving LA-Basic[77] ? (0x190 bytes for Basic right before Float)
+						# LA-Basic[77] is used for new L/R presses in PM
+loc_0x1DC:
+Not_Replay:
+
+
+#RESTORE
+  lwz r31, 0x8(r1)
+  lwz r30, 0xC(r1)
+  lwz r29, 0x10(r1)
+  lwz r26, 0x14(r1)
+  lwz r25, 0x18(r1)
+  addi r1, r1, 0x30
+  
+  lwz r12, 0x4(r28)	# Original operation
+}
+HOOK @ $80152C74
+{
+	mr r28, r3		# Original operation
+ 
+	li r3, 11			# \
+	bla 0x0249CC		# / Get replay heap offset
+	lwz r12, 0x8(r3)	# Get end of replay heap
+	addi r30, r3, 0x100	# previously 91301C00. Start of replay heap + 0x100
+	lwz r5, -0x234(r12)	# previously 9134C9CC
+	addi r5, r5, 0xA
+	sub r5, r5, r30
+	 
+	mr r30, r5			# Operation that was previously hooked. Need to replace r30
+	mr r3, r28			# restore r3
+}
+
+HOOK @ $803E16C8		# PFFat_CountFreeClusters
+{
+  li r3, 0x0
+  blr 				# Force disabling new file saving on the NAND?	
+}
+op li r27, 1337 @ $8001EFDC # Gamer.	
+HOOK @ $80017388	# Someone, please move this to somewhere not so low-level.
+{
+	cmpwi r3, 1;  bne- end		# Only modify things if it thinks we are paused
+	li r3, 11			# \
+	bla 0x0249CC		# | Get replay heap offset
+	lwz r12, 0x8(r3)	# / Get end of replay heap
+	
+	lis r3, 0x805C; lwz r3, -0x4040(r3)
+	xori r3, r3, 1;	cmpwi r3, 0
+	bne- end
+	
+	stw r31, -0x228(r12)	# \ Dangerous way to save memory?
+	stw r30, -0x224(r12)	# /
+    stw r30, 0x20(r1)		# \ Save better
+    stw r31, 0x24(r1)		# /
+	
+	
+	lis r3, 0x805B; ori r3, r3, 0xAD04		
+	
+	lwz r31, 0x00(r3)						# Check previous input of GC Controllers
+	lwz r30, 0x40(r3); or r31, r31, r30 
+	lwz r30, 0x80(r3); or r31, r31, r30
+	lwz r30, 0xC0(r3); or r31, r31, r30
+	lwz r30, 0x100(r3); or r31, r31, r30	# Check previous input of Wii Controllers
+	lwz r30, 0x140(r3); or r31, r31, r30 
+	lwz r30, 0x180(r3); or r31, r31, r30
+	lwz r30, 0x1C0(r3); or r31, r31, r30
+	andi. r31, r31, 0x100; beq- setSpeed
+	
+	li r30, 2
+
+setSpeed:
+  li r3, 1
+  cmpw r19, r30;  bge- loc_0x70
+  li r3, 0
+
+loc_0x70:
+  subi r30, r12, 0x228	# previously 9134C9D8
+  stw r31, -0x228(r12)	# \ This used to overwrite r30 and r31!
+  stw r30, -0x224(r12)	# /
+  lwz r30, 0x20(r1)		# \ Restore
+  lwz r31, 0x24(r1)		# /
+
+end:
+  cmpwi r3, 0			# Original operation
+}
+
+HOOK @ $8004B9E0
+{
+  lis r30, 0x805C; lbz r30, -0x75F6(r30)
+  cmpwi r30, 0;    bne- loc_0x28 		# Unk Pause Status
+  lis r30, 0x805C; lbz r30, -0x75F5(r30)
+  cmpwi r30, 0;    beq+ loc_0x28 		# Code Menu/Frame Advance active
+  li r0, 0; b %END%
+
+loc_0x28:
+  lwz r0, 0(r3)				# Original operation
+}
+
+HOOK @ $8004BCB8
+{
+	mr r26, r4
+	mr r25, r3
+	li r3, 11			# \
+	bla 0x0249CC		# | Get end of replay heap offset
+	lwz r12, 0x8(r3)	# / Get end of replay heap
+	
+	lis r24, 0x805B; ori r24, r24, 0xAD04	# \
+	lwz r31, 0x00(r24)						# |
+	lwz r30, 0x40(r24);	or r31, r31, r30	# | Check previous input of 
+	lwz r30, 0x80(r24); or r31, r31, r30	# | GC player slots.
+	lwz r30, 0xC0(r24); or r31, r31, r30	# |
+	andi. r0, r31, 0x200; bne- pressedB		# /	Check if B is pressed during a replay
+	
+	lwz r31, 0x100(r24)						# \
+	lwz r30, 0x140(r24); or r31, r31, r30	# | Check previous input of 
+	lwz r30, 0x180(r24); or r31, r31, r30	# | Wii player slots.
+	lwz r30, 0x1C0(r24); or r31, r31, r30	# |
+	andi. r0, r31, 0x200; bne- pressedB		# |	Check if B is pressed during a replay
+	andis. r0, r31, 0x40; beq+ noInput		# /
+	
+pressedB:
+	
+	lhz r24, -0x2FC(r12)	# previously 9134C904
+	andi. r0, r24, 0x100	# Check if A was also pressed
+	bne- notPressedA		# during replay mode?  
+	
+	lis r31, 0x805C; 
+	lhz r31, -0x75F6(r31)
+	sth r31, -0x2FA(r12)	# previously 9134C906
+	li r24, 0x100			# Fake it if it isn't if B was pressed(?)
+notPressedA:
+	andi. r24, r24, 0x103
+	cmpwi r24, 0x100
+	bne- addOne
+	
+	lis r31, 0x805B; ori r31, r31, 0x8A08
+	li r30, 0x102
+	sth r30, 2(r31)			# Load the pause state
+	
+addOne:
+	addi r24, r24, 1
+	b checkFrameAdvance
+
+noInput:
+	lbz r24, -0x2FC(r12)			# previously 9134C904
+	cmpwi r24, 1; bne- setZero
+	lhz r24, -0x2FA(r12)			# previously 9134C906
+	lis r31, 0x805C; sth r24, -0x75F6(r31) # 805B8A0A
+	
+setZero:
+  li r24, 0
+
+checkFrameAdvance:
+  sth r24, -0x2FC(r12)				# previously 9134C904
+  lis r3, 0x805C											# \ added check for frame advance state
+  lbz r24, -0x75F6(r3); cmpwi r24, 0; bne- storeSpeed		# /
+  lbz r24, -0x75F5(r3); cmpwi r24, 0; beq- storeSpeed		# \ updated pause check to detect all IDs	
+  li r0, 0; b end											# /
+  
+storeSpeed:
+  lwz r0, 0(r25)		# Modification of original operation which used r3
+  
+end:
+  mr r3, r25		   # \ Restore
+  mr r4, r26		   # /
+}
+###
+op NOP      @ $8004AB7C	# normally bl 8004bfa0
+op li r5, 0 @ $8004C11C #
+HOOK @ $806F14C8		#
+{
+	mr r31, r3			# Original operation 
+	li r3, 11			# \
+	bla 0x0249CC		# / Get replay heap offset
+	li r0, 0			# \ Set to 0 if training is starting to disable alts?
+	sth r0, 0x44A(r3)	# / Previously 91301F4A
+}
+HOOK @ $8009C984
+{
+	mr r30, r3			# Original operation
+	li r3, 11			# \
+	bla 0x0249CC		# | Get replay heap offset
+	lwz r3, 0x8(r3)		# / Get end of replay heap
+	stw r31, -0x304(r3)	# Previously 9134C8FC
+	mr r3, r30			# r3 is still needed
+}

@@ -59,21 +59,3 @@ loc_0x2C:
 op li r0, 0x3	@ $80053E8C
 op NOP 			@ $8004DA18
 // modified for compatibility by wiiztec
-
-##############################################
-Ignore Damage Gauge Setting [InternetExplorer]
-##############################################
-op li r3, 1 @ $8005063C
-
-######################################################
-Damage Gauge Toggles 3-Frame Buffer [InternetExplorer]
-######################################################
-HOOK @ $8085B784
-{
-  lis r3, 0x9017;  ori r3, r3, 0xF36C
-  lbz r3, 0(r3)
-  cmpwi r3, 0x1	# \
-  li r3, 0x0	# | If the handicap damage gauge is enabled . . . 
-  bne- %END%	# /
-  li r3, 0x3	# Set the buffer to 3 frames instead of 0
-}

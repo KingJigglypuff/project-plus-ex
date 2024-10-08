@@ -196,3 +196,9 @@ op sth r31, 0xC(r30) @ $807630DC
 DK Cargo Mash Fix [Magus]
 #########################
 op NOP @ $80891774
+
+############################################################################
+Grab victims don't shake violently when pushed to the edge [DukeItOut]
+############################################################################
+int 1 @ $80FB01C8 # Action 3E - Being held
+int 2 @ $80FAFE88 # Action 3D - Getting grabbed

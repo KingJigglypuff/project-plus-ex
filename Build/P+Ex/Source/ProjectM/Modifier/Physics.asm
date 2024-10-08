@@ -24,7 +24,7 @@ HOOK @ $8085765C
   li r4, 0x4
   divw r12, r12, r4
   lis r4, 0x8058
-  ori r4, r4, 0x5270
+  ori r4, r4, 0x5380
   mulli r5, r31, 0x4
   lwzx r4, r4, r5
   lis r0, 0x9340;  cmpw r4, r0;  bgelr
@@ -75,7 +75,7 @@ CODE @ $8058549C
 loc_0x18:
   lwz r30, 0x14(r30)
   lhz r30, 0x5A(r30);  ori r30, r30, 0x8000
-  lis r25, 0x8058;  ori r25, r25, 0x5270
+  lis r25, 0x8058;  ori r25, r25, 0x5380
   mulli r26, r27, 0x4
   lwzx r25, r25, r26
   lis r24, 0x9340;  cmpw r25, r24;  bgelr- 
@@ -214,7 +214,7 @@ PULSE					# Basically makes a series of pointers for each character to check for
   stmw r26, 8(r1)
 //  lis r31, 0x901B;  ori r31, r31, 0x4000	# Pointer to table, below
   lis r31, 0x8058;	lwz r31, 0x5520(r31)	# Pointer to table, below
-  lis r30, 0x8058;  ori r30, r30, 0x5270	# Where to write pointers to.
+  lis r30, 0x8058;  ori r30, r30, 0x5380	# Where to write pointers to.
   lwz r26, 0(r31);  cmpwi r26, 0x0;  ble- loc_0x50	# Prevent from accessing table if it doesn't exist yet or has been written???
   srawi r26, r26, 24
 
@@ -378,7 +378,7 @@ Skip:
 /*
 * 205A91F8 00000000
 * 4A000000 90000000
-* 161B4000 0000030A
+* 161B4000 000002E8
 * 00060004 3EC28F5C
 * 01060004 3EA8F5C3
 * 02060004 3F147AE1

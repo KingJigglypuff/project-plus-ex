@@ -335,3 +335,19 @@ ledgeGrabs:
   stw r4, 0x24(r3)
 }
 
+########################################################################################
+[Project+] Aerial Attacks and non-Up B specials remove ledge invulnerability from ledge jumps [DukeItOut]
+########################################################################################
+HOOK @ $8074D1EC
+{
+    subi r0, r4, 1    # Original operation: Decreases ledge invulnerability each frame.
+    lwz r12, 0x7C(r29)    # \ Obtain the previous action
+    lhz r4, 0x6(r12)        # /
+   cmpwi r4, 0x7A; bne %END%  # If it was the end of ledge jumping, then look at the coding, below
+    lwz r12, 0x38(r12)  # Obtain the current action
+    cmpwi r12, 0x33; beq clearInvuln        # If an aerial . . .
+    cmpwi r12, 0x112; blt+ %END%            # Or starting a special
+    cmpwi r12, 0x115; bgt- %END%            # then clear the invuln count!
+clearInvuln:    
+    li r0, 0
+}

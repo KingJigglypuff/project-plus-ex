@@ -1,10 +1,15 @@
 ######################################################################################
-[Legacy TE] ASL Helper for Solo Modes, SFX/GFX, and Replays V1.1 [DukeItOut]
+[Legacy TE] ASL Helper for Solo Modes, SFX/GFX, and Replays V1.3 [DukeItOut, Kapedani]
 #
 # 1.1: Changes hookpoint so that D-pad inputs don't get replaced by control stick ones
 # 			This fixes an issue where the D-pad couldn't get read when disabling it
 #			on the SSS with a different code!
+# 1.2: Adds support for Wiimotes and Wiimote+Nunchuk
+# 1.3: Add support for >=0x4000 forced ASL
 ######################################################################################
+.alias gfSceneManager__searchScene                = 0x8002d3f4
+.alias ASL_BUTTON						= 0x800B9EA2
+
 .macro LoadAddress(<arg1>,<arg2>)
 {
 .alias temp_Hi = <arg2> / 0x10000 
@@ -12,11 +17,27 @@
 	lis <arg1>, temp_Hi
 	ori <arg1>, <arg1>, temp_Lo 
 }
+.macro shd(<storeReg>, <addrReg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <addrReg>, temp_Hi
+    sth     <storeReg>, temp_Lo(<addrReg>)
+}
 .macro BranchBitSet(<arg1>,<arg2>)
 {
 	andi. r0, r3, <arg1>; 
 	bne- <arg2>
 }
+.macro call(<addr>)
+{
+  %LoadAddress(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+
 # This isn't optimal, but too many codes use the address 800B9EA0 at this point to move it.
 HOOK @ $800B9E98
 {
@@ -30,21 +51,22 @@ HOOK @ $800B9E98
 HOOK @ $800B99FC
 {
   %LoadAddress(r4,0x800B9EA4)
-  lis r12, 0x805B
-  lwz r12, 0x50AC(r12)
-  lwz r12, 0x10(r12)	# \
-  lwz r3, 0xC(r12)		# | Bail if current mode is NOT a menu
-  cmpwi r3, 6			# | (this avoids issues when on a transforming stage, since they can poll menu information for a split-second)
-  lwz r12, 0x0(r12)		# | 
-  bgt- abort			# /
   lis r3, 0x8070		
-  ori r0, r3, 0x3028; cmpw r0, r12; beq eventMatch	# "sqEvent"
+  lwz	r12, -0x43C0(r13) # gfSceneManager
+  lwz r11, 0x4(r12)                             # \
+  lwz r11, 0x0(r11)                             # | skip if gfSceneManager->currentScene->sceneName = "scMelee"
+  ori r0, r3, 0x0250; cmpw r0, r11; beq abort   # /
+  lwz r12, 0x10(r12)	# \ gfSceneManager->currentSequence->sequenceName
+  lwz r12, 0x0(r12)		# /
+  #ori r0, r3, 0x3028; cmpw r0, r12; beq eventMatch	# "sqEvent"
   ori r0, r3, 0x39D8; cmpw r0, r12; beq replay		# "sqReplay"
   ori r0, r3, 0x1B54; cmpw r0, r12; beq multiplayer	# "sqVsMelee"
   ori r0, r3, 0x2024; cmpw r0, r12; beq multiplayer	# "sqSpMelee"
-  ori r0, r3, 0x24D0; cmpw r0, r12; beq classic		# "sqSingleSimple"
-  ori r0, r3, 0x27E0; cmpw r0, r12; beq allStar		# "sqSingleAllStar"
-  ori r0, r3, 0x3850; cmpw r0, r12; beq training	# "sqTraining"  
+  #ori r0, r3, 0x24D0; cmpw r0, r12; beq classic		# "sqSingleSimple"
+  #ori r0, r3, 0x27E0; cmpw r0, r12; beq allStar		# "sqSingleAllStar"
+  ori r0, r3, 0x3850; cmpw r0, r12; beq training	# "sqTraining" 
+  ori r0, r3, 0x2130; cmpw r0, r12; beq rotation	# "sqQuMelee" 
+  ori r0, r3, 0x1F10; cmpw r0, r12; beq tourney   # "sqToMelee"
 myMusicCheck:
   ori r0, r3, 0x17B0; cmpw r0, r12; bne abort     # "sqMenuMain" is the only one this should currently run for
   lis r12, 0x805C		# \ 805B8BC4
@@ -52,71 +74,106 @@ myMusicCheck:
   lwz r12, 0x3D0(r12)	# Get current page of sqMenuMain
   cmpwi r12, 0xC		# Is it My Music's?
   bne abort				# If not, bail.
-  b multiplayer
+#  b multiplayer
 # Additional, more strict tests needed for My Music
 eventMatch:
-  lwz r12, 0x8(r24)		# \
-  lwz r12, 0x17B8(r12)	# | Retrieve event match number and add 1 for human readability 
-  addi r12, r12, 1		# /
-  lis r3, 0x815E		# \ Is it co-op for Event Match?
-  lwz r3, 0x7DBC(r3)	# | Those events are different if it is!
-  cmpwi r3, 0			# |
-  bne co_op_event		# /
-single_event:
-  cmpwi r12,  4;	beq- single_L	# Event Match  4 (A Skyworld Engagement), load Brawl Skyworld
-  cmpwi r12,  6;	beq- single_X	# Event Match  6 (Bird in the Darkest Night), loads Brinstar (Planet Zebes' X-alt)
-  cmpwi r12,  9;	beq- single_X	# Event Match  9 (Clash of Swords), load Castle Siege Brawl
-  cmpwi r12, 17;	beq- single_L	# Event Match 17 (Brisk Expedition), load Summit (Infinite Glacier's L-alt)
-  cmpwi r12, 19;	beq- single_Y	# Event Match 19 (Metal Battle in Metal Cavern), load Metal Cavern 64
-  cmpwi r12, 26;	beq- single_Y	# Event Match 26 (Carefree Concert), load K.K. Smashville
-  cmpwi r12, 33;	beq- single_L	# Event Match 33 (Advent of the Evil King), loads Ganon's Castle (Hyrule Castle's L-alt)
-  cmpwi r12, 38;	beq- single_X	# Event Match 38 (The Wolf Hunts The Fox), load tilting version of Lylat
-  cmpwi r12, 41;	beq- single_R	# Event Match 41 (The FINAL final battle), loads PM Final Destination
-  b single_default
-co_op_event:
-  cmpwi r12, 7;		beq- single_Z	# Event Match  7 (Battle of the Dark Sides), loads Bridge of Eldin 
-  cmpwi r12, 17;	beq- single_L	# Event Match 17 (Sonic & Mario), loads Brawl Green Hill Zone
-  cmpwi r12, 20;	beq- single_L	# Event Match 20 (The Final Battle for Two), loads Brawl FD (with Melee FD collisions)
-  b single_default
 classic:
 allStar:
-  lwz r3, 0xC(r1)		# Get the game input without the control stick influence
-  mflr r0
-  stw r0, -4(r4)		# preserve link register
-  %LoadAddress(r4,0x800B9F84)
-  lbz r4, 3(r4);  	  cmpwi r4, 0x3;  beq- single_default #Event mode always loads default.
-  %BranchBitSet(0x8,single_R)
-  %BranchBitSet(0x4,single_default)
-  %BranchBitSet(0x1,single_L)
-  %BranchBitSet(0x2,single_Z)
-  %LoadAddress(r4,0x803F8C3C) 	# \
-  mtctr r4						# | rand
-  bctrl 						# /
-  andi. r3, r3, 0x3;  cmpwi r3, 0x0;  beq- single_default
-					  cmpwi r3, 0x1;  beq- single_R
-					  cmpwi r3, 0x2;  beq- single_L
+#   lwz r3, 0xC(r1)		# Get the game input without the control stick influence
+#   mflr r0
+#   stw r0, -4(r4)		# preserve link register
+#   %LoadAddress(r4,0x800B9F84)
+#   lbz r4, 3(r4);  	  cmpwi r4, 0x3;  beq- single_default #Event mode always loads default.
+#   %BranchBitSet(0x8,single_R)
+#   %BranchBitSet(0x4,single_default)
+#   %BranchBitSet(0x1,single_L)
+#   %BranchBitSet(0x2,single_Z)
+#   %LoadAddress(r4,0x803F8C3C) 	# \
+#   mtctr r4						# | rand
+#   bctrl 						# /
+#   andi. r3, r3, 0x3;  cmpwi r3, 0x0;  beq- single_default
+# 					  cmpwi r3, 0x1;  beq- single_R
+# 					  cmpwi r3, 0x2;  beq- single_L
 
-single_Z:
-  li r0, 0x10;  b single
-single_L:
-  li r0, 0x40;  b single
-single_R:
-  li r0, 0x20;  b single
-single_Y:	# Only forced in event match contexts
-  li r0, 0x800; b single
-single_X:
-  li r0, 0x400; b single
-single_default:
-  li r0, 0x0;	b single
+# single_Z:
+#   li r0, 0x10;  b single
+# single_L:
+#   li r0, 0x40;  b single
+# single_R:
+#   li r0, 0x20;  b single
+# single_Y:	# Only forced in event match contexts
+#   li r0, 0x800; b single
+# single_X:
+#   li r0, 0x400; b single
+# single_default:
+#   li r0, 0x0;	b single
 replay:
 myMusic:
 multiplayer:
 training:
-  lwz r0, 0xC(r1);  b setStage	# Get the input, without the control stick
-single:
-  %LoadAddress(r4,0x800B9EA4)
-  lwz r3, -4(r4)
-  mtlr r3
+rotation:
+tourney:
+  lhz r12, -2(r4)     # \ 
+  cmpwi r12, 0x4000   # | check if current input >= 0x4000
+  bge+ abort          # /
+  li r3, 0
+	lis r5, 0xFFFF		  # \ Filter for ZL and ZR, see below. (FFFF 3FFF) 
+	ori r5, r5, 0x3FFF	# /
+	li r6, 0
+	li r7, 0
+portLoop:
+	lis r12, 0x805B
+	ori r12, r12, 0xAD00
+	lwzx r3, r12, r6
+	cmpwi r6, 0x100
+	bge- Wiimote
+GameCube:
+	or r7, r7, r3	# Set the buttons as expected
+	b buttonTested
+Wiimote:
+	and r3, r3, r5	# Filter out ZR and ZL to treat like Z on a Classic Controller.
+	andis. r0, r3, 0xFFFF; beq GameCube		# Treat non-Wiimote/Nunchuk unique buttons as GC for Classic
+
+	andis. r0, r3, 0x40; beq notWiiB;						# Wiimote B?
+
+
+	andi. r0, r3, 0xF; beq notWiiB							# Act as a modifier to get other inputs
+	andi. r0, r3, 1; beq notWiiMinusLeft; ori r7, r7, 0x40		# Wiimote B&Left? GC L
+notWiiMinusLeft:
+	andi. r0, r3, 8; beq notWiiMinusUp; ori r7, r7, 0x20		# Wiimote B&Up? GC R
+notWiiMinusUp:
+	andi. r0, r3, 2; beq notWiiMinusRight; ori r7, r7, 0x10		# Wiimote B&Right? GC Z
+notWiiMinusRight:
+	andi. r0, r3, 4; beq notWiiB; ori r7, r7, 0x400				# Wiimote B&Down? GC X
+
+	
+notWiiB:	
+	andis. r0, r3, 0x04; beq notWiiC; ori r7, r7, 0x400		# Wiimote C? Treat like GC X
+notWiiC:
+	andis. r0, r3, 0x20; beq notWiiA; ori r7, r7, 0x20		# Wiimote A? Treat like GC R
+notWiiA:
+	andis. r0, r3, 0x10; beq notCCPlus; ori r7, r7, 0x1000	# Classic +? Treat like GC Start
+notCCPlus:
+	andis. r0, r3, 0x08; beq notWiiMinus; 
+		
+	andi. r0, r3, 0x1000; beq justWiiMinus	# Is Wiimote + also pressed?
+	ori r7, r7, 0x800; b notWiiMinus	# Wiimote -&+? Treat like GC Y
+justWiiMinus:
+	ori r7, r7, 0x400					# Wiimote -? Treat like GC X
+notWiiMinus:
+	
+
+buttonTested:	
+	addi r6, r6, 0x40
+	cmpwi r6, 0x200
+	blt+ portLoop
+	
+	mr r0, r7
+  #lwz r0, 0xC(r1) #;  b setStage	# Get the input, without the control stick
+# single:
+#   %LoadAddress(r4,0x800B9EA4)
+#   lwz r3, -4(r4)
+#   mtlr r3
 setStage:
   stw r0, -4(r4)		# Stores input
 abort:
@@ -137,3 +194,11 @@ HOOK @ $806A51D0
   %LoadAddress(r28,0x800B9F84)
   sth r29, 0x2(r28)
 }
+
+HOOK @ $806ee8fc  # sqEvent::setupEvent
+{
+  stb	r0, 0x1C(r27) # Original operation
+  lhz r12, 0x22(r18)          # \ set asl button from event node
+  %shd(r12, r11, ASL_BUTTON)  # /
+}
+

@@ -1,0 +1,58 @@
+00 = Mario
+01 = Donkey Kong
+02 = Link
+03 = Samus
+04 = Zero Suit Samus
+05 = Yoshi
+06 = Kirby
+07 = Fox
+08 = Pikachu
+09 = Luigi
+0A = Captain Falcon
+0B = Ness
+0C = Bowser / Giga Bowser
+0D = Peach
+0E = Zelda
+0F = Sheik
+10 = Ice Climbers
+11 = Marth
+12 = Mr. Game & Watch
+13 = Falco
+14 = Ganondorf
+15 = Wario / Wario-Man
+16 = Meta Knight
+17 = Pit
+18 = Olimar
+19 = Lucas
+1A = Diddy Kong
+1B = Pokemon Trainer
+1C = Charizard
+1D = Squirtle
+1E = Ivysaur
+1F = Dedede
+20 = Lucario
+21 = Ike
+22 = R.O.B.
+23 = Jigglypuff
+24 = Toon Link
+25 = Wolf
+26 = Snake
+27 = Sonic
+2D - Roy
+2E = Mewtwo
+2F = Knuckles
+32 - Ridley
+33 - Waluigi
+40 - Dark Samus
+41 - Krystal
+62 - Sceptile
+6A - Red Alloy (Ex)
+6B - Blue Alloy (Ex)
+6C - Yellow Alloy (Ex)
+6D - Green Alloy (Ex)
+
+The last true costume values should be no later than 0x62-0x63!
+
+WARNING!! Do not place any Wario costume ID at 0xF (15), 0x1F (31), 0x2F (47) or 0x3F (63). These break the game if you try to load Wario-Man
+from the CSS. There are enough IDs to still give him 50, so simply select a different value instead of using those specific four.
+Mr. Game & Watch has two known unusable costume slots: 0xB (12) and 0xC (13). These are designated by red colors inside his costume .pac file.

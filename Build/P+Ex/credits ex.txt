@@ -1,27 +1,51 @@
-BrawlEx Engine and CSS Expansion by PhantomWings and SammiHusky. P+Ex logo by Link Tahuterasu Spirit.
+BrawlEx Engine and CSS Expansion by PhantomWings and SammiHusky. P+Ex logo by Link Tahuterasu Spirit. P+Ex Strap Screen and Title Screen updates by Kirbeast.
 
-###################
-Project+Ex Dev Team
-###################
+#########################
+Project+Ex Project Leader
+#########################
 -KingJigglypuff
+
+#######################
+Project+Ex Contributors
+#######################
+*P+Ex doesn't really have a dev team, just a collection of people I ask to help out.
+-codes/TheGag96
 -DesiacX
 -DukeItOut
 -Eon
+-Kapedani (also a tester)
+-Kirbeast
+-MarioDox
+-pikamaxi
+-Sammi Husky
+-QuickLava (also a tester)
 
 ##################
 Project+Ex Testers
 ##################
--DukeItOut
--PyroPM
--Kapedani
--King Draco
--pikamaxi
--Sammi Husky
--KorytheMaril
--codes/TheGag96
--Ripple
--Motobug
+-Ale64
 -Cahalan
+-CurtDog420
+-extreme
+-FWCrash
+-GoldenNickXT
+-Happymilla
+-ilikepizza107
+-Jerry
+-King Draco
+-KorytheMaril
+-lank
+-MaBoyBrad
+-Motobug
+-Nezha
+-Pyro
+-PussPuss
+-Ripple
+-Shadowic
+-Squidgy
+-SSK
+-Szion
+-Tatsuya
 -ZaTaisho
 
 ##############################
@@ -86,3 +110,94 @@ For the creation of the moveset itself, please refer to this external document c
 35 - Brown Strikers by MKHT, Mach7, and Dapperman
 AltR - Assist Trophy Waluigi by KingJigglypuff
 AltZ - Brawl in the Family Waluigi by MKHT
+
+SCEPTILE
+Pose by KingJigglypuff, model polish and renders by Cahalan
+For the creation of the project itself, please refer to this external document containing all credits for those involved with the making of Sceptile.
+https://docs.google.com/document/d/1YK_gjA9iwin7wm3id73UZFfC294i-anPDKL77J8yCiw/edit?usp=sharing
+00 - Default by StarWaffle, Moblin, KingDraco, Xenthos, and Cahalan
+01 - Red by MKHT and Cahalan
+03 - Blue by MKHT and Cahalan
+04 - Pokken P2 by Cahalan
+05 - Brown by MKHT and Cahalan
+06 - White by MKHT and Cahalan
+07 - Black by MKHT and Cahalan
+08 - Purple by MKHT and Cahalan
+09 - Yellow by MKHT and Cahalan
+10 - Shiny by Cahalan
+11 - Orange by Cahalan
+12 - Pink by Cahalan
+13 - Sandstone by Ale64 and Cahalan
+14 - Toxic by Cahalan
+15 - Steel by Cahalan
+16 - Manga by Cahalan
+AltR - N/A, Sceptile currently lacks an R-Alt.
+AltZ - N/A, Sceptile currently lacks a Z-Alt.
+
+Fighting Alloy Team EX
+Poses by KingJigglypuff, model polish and renders by Mach7 and Cahalan
+For the creation of the project itself, please refer to this external document containing all credits for those involved with the making of the Fighting Alloy Team EX. https://docs.google.com/document/d/17Lvnj_mvPDDAcW5Zj1j1FGXCB17Qxp36esb0v-l4_uk/edit?usp=sharing
+
+RED ALLOY EX
+00 - Default by KingJigglypuff
+02 - Green Default by KingJigglypuff
+03 - Blue Default by KingJigglypuff
+04 - Yellow Default by KingJigglypuff
+05 - Black Default by KingJigglypuff
+06 - Magenta Default by KingJigglypuff
+20 - Male Fighting Wireframe by KingJigglypuff and Moblin
+21 - Red Male Fighting Wireframe by KingJigglypuff
+22 - Blue Male Fighting Wireframe by KingJigglypuff
+23 - Green Male Fighting Wireframe by KingJigglypuff
+24 - Yellow Male Fighting Wireframe by KingJigglypuff
+25 - Black Male Fighting Wireframe by KingJigglypuff and Cahalan
+AltR - Captain Falcon Fighting Polygon by KingJigglypuff and Comjay (ripped model resource)
+AltZ - N/A
+
+BLUE ALLOY EX
+00 - Default by KingJigglypuff
+01 - Red Default by KingJigglypuff
+03 - Green Default by KingJigglypuff
+04 - Yellow Default by KingJigglypuff
+05 - Black Default by KingJigglypuff
+06 - Magenta Default by KingJigglypuff
+20 - Female Fighting Wireframe by KingJigglypuff and Moblin
+21 - Red Female Fighting Wireframe by KingJigglypuff
+22 - Green Female Fighting Wireframe by KingJigglypuff
+23 - Blue Female Fighting Wireframe by KingJigglypuff
+24 - Yellow Female Fighting Wireframe by KingJigglypuff
+25 - Black Female Fighting Wireframe by KingJigglypuff and Cahalan
+AltR - N/A
+AltZ - N/A
+
+YELLOW ALLOY EX
+00 - Default by KingJigglypuff
+01 - Red Default by KingJigglypuff
+02 - Green Default by KingJigglypuff
+03 - Blue Default by KingJigglypuff
+04 - Black Default by KingJigglypuff
+05 - Magenta Default by KingJigglypuff
+20 - Child Fighting Wireframe by KingJigglypuff and Spex130
+21 - Red Child Fighting Wireframe by KingJigglypuff
+22 - Green Child Fighting Wireframe by KingJigglypuff
+23 - Blue Child Fighting Wireframe by KingJigglypuff
+24 - Yellow Child Fighting Wireframe by KingJigglypuff
+25 - Black Child Fighting Wireframe by KingJigglypuff and Cahalan
+AltR - Mario Fighting Polygon by KingJigglypuff, Comjay (ripped model resource), and Solink (ripped model resource)
+AltZ - N/A
+
+GREEN ALLOY EX
+00 - Default by KingJigglypuff
+01 - Red Default by KingJigglypuff
+03 - Blue Default by KingJigglypuff
+04 - Yellow Default by KingJigglypuff
+05 - Black Default by KingJigglypuff
+06 - Magenta Default by KingJigglypuff
+20 - Ball Fighting Wireframe by KingJigglypuff and DemonBoy
+21 - Red Ball Fighting Wireframe by KingJigglypuff
+22 - Green Ball Fighting Wireframe by KingJigglypuff
+23 - Blue Ball Fighting Wireframe by KingJigglypuff
+24 - Yellow Ball Fighting Wireframe by KingJigglypuff
+25 - Black Ball Fighting Wireframe by KingJigglypuff and Cahalan
+AltR - Kirby Fighting Polygon by KingJigglypuff, MarioDox, and Comjay (ripped model resource)
+AltZ - N/A

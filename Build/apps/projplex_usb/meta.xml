@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+	<name>Project+Ex USB Loader</name>
+	<version>1</version>		\\Configurable SD/USB Loader v70r78.11 by oggzee, usptactical, gannon, Dr. Clipper, R2-D2199, FIX94, airline38, Howard, NiTRo THe DeMoN
+	<release_date>20220831</release_date>
+	<coder>Project+Ex Dev Team</coder>	\\Kirbeast, waffeln, Bird
+	<short_description>Project+Ex USB Loader</short_description>
+<long_description>
+Project+Ex v1.5. All changes are not final.
+
+This is a modified version of CFG USB Loader designed for instantly loading Project+Ex via USB.
+</long_description>
+<ahb_access/>
+<arguments>
+<arg>RSBE01</arg>
+<arg>intro = 0</arg>
+<arg>device = usb</arg>
+<arg>partition = auto</arg>
+<arg>ios = 249</arg>
+<arg>video = system</arg>
+<arg>video_patch = all</arg>
+<arg>ocarina = 1</arg>
+<arg>hooktype = axframe</arg>
+</arguments>
+</app>

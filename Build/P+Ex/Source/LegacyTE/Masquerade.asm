@@ -2,11 +2,11 @@
 [Legacy TE] Masquerade Costume Flags V2 [ds22, DukeItOut]
 #########################################################
 op subi r0, r31, 0x32 @ $8084CD48
-* 037C8500 007F00FF
+* 02AD817C 003200FF
 
-###########################################################################################
-[Legacy TE] Set Masquerade Costume Count to Zero to have up to 50 costumes v1.1 [DukeItOut]
-###########################################################################################
+############################################################################################
+[Legacy TE] Set Masquerade Costume Count to Zero to have up to 50 costumes v1.1a [DukeItOut]
+############################################################################################
 HOOK @ $8084CFFC
 {
   andi. r12, r0, 0xFFFE
@@ -18,8 +18,9 @@ HOOK @ $8084CFFC
 masqueradeBypass:
   and. r0, r3, r0
 }
-op rlwinm r5, r23, 0, 26, 31 @ $8084D00C
-op rlwinm r3, r0, 0, 26,  31 @ $8081C3D4
+op rlwinm r5, r23, 0, 25, 31 @ $8084D00C # Ghidra: $8085AF98 \ 
+op rlwinm r5, r8, 0, 25, 31  @ $8084DED4 # Ghidra: $8085BE60 | Changed to support 128 costume IDs per char.
+op rlwinm r3, r0,  0, 25, 31 @ $8081C3D4 # Ghidra: $8082A360 / 
 byte 0x34		     @ $8045A374	// '4'
 half 0xBB9 		     @ $800E1F0E
 HOOK @ $800E1F24
@@ -81,3 +82,18 @@ op rlwinm r0, r6, 0, 28, 31 @ $8082A91C
 byte 50 		    @ $80692DA7
 byte 50 		    @ $80692507
 byte[4] 0x30, 0x34, 0x64, 0 @ $806A17D8
+
+################################################################
+[Brawl-Themed Project+] Stage Select Screen Supports 50CC [QuickLava]
+################################################################
+# Stage Select Stock Icons 50CC Fix
+HOOK @ $806B2FFC
+{
+  	cmpwi r25, 0x36;   bne+ notWarioman		# 0x36 isn't a mistake.
+ 	li r3, 9000; b %END%					# Not sure why it's not 0x35 like in the above codes.
+notWarioman:
+ 	mulli r3, r3, 50
+}
+# Overwrites the old constants the game used as the frames for Random Icons with 50CC compliant ones.
+# First value should be left as is, second value should be the first plus how many colored random icons you need!
+float[2] 9051.0f, 9055.0f @ $806B91B0

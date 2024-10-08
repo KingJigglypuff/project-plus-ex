@@ -65,7 +65,9 @@ end:
   andi. r0, r4, 0x13
 }
 
+###################################################################
 Save Angle of Collided Platform of Aura Sphere (LA-Float[25]) [Eon]
+###################################################################
 HOOK @ $80AAB534
 {
     fmr f31, f1
@@ -80,7 +82,9 @@ HOOK @ $80AAB534
     frsp f0, f31
 }
 
+################################################
 Save Angle of Collided Wall of Aura Sphere [Eon] 
+################################################
 HOOK @ $80aab524
 {
     bgt %end%
@@ -153,3 +157,40 @@ end:
     mtctr r12
     bctr 
 }
+
+#######################################################################
+Fireballs' Normal stored in LA-Float 25 upon bounce [MarioDox]
+#######################################################################
+HOOK @ $809e8410 #notifyEventAnimCmd/[wnMarioFireball]
+{
+    stw r3, 0x60(r1)        # original op
+    subi r5, r27, 0x230    # \ get la float
+    lwz r5, 0x0(r5)        # |
+    lwz r5, 0xd8(r5)        # |
+    lwz r5, 0x64(r5)        # |
+    lwz r5, 0x20(r5)        # |
+    lwz r5, 0x14(r5)        # |
+    stfs f2, 0x64(r5)        # / 0x64 = 25(decimal)*4
+}
+
+###################################################
+Article Configure Edits
+###################################################
+# This table starts at 80AD97E0
+# The following flags exist
+# 0x01 = is part of Final Smash
+# 0x02 = is inhalable? Unused?
+# 0x04 = Affected by Cloaking Device Currently
+# 0x08 = is affected by Dark characters in Subspace?
+# 0x10 = Visible in Magnifying Glass
+###################################################
+byte 0x18 @ $80AD9812 # Weapon 50 (Dedede Jet Hammer) is now visible in the magnifying glass
+byte 0x1C @ $80AD983A # Weapon 90 (Pit Bow) is now also visible in the magnifying glass
+# Other valuable articles of note:
+#
+# 00: Mario Fireball
+# 49: Dedede Landing Stars
+# 50: Jet Hammer
+# 51: Waddle Dee, Waddle Doo AND Gordo
+# 52: Waddle Doo Spark
+# 53: Dedede Inhale Star

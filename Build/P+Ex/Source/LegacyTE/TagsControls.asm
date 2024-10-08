@@ -1,110 +1,215 @@
+######################################################################################################
 [Legacy TE] Holding L when new name at CSS goes to custom controls & back to CSS v1.21 [ChaseMcDizzle]
-* C269B860 0000000D
-* 3E208000 62312800
-* 82510000 2C120000
-* 41820018 3A60FFFF
-* 3E208069 6231B890
-* 7E2903A6 4E800420
-* 3E40FFFF 6252FFFF
-* 7C039000 4082002C
-* 81FD000C 71EF0040
-* 2C0F0040 4082001C
-* 3A400001 92510000
-* 3D00805A 810800E0
-* 8108001C 9A680028
-* 2C030000 00000000
-* C268D7C0 00000009
-* 3D008000 61082800
-* 81080000 2C080000
-* 4182002C 3800000C
-* 38600004 38C00004
-* 3BA00004 3BC00055
-* 3BE00003 3E008068
-* 6210D7F4 7E0903A6
-* 4E800420 7C00F000
-* 60000000 00000000
-* C202D654 0000000C
-* 3D008000 61082800
-* 81080000 2C080000
-* 41820048 2C080001
-* 4182000C 2C080002
-* 41820020 3C808070
-* 608418EC 38E00002
-* 3D008000 61082800
-* 90E80000 4800001C
-* 3C808070 608417E0
-* 38E00000 3D008000
-* 61082800 90E80000
-* 7C7A1B78 00000000
+######################################################################################################
+HOOK @ $8069B860
+{
+  lis r17, 0x8000
+  lwz r18, 0x2800(r17)
+  cmpwi r18, 0x0
+  beq- loc_0x28
+  
+  li r19, -1
+  
+  lis r17, 0x8069  
+  ori r17, r17, 0xB890
+  mtctr r17
+  bctr 
 
-[Project+] X To toggle Rumble V1.2 (requires Fracture's Controls) [ChaseMcDizzle, Fracture, Yohan1044] 
-#CSS tag colour based on rumble removed as had buggy effects on song title and nametag colouring
+loc_0x28:
+  li r18, -1
+  cmpw r3, r18
+  bne- loc_0x60
+  lwz r15, 0xC(r29)
+  andi. r15, r15, 0x40
+  beq- loc_0x60
+  
+  li r18, 0x1
+  stw r18, 0x2800(r17)
+  lis r8, 0x805A
+  lwz r8, 224(r8)
+  lwz r8, 28(r8)
+  stb r19, 40(r8)
 
-#If current tag has rumble on, remember for later
-#* C269F6B8 00000006
-#* 1DE40124 3E00805A
-#* 621000E0 82100000
-#* 82100028 7E107A14
-#* 8A1000EC 2C100001
-#* 40820008 3A2000FF
-#* 7C641B78 00000000
+loc_0x60:
+  cmpwi r3, 0x0
 
-#If tag is remembered to have rumble, change colour
-#* C206A1AC 00000004
-#* 2C1100FF 40820014
-#* 39200024 39000037
-#* 38E0008E 3A200000
-#* 7D2621AE 00000000
+}
+HOOK @ $8068D7C0
+{
+  lis r8, 0x8000
+  lwz r8, 0x2800(r8)
+  cmpwi r8, 0x0
+  beq- loc_0x3C
+  li r0, 0xC
+  li r3, 0x4
+  li r6, 0x4
+  li r29, 0x4
+  li r30, 0x55
+  li r31, 0x3
+  
+  lis r16, 0x8068
+  ori r16, r16, 0xD7F4
+  mtctr r16
+  bctr 
 
-#Alters Rumble of tag
-* C269FEC8 0000000E
-* 89C30060 2C0E0001
-* 41810058 70CE0400
-* 2C0E0400 4082004C
-* 81C30044 2C0EFFFF
-* 41820040 2C0E0000
-* 41820038 39CEFFFF
-* 1DCE0002 39CE0070
-* 7DC3722E 1EEE0124
-* 3DE0805A 61EF00E0
-* 81EF0000 81EF0028
-* 7DEFBA14 8B0F00EC
-* 6B180001 9B0F00EC
-* 8004000C 7CF83B78
-* 60000000 00000000
+loc_0x3C:
+  cmpw r0, r30
+}
+HOOK @ $8002D654
+{
+  lis r8, 0x8000
+  lwz r12, 0x2800(r8)
+  cmpwi r12, 0x0;  beq- loc_0x58
+  cmpwi r12, 0x1;  beq- loc_0x24
+  cmpwi r12, 0x2;  beq- loc_0x40
+
+loc_0x24:
+  lis r4, 0x8070
+  ori r4, r4, 0x18EC
+  li r7, 0x2
+  b loc_0x4C
+
+loc_0x40:
+  lis r4, 0x8070
+  ori r4, r4, 0x17E0
+  li r7, 0x0
+  
+loc_0x4C:
+  stw r7, 0x2800(r8)
+
+loc_0x58:
+  mr r26, r3
+
+}
+
+
+#################################################################################################################
+[Project+] X To toggle Rumble V1.3 (requires Fracture's Controls) [ChaseMcDizzle, Fracture, Yohan1044, DukeItOut]
+#
+# 1.3: Moved slot rumble from Fracture's Controls and added rumble and sound effect support.
+#################################################################################################################
+.alias SFX_ToggleRumble	= 	0x24	# (Menu 15)
+.alias TagSize			=	0x124	# Assumed size of each tag
+.macro playRumble()
+{
+	lwz r4, -0x20(r3)		# Controller ID number
+	lwz r3, -0x43E0(r13)	# Controller manager
+	li r5, 10				# Rumble Type
+	bla 0x02A9E8			# Cause controller rumble 
+}
+#Alters Rumble of tag AND slot
+HOOK @ $8069FEC8
+{
+  
+  
+	lbz r14, 0x60(r3);  	cmpwi r14, 0x1;  bne- customPage	# Is this the normal tag menu?
+	andi. r14, r6, 0x400;  	beq- noXPress					# Was X pressed?
+	
+	
+	lis r4, 0x9017;  ori r4, r4, 0xBE60	# Where player slot rumble info is placed
+	lbz r27, 0x57(r3);  subi r27, r27, 0x31	# Check for player slot
+	
+	
+	lwz r14, 0x44(r3);  cmpwi r14, 0;  	blt- notSlot		# Is this an invalid slot?
+										beq- notTag			# Is this the player slot?
+	lwz r12, 0x6C(r3);	cmpw r14, r12;  bgt- notSlot		# Is this an invalid slot?
+  subi r14, r14, 0x1
+  mulli r14, r14, 0x2
+  addi r14, r14, 0x70
+  lhzx r14, r3, r14
+  mulli r23, r14, TagSize
+  lis r15, 0x805A
+  lwz r15, 0xE0(r15)
+  lwz r15, 0x28(r15)
+  add r15, r15, r23
+  lbz r24, 0xEC(r15)
+  xori r24, r24, 1			# Toggle the tag's rumble!
+  stb r24, 0xEC(r15)
+  b finishToggle
+notTag:  
+	lbzx r14, r4, r27;  xori r14, r14, 1;  stbx r14, r4, r27
+	li r24, 1		# Always make it assume rumble for the below context if no tag!
+finishToggle:
+	lbzx r14, r4, r27	# Check player rumble slot (again)
+	mr r27, r5
+	cmpwi r24, 1; bne+ noRumbleShake	# Does the tag allow rumble?
+	cmpwi r14, 1; bne+ noRumbleShake	# Does the slot allow rumble?
+
+	%playRumble()
+noRumbleShake:
+	li r4, SFX_ToggleRumble	# \
+	lis r3, 0x805A			# | Play Sound Effect!
+	bla 0x6A83F4			# /	
+	mr r3, r26		# restore r3
+	mr r5, r27		# restore r5
+noXPress:
+notSlot:
+customPage:
+  lwz r0, 0xC(r28)	# Most recent input
+  mr r4, r28		# Restore r4
+  mr r24, r7		# Original operation
+}
 #Scrolls Through list
-* C26A01D0 00000006
-* 7318000F 2C180002
-* 4181000C 3A600421
-* 4800001C 54000739
-* 40820014 3F00806A
-* 631802FC 7F0903A6
-* 4E800420 00000000
-* C26A0518 00000004
-* 2C130421 41820014
-* 3E60800B 62733C5C
-* 7E6903A6 4E800421
-* 60000000 00000000
+HOOK @ $806A01D0
+{
+  andi. r24, r24, 0xF
+  cmpwi r24, 0x2
+  bgt- loc_0x14
+  li r19, 0x421
+  b %END%
+
+loc_0x14:
+  rlwinm. r0, r0, 0, 28, 28
+  bne- %END%
+  lis r24, 0x806A
+  ori r24, r24, 0x2FC
+  mtctr r24
+  bctr 
+}
+HOOK @ $806A0518
+{
+  cmpwi r19, 0x421; beq- %END%
+  lis r19, 0x800B
+  ori r19, r19, 0x3C5C
+  mtctr r19
+  bctrl 
+}
 #SetFrameMatCol on scroll
-* C26A0548 00000004
-* 2C130421 41820014
-* 3E60800B 62737A18
-* 7E6903A6 4E800421
-* 60000000 00000000
+HOOK @ $806A0548
+{
+  cmpwi r19, 0x421;  beq- %END%
+  lis r19, 0x800B
+  ori r19, r19, 0x7A18
+  mtctr r19
+  bctrl 
+}
 #setFontColor on scroll
-* C26A05CC 00000004
-* 2C130421 41820014
-* 3E60800B 627393A4
-* 7E6903A6 4E800421
-* 60000000 00000000
+HOOK @ $806A05CC
+{
+  cmpwi r19, 0x421;  beq- %END%
+  lis r19, 0x800B
+  ori r19, r19, 0x93A4
+  mtctr r19
+  bctrl 
+}
 #playSoundEffect on scroll
-* C26A02F8 00000006
-* 2C130421 41820018
-* 3E608007 627342B0
-* 7E6903A6 4E800421
-* 4800000C 827A0048
-* 927A0044 3A600000
-* 60000000 00000000
+HOOK @ $806A02F8
+{
+  cmpwi r19, 0x421
+  beq- loc_0x1C
+  lis r19, 0x8007
+  ori r19, r19, 0x42B0
+  mtctr r19
+  bctrl 
+  b loc_0x24
+
+loc_0x1C:
+  lwz r19, 0x48(r26)
+  stw r19, 0x44(r26)
+
+loc_0x24:
+  li r19, 0x0
+}
 
 ##################################################
 [Project+] CSS Tags with Rumble are Coloured [Eon] 
@@ -141,19 +246,16 @@ renderColours:
 
   #specific rumble check for player port
 portRumble:
-  lbz r16,96(r24)
-  cmpwi r16,1
-  bgt- 0x24
-  lbz r16,87(r24)
+  lbz r16, 0x60(r24)
+  cmpwi r16, 1;  bgt- 0x24
+  lbz r16, 0x57(r24)
   subi r16,r16,49
-  lis r15,-28649
-  ori r15,r15,48736
+  lis r15, 0x9017;  ori r15,r15, 0xBE60
   lbzx r16,r15,r16
 
   #if current working tag is centre tag, remember its value for if going off-centre
 storeCentre:
-  cmpw r25, r27
-  bne end
+  cmpw r25, r27;  bne end
   mr r17, r16
 
   #original command (is working tag centred)
@@ -191,9 +293,6 @@ HOOK @ $806a05c8
   li r6, 0x80
   li r7, 0x80
 }
-
-
-
 
 ###########################################################
 [Legacy TE] Load Player Tags on Win Screen v2 [PyotrLuzhin]

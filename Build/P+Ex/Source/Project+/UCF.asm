@@ -46,7 +46,7 @@
 * 8001FFFC 3C6080B8
 * 60000000 00000000
 
-[Project+] UCF with Melee threshold 2.0 [Fracture, Eon]
+[Project+] UCF with Melee threshold 2.1 [Fracture, Eon]
 #reworked to better match melees thresholds and mechanics 
 
 #when doing an action override, use a subroutine pointing to 0x80FC2138, this is where the platdrop code that this code edits is found
@@ -89,9 +89,11 @@ checkStickPos:
   lfs f1, 0x38(r3) #get stick pos
   fabs f1, f1
   fadd f1, f1, f0   
+  fmuls f1, f1, f1
   lfs f2, 0x3C(r3) #get stick pos
   fabs f2, f2
   fadd f2, f2, f0
+  fmuls f2, f2, f2
 
   fadd f1, f1, f2
 

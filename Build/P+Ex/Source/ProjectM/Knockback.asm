@@ -52,23 +52,30 @@ loc_0x18:
   lfs f3, 8(r3)
 }
 
-################################################################
-Melee KB Stacking and Stacks After 10th Frame of KB v1.1 [Magus] (char id fix fix)
-################################################################
+###########################################################################
+Melee KB Stacking and Stacks After 10th Frame of KB v1.3b [Magus, DukeItOut]
+#
+# 1.1: made it so the Char ID check doesn't cause a memory leak
+# 1.2: made knockback stacking not randomly fail to apply to high knockback
+# 1.3: made a more robust character check that isn't dependent on char ID
+###########################################################################
+
 op b 0x1AC @ $8085C8D4
 HOOK @ $8076D3B0
 {
   mfcr r12
   stw r12, 0x14(r2)
   stw r4,  0x18(r2)
-  lis r4, 0x9380
+  
   lfs f4,  0x24(r1)
-  lwz r12, 0x70(r18)
-  lwz r12, 0x20(r12)
-  lwz r12,0x0C(r12)
-  lwz r12,0x2D0(r12);	cmpw r12, r4;	bge- loc_0x118
-  lwz r12, 0x08(r12);  	cmpw r12, r4; 	bge- loc_0x118
-  lwz r12,0x110(r12);	cmpwi r12, 0x80;  bge- loc_0x118
+
+  lwz r12, 0x8(r18)
+  lwz r12, 0x3C(r12)
+  lwz r12, 0xA4(r12)
+  mtctr r12
+  mr r4, r3
+  bctrl
+  cmpwi r3, 0; mr r3, r4; bne- loc_0x118 # check if the object hit is a character. Other objects don't get knockback stacking!
 
   lwz r12, 0x70(r18)
   lwz r12, 0x20(r12)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectm>
   <game>
-    <version>1.26.1</version>
+    <version>3.0.2</version>
     <minimumLauncherVersion>1.14</minimumLauncherVersion>    
   </game>
   <launcher />

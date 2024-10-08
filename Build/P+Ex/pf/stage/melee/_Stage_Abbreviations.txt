@@ -1,0 +1,45 @@
+To help identify competitive 1:1s in the file structure, there are the commonly used competiive alt signifiers
+
+BF: Battlefield
+
+BC: Bowser's Castle
+
+CS: Castle Siege
+
+CSC: Ceres Space Colony
+
+DS: Delfino Secret
+
+DP: Distant Planet
+
+FD: Final Destination
+
+FH: Frigate Husk
+
+FOD: Fountain of Dreams
+
+GHZ: Green Hill Zone
+
+GT: Golden Temple
+
+LM: Luigi's Mansion
+
+MC: Metal Cavern
+
+NF: Norfair (PM 3.6)
+
+PS2: Pokemon Stadium 2
+
+SW: Skyworld
+
+SSZ: Sky Sanctuary Zone
+
+TOT: Temple of Time
+
+WL: Warioland
+
+YI: Yoshi's Island (P+)
+
+YIPM: Yohsi's Island PM
+
+YS: Yoshi's Story

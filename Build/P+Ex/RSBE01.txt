@@ -19,37 +19,57 @@
 ######################          Backend Codes          ######################
 #############################################################################
 
-#############################################################################
-AXNextFrame -> VBI Hook Switch After Strap Screen v1.1 [Magus, Sammi-Husky]
-#############################################################################
-* 20200984 4BE00F24
-* 20497ED0 00000001
-CODE @ $80001198
+.include Source/Community/Hooktype.asm
+
+######################################################
+BA and BLA are usable instructions v1.3 [Eon, taukhan]
+######################################################
+  .po<-flag
+32000000 00000001 #if flag != 1
+14000000 00000001 #set flag to 1
+  .goto->code
+
+flag:
+  word 0;
+code:
+PULSE #80568100
 {
-	addi r6, r7, 0x4C
-	mr r3, r7
-	addi r4, r7, 0x34
-	addi r5, r7, 0x38
+  li r3, 0x2
+  #virtual address space = 0x00000000
+  word 0x7C7383A6   #mtibatl 1, r3  #sets instruction bat lower half
+  li r3, 0x1FF
+  #physical address space = 0x00000000
+  word 0x7C7283A6   #mtibatu 1, r3  #sets instruction bat upper half
+  isync 
+  blr
 }
-address $80023D5C @ $80002778
-op b -0x1E8184    @ $801E9A2C
-op blr	 	  @ $80200984
+* E2000001 80008000
 
-PULSE
-{
-	lis r3,0x8020
-	ori r3,r3,0x0984
-	icbi r0,r3
-	lis r3,0x801E
-	ori r3,r3,0x9A2C
-	icbi r0,r3
-	isync
-	blr
-}
+##################################################
+Memory Extention for FighterXResource2 [Dantarion]
+##################################################
+int 0x91E80 @ $80421B54
+int 0x91E80 @ $80421B74
+int 0x91E80 @ $80421B94
+int 0x91E80 @ $80421BB4
+int 0x91E80 @ $80421E1C
+int 0x91E80 @ $80421E3C
+int 0x91E80 @ $80421EBC
+int 0x91E80 @ $80421EDC
 
-* E2000002 00000000
+###############################################################
+Memory Extension for CSS/SSS MenuResource (+0.88MB) [DukeItOut]
+###############################################################
+int 0x73EA00 @ $80422384
 
-.include Source/P+Ex/BootToCSS.asm
+############################################
+STGRESULT.PAC expansion (+3.5MB) [DukeItOut]
+############################################
+int 0x64CE00 @ $80422334
+
+#.include Source/Project+/MemoryLayout.asm # Disabled due to incompatibility with the current Code Menu. Included for referential purposes.
+						# When re-enabled, remove the two memory extension codes right above this .include line!
+						# asm file will be fine-tuned when fully implemented to fix oversights within it.
 
 #############################################################################
 Reset multipac stage lock status between Classic & All-Star matches [wiiztec]
@@ -102,18 +122,6 @@ HOOK @ $80946954
   	mr r0, r11
 }
 
-#################################################
-Poke Balls use Normal Item Limit [standardtoaster]
-#################################################
-op NOP @ $809B0AC0
-
-#######################################################
-!Increase Pokemon Queue Size to Its Max (12) [Kapedani]
-#######################################################
-#Currently disabled until memory can be moved to a different location.
-op cmpwi r3, 12 @ $809afd74
-op cmpwi r3, 12 @ $809ad73c
-
 ###############################################
 Explodey Items Use Normal Item Limit [Kapedani]
 ###############################################
@@ -129,40 +137,50 @@ Bunny Hoods Use Normal Item Limit [Kapedani]
 ############################################
 op li r3, 1 @ $809b0e2c
 
-#############################################
-!Smash Balls use Normal Item Limit [Kapedani]
-#############################################
-#(Currently disabled) Not recommended for normal use since vanilla behvaviour makes other players Final Smash unload upon a character receiving their Final Smash
-op li r3, 1 @ $809b0c20
-op li r3, 1 @ $809b0c40
-
 ######################################################
-!Assist Trophy Stands Use Normal Item Limit [Kapedani]
+mtRand::randi behaves as mtRand->randi(max) [Kapedani] 
 ######################################################
-#Currently disabled for thematic reasons.
-op li r3, 1 @ $809b0b3c
+op lwz r12, 0xc(r12) @ $8003fb08  # call mtRand->generate() instead of mtRand->randi() in mtRand::randf
 
-###################################################################
-Team Healer's slot spawns items outside of team battles [DukeItOut]
-###################################################################
-op NOP @ $80055B68
+HOOK @ $8003fae8 # mtRand::randi
+{
+    stwu r1, -0x40(r1)
+    mflr r0
+    stw    r0, 0x44(r1)
+    stw    r31, 0x3c(r1)
+    mr r31, r4
 
-##################################################
-Memory Extention for FighterXResource2 [Dantarion]
-##################################################
-int 0x91E80 @ $80421B54
-int 0x91E80 @ $80421B74
-int 0x91E80 @ $80421B94
-int 0x91E80 @ $80421BB4
-int 0x91E80 @ $80421E1C
-int 0x91E80 @ $80421E3C
-int 0x91E80 @ $80421EBC
-int 0x91E80 @ $80421EDC
+    lwz r12, 0x0(r3)
+    lwz r12, 0xc(r12)
+    mtctr r12
+    bctrl 
 
-##############################
-Stage Choice Random Fix [ds22]
-##############################
-op bge- 0x14C 	@ $80055444
+    rlwinm    r0, r3, 24, 8, 31
+    lis    r3, 0x4330
+    stw    r0, 0x1C(r1)
+    xoris    r0, r31, 0x8000
+    stw    r3, 0x18(r1)
+    lfd    f2, -0x7BC8(r2)
+    lfd    f1, 0x18(r1)
+    lfs    f0, -0x7BC0(r2)
+    fsubs    f2,f1,f2
+    stw    r0, 0x24(r1)
+    stw    r3, 0x20(r1)
+    fdivs    f2,f2,f0
+    lfd    f1, -0x7BD0(r2)
+    lfd    f0, 0x20(r1)
+    fsubs    f0,f0,f1
+    fmuls    f0,f0,f2
+    fctiwz f0,f0
+    stfd f0, 0x28(r1)
+    lwz    r3, 0x2C(r1)
+
+    lwz r31, 0x3c(r1)
+    lwz    r0, 0x44(r1)
+    mtlr r0
+    addi r1, r1, 64
+    blr
+}
 
 #######################################
 Ragequit Accelerator [InternetExplorer]
@@ -367,27 +385,6 @@ singleplayer:
   	cmpwi r6, 0x0
 }
 
-##############################################################################
-[Project+] Load Common2.pac from the SD card [DukeItOut, P+ paths by waffeln]
-##############################################################################
-* C201BF2C 00000010
-* 80630000 48000005
-* 7C8802A6 3884005F
-* 7C6C1B78 3CA0803F
-* 60A5A3FC 7CA903A6
-* 4E800421 2C030000
-* 7D836378 40A20050
-* 3884FFDE 3CA0803F
-* 60A5A280 7CA903A6
-* 4E800421 3C808063
-* 3CA08001 60A5BF2C
-* 90850000 48000028
-* 73643A2F 502B4578
-* 2F2E2F2E 2F70662F
-* 73797374 656D2F63
-* 6F6D6D6F 6E322E70
-* 61630000 00000000
-
 ############################################################
 [Legacy TE] Always use PACs instead of PCS files [DukeItOut]
 ############################################################
@@ -473,138 +470,75 @@ printInstructionCrash:
 op li r7, 0 @ $801dbf60
 op li r8, 0 @ $801dbf68
 
-##########################################################################################################
-Effect.pac Roster Expansion System (RSBE.Ver) V2 (Costume-Specific Etc File Support) [JOJI, DukeItOut]
-##########################################################################################################
-* E0000000 80008000
-* 0405EAD0 3800000B
-* 04451A88 8059DAB8
-* 04451A8C 80452C54
-* 04451A90 80452C64
-* 04416F7C 80416F70
-* 06416F60 00000006
-* 63757374 6F6D0000
-* C205EFCC 0000001F
-* 3BFF0004 281B0137
-* 418000E8 3FE08041
-* 3BFF6F7C 281B02B7
-* 41820048 281B0277
-* 41820034 281B0237
-* 41820020 281B0137
-* 40820058 389FFFE4
-* 80640000 907FFFF4
-* A0640004 48000034
-* 3C808059 6084D734
-* 48000018 3C808059
-* 6084D6F4 4800000C
-* 3C808059 6084D638
-* 80640000 907FFFF4
-* A0640004 60630058
-* B07FFFF8 38000000
-* 901FFFFC 48000010
-* 809FFFFC 38840001
-* 909FFFFC 889FFFFF
-* 2C1B0237 4180001C
-* 3860000A 7C041840
-* 41800010 38630010
-* 38840006 4BFFFFF0
-* 7C802378 7004000F
-* 2804000A 38840030
-* 41800008 38840007
-* 989FFFFB 700400F0
-* 5484E13E 2804000A
-* 38840030 41800008
-* 38840007 989FFFFA
-* 60000000 00000000
-* 0405EFD0 2C1B02F7
-* 0405F01C 2C0302F7
-* 0405F0A8 2C0302F7
-* 04061200 28040A8D
-* C2061218 00000007
-* 7C84482E 28150087
-* 4180002C 38800028
-* 2815008D 41800020
-* 38800137 38D5FF73
-* 2806000A 41800010
-* 38C6FFF6 38840001
-* 4BFFFFF0 00000000
-* 06416F80 00000011
-* 54657852 6F795377
-* 6F726454 72616365
-* 30000000 00000000
-* 06416FA0 00000009
-* 54657843 7573746F
-* 6D000000 00000000
-* 06416FAB 00000006
-* 54726163 65300000
-* C2061278 00000015
-* 7C84482E 28150087
-* 4180009C 3C808041
-* 38846F80 90640014
-* 38B5FF79 38650030
-* 98640011 80640014
-* 2815008D 41800078
-* 38B5FF73 90C40018
-* 90E40034 38840020
-* 38C00000 38600000
-* 2805000A 41800010
-* 38A5FFF6 38C60001
-* 4BFFFFF0 70C7000F
-* 2807000A 41800008
-* 38E70007 38E70030
-* 98E4000A 70C700F0
-* 54E7E13E 2807000A
-* 41800008 38E70007
-* 38E70030 98E40009
-* 38650030 98640011
-* 8064FFF4 80C4FFF8
-* 80E40014 00000000
-* E0000000 80008000
+.include Source/Community/TrailEffects.asm
 
+######################################
+Bone Visibility Stabilizer [DukeItOut]
+######################################
+#
+# Prevents a potential hang related
+# to trying to set up visibility of
+# model parts that do not exist.
+#####################################						
+HOOK @ $80043DD8
+{
+	lwz r0, 0xE8(r27)	# \
+	addi r3, r1, 8		# | Retrieve bone info
+	stw r0, 8(r1)		# /
+	bla 0x18EE4C		# Will return bone count
+	lwz r5, 0(r31)	# Original operation: The bone switch's bone ID to check for. 
+					# It can be a problem if it is higher than the bone count!
+	cmplw r3, r5	# Compare the bone to modify with the amount of bones this model has
+	bgt+ %END%		# Behave normally if the bone to be modified is present 
+	ba 0x043DF4		# Skip process for this check. This model doesn't have the bone to modify!
+}
 
 #######################################################################
 [Project+] Turbo item does not fire curry shots in any mode [DukeItOut]
 #######################################################################
 half 0x4800 @ $8083A0A0
 
-####################################################
-[Project+] Stickers do not randomly drop [DukeItOut]
-####################################################
-op b 0x140 @ $809B4BAC
+####################################################################################################################################
+[Project+] Item Frequency None if all items turned off and Items spoofed off if item frequency None (ItemEx Edition) [Eon, Kapedani]
+####################################################################################################################################
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
 
-##########################################################################################################
-[Project+] Item Frequency None if all items turned off and Items spoofed off if item frequency None  [Eon]
-##########################################################################################################
 #If all items turned off, save Item frequency as None
 HOOK @ $806aa9bc
 {
-	cmpwi r27, 0
-	bne end
-	cmpw r28, r0
-	bne end
-	li r29, 0
+    cmpwi r27, 0
+    bne end
+  rlwinm. r12,r28,0,13,31 # 0x0007FFFF
+    bne end
+    li r29, 0
 end:
-	stb r29, 0(r3)
+    stb r29, 0(r3)
 }
 #If Item Frequency None, pretend all items are turned off
 
-#ScMelee
+#sqVsMelee
 HOOK @ $806dcf58
 {
-	lbz r0, 0x0(r25)
-	cmpwi r0, 0
-	bne %end%
-	stw r0, 0x34(r31)
-	stw r0, 0x30(r31)
+    lbz r0, 0x0(r25)
+    cmpwi r0, 0
+    bne %end%
+    stw r0, 0x34(r31)
+    stw r0, 0x30(r31)
 }
-#SpMelee
+#sqSpMelee
 HOOK @ $806def74
 {
-	lbz r0, 0x0(r29)
-	cmpwi r0, 0
-	bne %end%
-	stw r0, 0x34(r27)
-	stw r0, 0x30(r27)
+    lbz r0, 0x0(r29)
+    cmpwi r0, 0
+    bne %end%
+    stw r0, 0x34(r27)
+    stw r0, 0x30(r27)
 }
 
 #####################################################
@@ -638,86 +572,20 @@ HOOK @ $801f3058
   bctr
 }
 
-###################################################################
-[Project+] Pitfall effect can have no-bury with trip rate 2.0 [Eon]
-###################################################################
-HOOK @ $8076CE84
-{
-	lwz r24, 0x60(r19) #load hitbox trip rate
-	lis r25, 0x4000    #2.0 float
-	cmpw r24, r25 	   #if trip rate = 2.0, dont burry.
-	bne buryNormal
-dontBury:
-#pretends to be angle 0, keeps them grounded no matter the attack strength.
-	li r24, 0
-	li r25, 0
-	lis r12, 0x8076
-	ori r12, r12, 0xd0b0 
-	mtctr r12
-	bctr
-buryNormal:
-	li 24, 6
-}
-
-######################################
-Ground Below on IC-Basic[20027] [Eon]
-######################################
-op cmplwi r0, 27 @ $807966b0
-
-    .BA<-CustomCommand
-* 42100000 00000008 #BA+=8 to abuse Pulse command as an easy way to write a block of code
-    .BA->$80AF2888 #IC-Basic[20027]
-    .RESET
-    .GOTO->end
-
-CustomCommand:
-PULSE
-{
-    lwz r3, 0xD8(r4)	#r4 main index
-    li r4, 8
-    li r5, 0
-    lwz r3, 0x10(r3)
-    lwz r12, 0x8(r3)
-    lwz r12, 0x100(r12)
-    mtctr r12
-    bctrl
-    lis r12, 0x8079
-    ori r12, r12, 0x6a20
-    mtctr r12
-    bctr
-}
-end:
-
-
-.include Source/ProjectM/ButtonPresses.asm
 .include Source/ProjectM/CloneEngine.asm
-.include Source/ProjectM/CustomAI.asm
-.include Source/ProjectM/Events.asm
-.include Source/ProjectM/Handicap.asm
 
-.include Source/ProjectM/SpecialModes/AllStarVs.asm
-.include Source/ProjectM/SpecialModes/BombRain.asm
-.include Source/ProjectM/SpecialModes/RandomElement.asm
-.include Source/ProjectM/SpecialModes/Rules.asm
-.include Source/ProjectM/SpecialModes/Stamina.asm
-.include Source/ProjectM/SpecialModes/Turbo.asm
-.include Source/ProjectM/SpecialModes/Wild.asm
-.include Source/ProjectM/SpecialModes/Zero2Death.asm
+.include Source/CodeMenu/CodeMenu.asm
+.include Source/CodeMenu/BigHeadMode.asm
+.include Source/CodeMenu/InputBuffer.asm
+.include Source/CodeMenu/RandomAngleMode.asm
+.include Source/CodeMenu/ScaleModifier.asm
+.include Source/CodeMenu/SpeedModifier.asm
 
-.include Source/LegacyTE/ASLHelper.asm
-.include Source/LegacyTE/CPU.asm
-.include Source/LegacyTE/LoadFlags.asm
-.include Source/LegacyTE/UnboundedTeamEngine.asm
-
-.include Source/Project+/Articles.asm
-.include Source/Project+/Boss.asm
-.include Source/Project+/CodeMenu.asm
+.include Source/Project+/TripRate.asm
 .include Source/Project+/CompressPAC.asm
 .include Source/Project+/FilePatchCode.asm
-.include Source/Project+/IndependentSub.asm
+.include Source/P+Ex/WaveIDIntercept.asm
 .include Source/Project+/Memory.asm
-.include Source/Project+/TrainingMode.asm
-.include Source/Project+/VictoryCamera.asm
 
 #############################################################################
 ######################          Engine Codes          #######################
@@ -972,24 +840,43 @@ fsOkay:
   stb r0, 4(r27)
 }
 
-##########################################################
-No Autosweetspot Ledges v1.1 [spunit262, Dantarion, Magus]
-##########################################################
+##########################################################################
+No Autosweetspot Ledges v1.3&K [spunit262, Dantarion, Magus, DukeItOut]
+#
+# v1.2: Cleaned up code
+# v1.3: Made an exception for Knuckles' wall climb so it could grab ledges
+##########################################################################
 HOOK @ $807812B0
 {
-  	cmpwi r4, 0xA; bne+ loc_0x38
-  	lwz r12, 60(r1)
-  	lwz r11, 24(r12)
-  	lfs f0, 16(r11)
-  	lfs f1, 28(r11);    fcmpo cr0, f0, f1; bge+ loc_0x34
-  	fsubs f0, f1, f0
-  	lfs f1, -27140(r2); fcmpo cr0, f0, f1; bge+ loc_0x38
-  	nop 
-loc_0x34:
-  	li r0, 0x0
-loc_0x38:
-  	rlwinm. r0, r0, 25, 31, 31
+    cmpwi r4, 0xA; bne+ normal
+
+    lwz r12, 0x28(r1)		#
+	cmplwi r12, 0x100		# \ Sometimes input buffer goes through here.
+	blt+ normal				# / It's not doing what we expect so this makes it skip that!
+	
+    lwz r11, 0x110(r12)    # Get the instance ID
+    lwz r12, 0x3C(r1)
+    cmpwi r11, 0x2D        # Is it Knuckles?
+    bne+ notEchidna
+
+    lwz r11, 0x7C(r12)
+    lhz r7, 0x3A(r11)
+    cmpwi r7, 0x117        # Is Knuckles climbing a wall?
+    beq normal             # Let them grab the ledge!
+
+notEchidna:
+notWallClimb:    
+      lwz r11, 0x18(r12)
+      lfs f0, 0x10(r11)
+      lfs f1, 0x1C(r11);   fcmpo cr0, f0, f1; bge+ noSweetspot
+      fsubs f0, f1, f0
+      lfs f1, -0x6A04(r2); fcmpo cr0, f0, f1; bge+ normal
+noSweetspot:
+      li r0, 0x0
+normal:
+      rlwinm. r0, r0, 25, 31, 31
 }
+
 
 ####################################################
 No Air Dodge in tumble [spunit262, Phantom Wings]
@@ -1245,7 +1132,7 @@ setLedgeGrab:
   mtctr r12 
   bctrl #set LA-Basic[79] = 0, ledgegrab count
 end:
-  stw r28, 0x38(r30)
+  stw r28, 0x38(r30) # Set Action
   li r29, 1
   lwz r3, 0x44(r30)
 }
@@ -1274,13 +1161,6 @@ float 44.0 @ $80B87ABC
 float 32.0 @ $80B87AC0
 float 32.1 @ $80B87AC4
 
-############################################
-Only Trip Rate 1.0 Can Trip Foes [DukeItOut]
-############################################
-op nop @ $8076D120
-op lfs f1, 0x18(r13) @ $8076D124
-op bne+ 0x40 @ $8076D130
-
 ##################################################################
 Weight Independent Knockback and Forced Tumble on Throws [Magus]
 ##################################################################
@@ -1301,7 +1181,7 @@ HOOK @ $80769EA0
 	li r8, 0x2329
 	stw r8, 4(r9)
  }
-
+ 
 ##########################################################
 [Project+] Can Grab Characters Slightly Behind [DukeItOut]
 ##########################################################
@@ -1491,9 +1371,10 @@ Hitstun Modifier [Phantom Wings, spunit262]
 #* 04B87AA8 3ECCCCCD # Hitstun mult written by code menu, so disabled here
 
 ##########################################
-Tripping Rate is 0 V2 [ds22, KirbyIsCool]
+Tripping Rate is 0 V3.1 [Kapedani]
 ##########################################
-* 0489E910 FFE0F090
+* op stfs f1, 0x04D0(r3) @ $8081bd54
+* op lfs f1, -0x4BBC(r31) @ $809a9a44
 
 ##################################################
 Triple Jump Glitch Fix [Phantom Wings, spunit262]
@@ -1515,10 +1396,70 @@ op fdivs f1, f0, f31 @ $80873B54
 #######################################################
 float 0.0 @ $80AD7204
 
-###############################################
-[Project+] Don't drop items when hit [Fracture]
-###############################################
-float NaN @ $80B88FF0
+######################################################
+Don't drop fighter generated items when hit [Kapedani]
+######################################################
+.alias BaseItem__getCreaterItem             = 0x8099302c
+.alias g_ftEntryManager                     = 0x80B87c48
+.alias ftEntryManager__getEntryIdFromTaskId = 0x80823f90
+
+.macro lwd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+.macro branch(<addr>)
+{
+    %lwi(r12, <addr>)
+    mtctr r12
+    bctr
+}
+
+HOOK @ $808411ac   ## Fighter::dropItemCheck
+{
+  addi r4, r1, 0x34   # \
+  li r5, 0            # |
+  lwz r3, 0xd8(r30)   # |
+  lwz r3, 0xa8(r3)    # | moduleAccesser->enumerationStart->itemManageModule->getHaveItem(&soItemInfo, 0)
+  lwz r12, 0x0(r3)    # | 
+  lwz r12, 0x5C(r12)  # |
+  mtctr r12           # |
+  bctrl               # /
+  lwz r3, 0x38(r1)   # itemInfo.baseItem
+isItem:
+  stw r3, 0x38(r1)  # itemInfo.baseItem = item
+  %call (BaseItem__getCreaterItem)
+  cmpwi r3, 0x0 
+  bne+ isItem
+  lwz r3, 0x38(r1)   # \
+  lwz r4, 0x8C8(r3)  # / itemInfo.baseItem->emitterTaskId
+  %lwd (r3, g_ftEntryManager)                     # \
+  li r5, 0                                        # |
+  %call (ftEntryManager__getEntryIdFromTaskId)    # | Check if emitterTaskId belongs to a fighter
+  cmpwi r3, 0                                     # |
+  blt+ dropItem                                   # /
+noDropItem:
+  %branch (0x808412f4)
+dropItem:
+  lwz    r3, 0x00D8 (r30)  # Original operation
+}
 
 ##################################################
 [Project+] Rolls Don't Cancel Knockback [Fracture]
@@ -1530,11 +1471,6 @@ op NOP @ $80885020
 ################################################
 int 0x20000 @ $80FC2AB0
 int 0x20000 @ $80FC2AB8
-
-##############################################################
-[Project+] Egged Damage Multiplier (0.5x -> 0.75x) [DukeItOut]
-##############################################################
-float 0.75 @ $80B88758
 
 ##########################################################
 [Project+] Angle 365 negative y speed capped at -0.5 [Eon]
@@ -1670,7 +1606,7 @@ MultiplyHitlag:
 	ori r5, r5, 60000		# | Scalars are really just ints * 60000			
 	divw r4, r4, r5			# / Convert back into an int!
 ModifiedHitlag:
-	cmpw r4, 0			# \
+	cmpwi r4, 0			# \
 	bge- %END%			# / Safety to prevent people trying to force negative hitlag
 NoHitlag:
 	li r4, 0			# No frames of hitlag!
@@ -1977,6 +1913,11 @@ end:
    stw r3, 0x44(r1)
 }
 
+##################################################
+Melee Invince Mechanics [Eon]
+##################################################
+op b 0x60 @ $80741744 # makes it so you can't "rehit" an opponent if they change from invincible to vulnerable
+
 .include Source/ProjectM/Damage.asm
 .include Source/ProjectM/DirectionalInfluence.asm
 .include Source/ProjectM/DirectionalInput.asm
@@ -2004,9 +1945,9 @@ Timer Always Displays 6th Digit [ds22]
 ######################################
 op nop @ $800DE17C
 
-########################################################################
+##########################################################################################################
 Individual Stock Icons (info.pac) V2.6 PMEx + 50CC [ds22, wiiztec, DukeItOut, PyotrLuzhin, KingJigglypuff]
-########################################################################
+##########################################################################################################
 * C20E2168 0000002C
 * 818100E8 3D609018
 * 896BF37F 2C0B0002
@@ -2115,33 +2056,47 @@ Menu Scroll Speeds Modifier [Magus]
 ########################################
 Name Scroll Transition Modifier [Magus]
 ########################################
-float[2] 0.5, 3.5 @ $806A1ED8
-float[2] 5.5, 8.5 @ $806A1EEC
+float[2] 0.5, 3.5 @ $806A1ED8	# Related to upwards scrolling animation pauses
+float[2] 5.5, 8.5 @ $806A1EEC	# Related to downwards scrolling animation pauses (+5.0)
 
 ##################################################################
-Faster Name Scrolling with Shoulder Buttons v1.1 [wiiztec, Magus]
+Faster Name Scrolling with Shoulder Buttons v1.2 [wiiztec, Magus]
+#
+# 1.2: Modified to account for the custom control menu revamp
 ##################################################################
 HOOK @ $806A021C
 {
-  	rlwinm. r8, r23, 0, 25, 26;	bne- loc_0x10
- 	rlwinm. r8, r23, 0, 13, 13;  	beq+ loc_0x20
-loc_0x10:
+  	rlwinm. r8, r23, 0, 25, 26;	bne- Fast	# L/R on a GC/CC
+ 	rlwinm. r8, r23, 0, 13, 13;  	beq+ Normal	# C on a Nunchuk
+Fast:
+	
   	subi r5, r5, 0x4
-  	cmpwi r5, 0xFFFF;	bge+ loc_0x20
-  	li r5, 0xFFFF
-loc_0x20:
-  	stw r5, 68(r26)	
+  	cmpwi r5, -1;	bge+ Normal
+
+  	li r5, -1
+	lbz r8, 0x60(r26); cmpwi r8, 1; beq+ Normal
+	li r5, 0			# Don't scroll up to "Name Entry" if in a custom control
+
+Normal:
+  	stw r5, 0x44(r26)	# Original operation
 }
 HOOK @ $806A039C
 {
-  	rlwinm. r8, r23, 0, 25, 26;  bne- loc_0x10
-  	rlwinm. r8, r23, 0, 13, 13;  beq+ loc_0x20
-loc_0x10:
+  	rlwinm. r8, r23, 0, 25, 26;  bne- Fast		# L/R on a GC/CC
+  	rlwinm. r8, r23, 0, 13, 13;  beq+ Normal	# C on a Nunchuk
+Fast:
   	addi r5, r5, 0x4
-  	cmpw r5, r29; 		blt+ loc_0x20
+	lbz r8, 0x60(r26); cmpwi r8, 1; bne+ CustomControl
+  	cmpw r5, r29; 		blt+ Normal
   	subi r5, r29, 0x1
-loc_0x20:
-  	stw r5, 68(r26)
+	b Normal
+CustomControl:
+	lwz r8, 0x6C(r26)		# Get the highest scroll option
+	cmpw r5, r8;		ble+ Normal
+	mr r5, r8			# Use that if it tried to go higher
+	
+Normal:
+  	stw r5, 0x44(r26)	# Original operation
 }
 
 ##############################
@@ -2185,28 +2140,6 @@ op mr r19, r3 @ $8069B868
 CSS Cursor Speed [Dantarion]
 #############################
 float 1.0 @ $806A1014
-
-#########################################################################
-More Rules & Random Stage Switch are Selectable without Unlocking [Magus]
-#########################################################################
-op li r3, 1 @ $8004E818
-op li r3, 1 @ $8004E83C
-
-######################################################################
-All Stages Selectable on Random Stage Switch without Unlocking [Magus]
-######################################################################
-op li r0, 0xFFF @ $806AB860
-op li r0, 0xFFF @ $806AB8DC
-
-######################################################
-All-Star Mode is Selectable without Unlocking [Spigel]
-######################################################
-op li, r3, 1 @ $8004E7D0
-
-##########################################################
-Boss Battles Mode is Selectable without Unlocking [Spigel]
-##########################################################
-op li, r3, 1 @ $8004E7F4
 
 #########################################
 Use Custom CLR ID on Anchored GFX [Magus]
@@ -2414,7 +2347,7 @@ HOOK @ $8068AE24
 loop:
   cmpwi r27, 0
   beq endLoop 
-  mr r3, r26
+  mr r3, r28    # Changed this line so costume gets incremented for correct player
   lis r12, 0x8069
   ori r12, r12, 0xA22C
   mtctr r12 
@@ -2510,28 +2443,6 @@ hastyScroll:
   	add r26, r26, r6
 }
 
-
-##################################################################
-[Project+] 1-P Battles Don't Use Start Countdown [JOJI, DukeItOut]
-##################################################################
-HOOK @ $806D182C
-{
-  cmpwi r0, 0;  bne- normal	# not multiplayer if non-zero
-  lis r12, 0x9018;  ori r12, r12, 0xF5D	# 90180F5D+5C= 90180FB9, the first address we need, with each port separated by 0x5C bytes
-  lbzu r3, 0x5C(r12)	# note that is a load with update and not a load, reading port 1
-  lbzu r5, 0x5C(r12)	# reading port 2
-  add r3, r3, r5
-  lbzu r5, 0x5C(r12)	# reading port 3
-  add r3, r3, r5
-  lbzu r5, 0x5C(r12)	# reading port 4
-  add r3, r3, r5
-  cmplwi r3, 9;  blt+ normal
-  li r0, 0x2		# force to skip countdown if the sum suggests that more than 2 ports are inactive
-normal:
-  mulli r0, r0, 0x14
-
-}
-
 #############################################################################
 Disable CSS Hand resizing and Hand size based on roster size (BEX) v1.1 [Eon]
 #############################################################################
@@ -2604,11 +2515,10 @@ op fmr f0, f3 @ $8010c888
 .include Source/ProjectM/SSS.asm
 .include Source/ProjectM/SSSButtons.asm
 
-.include Source/LegacyTE/AltCostume.asm
+.include Source/P+Ex/HiddenAltSets.asm
 .include Source/LegacyTE/Masquerade.asm
 .include Source/LegacyTE/TagsControls.asm
-
-.include Source/Project+/CSSCustomControls.asm
+.include Source/LegacyTE/CSSCustomControls.asm
 
 #############################################################################
 ###################          Visual/Audio Codes          ####################
@@ -2632,9 +2542,9 @@ Team Coloured Shields V2 [ds22]
 * 38800003 00000000
 * 0481DEF4 7EE4BB78
 
-###################################
+#########################################################
 Team Colour Shade Check Fix (BrawlEx) [ds22, Sammi Husky]
-###################################
+#########################################################
 * C26D5BE0 00000002
 * 7C7F1B78 7D6C5B78
 * 60000000 00000000
@@ -2670,17 +2580,17 @@ SFX Survival -> Choose Your Character [Standardtoaster]
 op li r4, 0x2046 @ $80683998
 op li r4, 0x2046 @ $8068E590
 
-#####################################################
-No Audience SFX on Stage Selection [Standardtoaster]
-#####################################################
-op NOP @ $806B46BC
-op NOP @ $806B53A4
+############################################################################
+No Audience SFX on Stage Selection v2 [Standardtoaster, DukeItOut, Kapedani]
+############################################################################
+op NOP @ $806b46d0
+op NOP @ $806b53b8
 
-#######################################################
-No Swoosh SFX on Character Selection [standardtoaster]
-#######################################################
-op NOP 		@ $8068AE3C
-op li r4, -1 	@ $8068D18C
+###################################################################
+No Swoosh SFX on Character Selection v2 [standardtoaster, Kapedani]
+###################################################################
+op NOP         @ $8068ae54
+op li r4, -1     @ $8068D18C
 
 ############################################
 Random has Announcer Call [standardtoaster]
@@ -2735,46 +2645,7 @@ Cape Reversed Control Time [standardtoaster]
 ###############################################
 op li r4, 20 @ $8085B814
 
-###########################################################
-Yoshi Eggs are Costume Based v1.1 [ds22] (char id fix fix)
-###########################################################
-HOOK @ $80A1580C
-{
-  	lwz r31, 0x1C(r26); lwz r31, 0x28(r31);  lwz r31, 0x10(r31); lbz r31, 0x55(r31)
-
-	lwz r26, 0x70(r26);
-	lwz r26, 0x20(r26);
-	lwz r26, 0x0C(r26);
-	lwz r26,0x2D0(r26);
-	lwz r26, 0x08(r26);
-	lwz r26,0x110(r26);
-
-  	cmpwi r26, 0x5;     beq- loc_0x50
-  	lis r26, 0x80B8;    lwz r26, 0x7C50(r26);lwz r26, 0(r26)
-  	mulli r31, r31, 0x4D4
-  	add r26, r26, r31
-  	addi r26, r26, 0x18
-loc_0x3C:
-  	lwzu r4, 4(r26)
-  	cmpwi r4, 0xFF;	bge+ loc_0x3C
-  	stw r4, 20(r1)
-  	b loc_0x54
-loc_0x50:
-  	stw r5, 20(r1)
-loc_0x54:
-  	mr r31, r3
-}
-op NOP @ $80A15820
-
-#########################################################
-[Project+] Yoshi's Egg break out intang 14 > 9 [Fracture]
-#########################################################
-int 9 @ $80B88FD4
-
-##############################################
-Yoshi Eggs don't despawn when Yoshi dies [Eon]
-##############################################
-op nop @ $80A15CC0
+.include Source/Project+/YoshiEggs.asm
 
 ###############################################################
 [Project+] Diddy Kong Flip Base Hold Time 70 > Infinite [Boiko]
@@ -3036,6 +2907,11 @@ op nop @ $80A068C0
 op nop @ $80A068C4
 op bge-	0x9C @ $80A06160
 
+########################################
+Samus Bombs account for Shields [DukeItOut]
+########################################
+op rlwinm. r0, r30, 0, 29, 31 @ $809F4B7C
+
 ################################
 ZSS Jumbo Screen Name Fix [ds22]
 ################################
@@ -3221,58 +3097,6 @@ Snake's U-Smash can Have Horizontal Velocity [Magus]
 ##########################################################
 op nop @ $80ac7d2c
 
-####################################################################
-[Project+] All-Star allows Giga Bowser to the next stage [DukeItOut]
-####################################################################
-HOOK @ $80944048
-{
-	bctrl		# Original operation
-	lis r12, 0x9018		# \
-	lhz r12, 0x0F3A(r12)# |
-	cmpwi r12, 0x36		# | All-Star Rest Area is the only stage this will apply to! 
-	bne+ %END%			# /		
-	lis r12, 0x4150		# \ 13.0 (center of platform is at 0.0, so absolutes can be used!)
-	stw r12, -0x4(r1)	# |
-	lfs f1, -0x4(r1)	# /
-Check_P1:
-	lis r12, 0x8062		# \
-	lwz r12, 0x3324(r12)# |
-	cmpwi r12, 0		# | If this is 0, the character is unloaded!
-	beq- %END%			# /
-	lwz r12, 0x60(r12)	# \
-	lwz r3, 0x1C(r12)	# | Get Air/Ground status
-	lwz r3, 0x28(r3)	# |
-	lwz r3, 0x10(r3)	# |
-	lbz r3, 0x8(r3)		# /
-	cmpwi r3, 1			# \ 1 = On Ground
-	bne- Check_P2_Co_Op	# /
-	lwz r12, 0x18(r12)	# \
-	lfs f0, 0xC(r12)	# / Get Player 1's X position
-	fabs f0, f0			# | Is the character within 13.0 units of all-star and on the ground???
-	fcmpu cr0, f0, f1	# |
-	blt- Move_On		# /
-Check_P2_Co_Op:
-	lis r12, 0x8062		# \
-	lwz r12, 0x3568(r12)# |
-	cmpwi r12, 0		# | If this is 0, the character is unloaded!
-	beq- %END%			# /
-	lwz r12, 0x60(r12)	# \
-	lwz r3, 0x1C(r12)	# | Get Air/Ground status
-	lwz r3, 0x28(r3)	# |
-	lwz r3, 0x10(r3)	# |
-	lbz r3, 0x8(r3)		# /
-	cmpwi r3, 1			# \ 1 = On Ground
-	bne- %END%			# /
-	lwz r12, 0x18(r12)	# \
-	lfs f0, 0xC(r12)	# / Get Player 2's X position
-	fabs f0, f0			# | Is the character within 13.0 units of all-star and on the ground???
-	fcmpu cr0, f0, f1	# |
-	bge+ %END%			# /
-Move_On:	
-	li r3, 1			# \ Force All-Star to the next stage if within 13 units of the platform and on the ground.
-	stb r3, 0x2A8(r30)	# /
-}	
-
 #############################################
 Alloys Can Shield, Dodge & Grab Ledges [ds22]
 #############################################
@@ -3280,51 +3104,12 @@ op b 0x88	@ $808A082C
 op b 0x78	@ $808A083C
 op b 0x38	@ $808A087C
 
-###################################################
-PSA command 11210100 sets next GFX anim index [Eon]
-###################################################
-HOOK @ $807A55F0
-{
-    li r3, 0
-    bne %end%
-    lwz r12, 0(r21)
-    mr r4, r21
-    addi r3, r1, 0x818
-    lwz r12, 0x1C(r12)
-    mtctr r12 
-    bctrl 
-    addi r3, r1, 0x818
-    stw r31, 0x10(r3) #store moduleAccesser for getInt to use
-    li r4, 0
-    #soAnimCmdArgList.getInt(animArgList, index) #static function
-    lis r12, 0x8077 
-    ori r12, r12, 0xDFDC
-    mtctr r12 
-    bctrl
-    mr r27, r3
-
-    #ecMgr.getInstance() #static function
-    lis r12, 0x807A
-    ori r12, r12, 0x2874
-    mtctr r12 
-    bctrl
-    mr r4, r27
-    mr r5, r27
-    mr r6, r27
-    mr r7, r27
-    mr r8, r27
-    mr r9, r27
-    #ecMgr.presetAnimIdx(i, i, i, i, i, i, i) #static function
-    lis r12, 0x8006
-    ori r12, r12, 0x06A8
-    mtctr r12 
-    bctrl
-    li r3, 1
-}
-
-.include Source/Project+/Attributes.asm
-.include Source/Project+/PokeTrainer.asm
+.include Source/LegacyTE/CPU.asm		# Don't move this to BOOST, it will fail to function for some reason
+.include Source/ProjectM/ButtonPresses.asm
 .include Source/Project+/Debug/modifiedDebug.asm
-
+.include Source/Project+/CStick.asm		# Don't move this to BOOST, it will cause aerial drift for some reason
+.include Source/Project+/Items.asm
+.include Source/Community/ItemEx.asm
+.include Source/Community/Syringe.asm		# Move out of Extras when more fully tested
 
 .include Source/Project+/MultiGCT.asm		# MAKE SURE THIS IS AT THE VERY BOTTOM OF THIS CODESET!!!

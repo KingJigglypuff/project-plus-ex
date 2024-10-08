@@ -1,0 +1,146 @@
+################################
+
+New to P+ 2.5.2:
+
+################################
+ItmPowderBoxParam.pac
+
+Action 7:
+	Basic Variable Set: LA-Basic[10] = -1	# Disable item timer for granting hurtboxes, this is an exploding action!
+
+	Body Collision: Intangible No Flashing	# Make impossible to collide with, as it could while blowing up.
+
+
+################################
+
+New to P+ 2.5:
+
+################################
+ItmSensorBombParam.pac
+
+Action 1:
+	65040100: 0x578				# Motion-Sensor Bomb appearance Lifespan 6.33s > 23.33s (normalized with most items in Melee and Brawl)
+Action 7:
+	65000000					# Disappears from an explosion without leaving timeout smoke (replaces action change)
+Action C:
+	65050100: 0x1518			# Motion-Sensor Bomb set lifespan 20s > 90s [DukeItOut] (replaces 0x4B0) Similar change to P+ 2.0
+								# Ended up being inconsistent due to two different actions setting the value.
+Subaction 4 - GFX:
+	Graphic Effect: File#=0, Graphic=72, Size=0.82 # Adds sparks to the explosion
+Subaction 7/8 - GFX:
+	03000100: 0x3				# Force onto transparency layer for glow effect to work properly.
+
+ItmDoseisanParam.pac
+
+Action 9:
+	Change Action Status ID=63, Action=A, Requirement=Not 2715:3.0	# Closest tolerance of a ledge 10.0 units > 3.0 
+
+Subaction 1 - Main:
+	Frame Speed Modifier: 3.0	# Triple ledge/wall turn rate, similar to the Bob-Omb change.
+
+ItmKabigonParam.pac
+
+Subaction 2 - Main:
+	03000100: 0x6				# Force in front of all stage visuals like in the first Smash game
+
+ItmNintendogsHiParam.pac
+
+Subaction 0 - Main:
+	03000100: 0x6				# Force in front of all stage visuals
+
+################################
+
+New to P+ 2.3:
+
+################################
+ItmCommonGen.pac
+
+Group 4: Food Spawn Range (0x7D1) for Party Ball 7-to-5 -> 13-to-10 
+
+ItmBombheiParam.pac
+
+Subaction 7 - SFX:
+	<cleared out>				# Moved to Action A to not replay when turning around
+Action 8:
+	Frame Speed Modifier: 3.0	# Ledge/Wall turn animation speed
+Action A:
+	If Roll A Die: 2			# \
+		Reverse Direction		# |
+		Posture 04				# | 50% chance of moving left instead of 100% chance of moving right
+		Character Specific 01	# /
+	End If:		
+	Sound Effect: 0x1FA5		# Sound effect for starting to move
+
+
+################################
+
+New to P+ 2.2:
+
+################################
+ItmPowderBoxParam.pac
+Hidden Action 0:
+	If Compare: IC-Basic[21004] == 5.0				# If the last hit was type 5 (Fire), 15 (Green Fire) or 21 (Aura), blow up!
+		Or Comparison Compare: IC-Basic[21004] == 15.0
+		Or Comparison Compare: IC-Basic[21004] == 21.0
+			020E0000:
+			Change Action: action=7, Requirement=Button Tap?
+	End If
+End If
+
+################################
+
+New to P+:
+
+################################
+ItemSensorBombParam.pac
+Action 8:
+	65050100: 0x1518								# Motion-Sensor Bomb set lifespan 20s > 90s [DukeItOut] (replaces 0x4B0)
+
+
+Modified from PM:
+
+#################################
+ItemPeachDaikonParam.pac
+Action 5:
+	Subroutine 2x60
+	Change Subaction: subAction=3
+	Set Loop: Infinite									# \
+		If Hitbox has Connected: 5						# |
+			Synchronous Timer: frames=19.0				# | Turnip Hitbox Refreshes on Shield Hit and Trade v2.0 [Magus, Eon]
+			Change Action: action=5 Requirement=exists	# |
+		End If											# |
+		Synchronous Timer: frames=1.0					# |
+	Execute Loop										# /
+	
+	
+PM:
+
+################################
+ItemBombheiParam.pac
+Action 2:
+	65050100: 0xFFFFFF									# \ Bob-omb timer doesn't run when held [ds22]
+	Change Subaction: subAction = 1						# /
+	Frame Speed Modifier 5.0					
+################################
+ItemSZeroSuitArmorParam.pac
+Action 1:
+	Change Action: action 7, Requirement: Exists	# ZSS No Armor Pieces [Standardtoaster] (replaces action 3: req: in air)
+################################
+ItemSnakeGrenadeParam.pac
+Action 2:
+	65050100: 0x5A										# "Snake Fuse Timer [Shanus]" (previously 0xB4)
+################################
+ItemLinkBombParam.pac
+Action 5:
+	22020100 0x14	# Link and Toon Link's Bombs Are now Collidable on Hit [Shanus]
+################################
+ItemToonLinkBombParam.pac
+Action 5:
+	22020100 0x14	# Link and Toon Link's Bombs Are now Collidable on Hit [Shanus]
+Action 7:
+	Set/Add Momentum 0.0, 0.0, 0x1, 0x7		# \
+	Set Air/Ground: Undefined(7)			# | Toon Link Bomb Physics [Shanus, Camelot]
+	Visibility: False						# /
+	Body Collision: Intangible No Flashing
+	Synchronous Timer Frames: 11.0
+################################	

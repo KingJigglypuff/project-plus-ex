@@ -180,7 +180,8 @@ loc_0x0:
   lbz r11, -3208(r12)
   cmpwi cr3, r11, 0x2
   bne- cr3, loc_0x30
-  stb r8, -3227(r12)
+  li r11, 0
+  stb r11, -3227(r12)
 
 loc_0x30:
 

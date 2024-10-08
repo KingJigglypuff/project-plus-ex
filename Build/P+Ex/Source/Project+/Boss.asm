@@ -19,8 +19,9 @@ clearCPUtag:
   sth r0, 0xC(r3)	# Original operation, clears tags in AI slots
 
 }
+
 ############################################################################
-[Project+] BOSS Characters in Special Modes v1.1 [DukeItOut]
+[Project+] BOSS Characters in Special Modes v1.3 [DukeItOut, Kapedani]
 # If someone has a tag containing the word "BOSS"
 # Then characters that do not will not experience
 # special mode's behaviors
@@ -35,75 +36,91 @@ clearCPUtag:
 #
 # v1.1: Fixed issue where ports other than P1 no longer could activate this
 ###########################################################################
-HOOK @ $8094693C		# $80946914 for Stamina support [incomplete]
+HOOK @ $806df2d4		
 {
-	li r3, 4				# \ Amount of ports to check
-	mtctr r3				# /
-	li r3, 0				# Set to 0 to indicate it has not found BOSS tags
-	lwz r12, 0x40(r26)		# \ Get port 1's tag
-	addi r12, r12, 0xA4		# /
+	li r8, 4				# Amount of ports to check
+	li r0, 0				# Set to 0 to indicate it has not found BOSS tags
+	addi r12, r27, 0xA4		# /
 loopCheck:
 JapaneseCheck:		# Look for "ボス"
-	lis r5, 0x30DC		# \ r5 = "ボス"
-	ori r5, r5, 0x30B9	# /
-	lwz r4, 0(r12);	cmpw r4, r5;	beq- hasBossTag
-	lwz r4, 2(r12);	cmpw r4, r5;	beq- hasBossTag
-	lwz r4, 4(r12);	cmpw r4, r5;	beq- hasBossTag
-	lwz r4, 6(r12);	cmpw r4, r5;	beq- hasBossTag
+	lis r10, 0x30DC		# \ r10 = "ボス"
+	ori r10, r10, 0x30B9	# /
+	lwz r9, 0(r12);	cmpw r9, r10;	beq- hasBossTag
+	lwz r9, 2(r12);	cmpw r9, r10;	beq- hasBossTag
+	lwz r9, 4(r12);	cmpw r9, r10;	beq- hasBossTag
+	lwz r9, 6(r12);	cmpw r9, r10;	beq- hasBossTag
 BOSScheck:
-	lis r5, 0xFF22		# \ r5 = "BO"
-	ori r5, r5, 0xFF2F	# /
-	lis r6,	0xFF33		# \ r6 = "SS"
-	ori r6, r6, 0xFF33 	# /
+	lis r10, 0xFF22		# \ r10 = "BO"
+	ori r10, r10, 0xFF2F	# /
+	lis r11,	0xFF33		# \ r11 = "SS"
+	ori r11, r11, 0xFF33 	# /
 B_0a:
-	lwz r4, 0(r12); cmpw r4, r5; bne+ B_1a
-	lwz r4, 4(r12); cmpw r4, r6; beq- hasBossTag
+	lwz r9, 0(r12); cmpw r9, r10; bne+ B_1a
+	lwz r9, 4(r12); cmpw r9, r11; beq- hasBossTag
 B_1a:
-	lwz r4, 2(r12); cmpw r4, r5; bne boss_Check
-	lwz r4, 6(r12); cmpw r4, r6; beq- hasBossTag
+	lwz r9, 2(r12); cmpw r9, r10; bne boss_Check
+	lwz r9, 6(r12); cmpw r9, r11; beq- hasBossTag
 boss_Check:		
-	lis r5, 0xFF42		# \ r5 = "bo"
-	ori r5, r5, 0xFF4F	# /
-	lis r6,	0xFF53		# \ r6 = "ss"
-	ori r6, r6, 0xFF53 	# /
+	lis r10, 0xFF42		# \ r10 = "bo"
+	ori r10, r10, 0xFF4F	# /
+	lis r11,	0xFF53		# \ r11 = "ss"
+	ori r11, r11, 0xFF53 	# /
 B_0b:
-	lwz r4, 0(r12); cmpw r4, r5; bne+ B_1b
-	lwz r4, 4(r12); cmpw r4, r6; beq- hasBossTag
+	lwz r9, 0(r12); cmpw r9, r10; bne+ B_1b
+	lwz r9, 4(r12); cmpw r9, r11; beq- hasBossTag
 B_1b:
-	lwz r4, 2(r12); cmpw r4, r5; bne continueLoop
-	lwz r4, 6(r12); cmpw r4, r6; beq- hasBossTag
+	lwz r9, 2(r12); cmpw r9, r10; bne continueLoop
+	lwz r9, 6(r12); cmpw r9, r11; beq- hasBossTag
 boss_Check2:	
-	lis r5, 0xFF22		# \ r5 = "Bo"
-	ori r5, r5, 0xFF4F	# /
-	lis r6,	0xFF53		# \ r6 = "ss"
-	ori r6, r6, 0xFF53 	# /
+	lis r10, 0xFF22		# \ r10 = "Bo"
+	ori r10, r10, 0xFF4F	# /
+	lis r11,	0xFF53		# \ r11 = "ss"
+	ori r11, r11, 0xFF53 	# /
 B_0c:
-	lwz r4, 0(r12); cmpw r4, r5; bne+ B_1c
-	lwz r4, 4(r12); cmpw r4, r6; beq- hasBossTag
+	lwz r9, 0(r12); cmpw r9, r10; bne+ B_1c
+	lwz r9, 4(r12); cmpw r9, r11; beq- hasBossTag
 B_1c:
-	lwz r4, 2(r12); cmpw r4, r5; bne continueLoop
-	lwz r4, 6(r12); cmpw r4, r6; beq- hasBossTag	
+	lwz r9, 2(r12); cmpw r9, r10; bne continueLoop
+	lwz r9, 6(r12); cmpw r9, r11; beq- hasBossTag	
 hasBossTag:
-	ori r3, r3, 1		# Confirm there is a boss tag on one of the slots!	
-	addi r5, r31, 0xC	# Get the tag for THIS port
-	cmpw r5, r12
+	ori r0, r0, 1		# Confirm there is a boss tag on one of the slots!	
+	addi r10, r6, 0xA4	# Get the tag for THIS port
+	cmpw r10, r12
 	bne+ continueLoop
-	ori r3, r3, 2		# I'm the boss!
+	ori r0, r0, 2		# I'm the boss!
 continueLoop:
 	addi r12, r12, 0x5C	# Go to next port!
-	bdnz+ loopCheck
+	subi r8, r8, 0x1
+	cmpwi r8, 0x0
+	bgt+ loopCheck
 
 determineBossStatus:	
-	andi. r0, r3, 1;	beq+ normal	# Is there a boss?
-	andi. r0, r3, 2;	bne+ normal	# Am I the boss?
-	# lbz r3, 0x1C(r31)		# \
-	# andi. r3, r3, 0x7F		# | Turn off stamina behavior for this character.
-	# stb r3, 0x1C(r31)		# / Commented out currently until it works.
-	lis r12, 0x8094			# \
-	ori r12, r12, 0x6A08	# | Skip checking special mode statuses on spawning if someone else has a BOSS tag
-	mtctr r12				# |
-	bctr					# /
-normal:
-	# lhz r0, 0x24(r31)		# Original operation for stamina version [incomplete]
-	lfs f1, 0x40(r31)		# Original operation for non-stamina version 
+	andi. r12, r0, 1;	beq+ end	# Is there a boss?
+	andi. r12, r0, 2;	bne+ boss	# Am I the boss?
+	li r12, 0x10		
+	stb r12, 0x0(r5)	
+	li r12, 0
+	stb r12, 0x0(r7)
+	sth r12, 0xba(r6)	# startDamage
+	sth r12, 0xbc(r6)	# hitPointMax
+	stfs f4, 0xd8(r6)	# scale
+	stfs f4, 0xe0(r6)	# gravity
+	stfs f4, 0xd0(r6)	# damageReactionMul
+	stfs f4, 0xcc(r6)	# attackReacitonMul
+	stfs f4, 0xc8(r6)	# damageRatio
+	stfs f4, 0xc4(r6)	# attackRatio
+	b end
+boss:
+	lbz r12, 0x18(r26)	
+	cmpwi r12, 0x2
+	bne+ end 
+	li r12, 1
+	stb r12, 0x9c(r6)
+end:
+	addi r5, r5, 92	# Original operation
 }
+
+######################################################
+Disable Hardcoded Special Mode Item Switch [Kapedani]
+######################################################
+op b 0x8C @ $806df358

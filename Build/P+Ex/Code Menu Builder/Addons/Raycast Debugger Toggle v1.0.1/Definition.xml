@@ -1,0 +1,8 @@
+<addon name="Raycast Debugger Toggle v1.0.1 [Eon, QuickLava]" shortName="RAYDEBUG">
+	<codeMenuPage shortName="_DEBUG">
+		<codeMenuToggle name="Raycast Display" shortName="ONOFF">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+</addon>
+

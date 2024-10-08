@@ -6,58 +6,104 @@ op cmplwi r0, 0x30 @ $8018CFC4
 op blt- 0x34	   @ $8018CFC8
 
 .include Source/LegacyTE/Replays.asm
+
 .include Source/Netplay/Net-StageFiles.asm
 .include Source/Project+/CustomRequirements.asm
 .include Source/Project+/Shake.asm
-.include Source/Project+/CStick.asm
 .include Source/Project+/LedgeGrab.asm
 .include Source/Project+/ScreenKO.asm
 .include Source/Project+/Timeout.asm
 .include Source/Project+/UCF.asm
 .include Source/Project+/PSA.asm
-.include Source/ProjectM/Constants.asm
-.include Source/ProjectM/PSA/Effects.asm
-.include Source/ProjectM/PSA/Misc.asm
-.include Source/ProjectM/PSA/Tethers.asm
-.include Source/ProjectM/PSA/TauntCancel.asm
-.include Source/ProjectM/PSA/PowerShield.asm
-.include Source/ProjectM/PSA/Items.asm
-.include Source/ProjectM/PSA/Hitstun.asm
-.include Source/ProjectM/PSA/C-Stick.asm
-.include Source/ProjectM/PSA/MeteorCancel.asm
-.include Source/ProjectM/PSA/WallCling.asm
-.include Source/ProjectM/PSA/Glide.asm
-.include Source/ProjectM/PSA/Grabs.asm
-.include Source/ProjectM/PSA/SlowTurn.asm
-.include Source/ProjectM/PSA/Edge.asm
+.include Source/Project+/AnimatedCSS.asm
+.include Source/Project+/Hurtbox.asm
+
+.include Source/ProjectM/IdleAudioFade.asm
+
+###############################################
+Sleep doesn't pierce armour in air [Eon]
+# Formerly in Source/ProjectM/PSA/Misc.asm
+# Moved so the rest of that file could be
+# converted into an inject!
+###############################################
+HOOK @ $8085CDD0
+{
+    stw r4, 0xC(r1)
+    lwz r3, 0xD8(r4)
+}
+HOOK @ $8085CDF0 
+{
+    lwz r3, 0xC(r1)
+    lwz r3, 0xD8(r3)
+    lwz r3, 0x14(r3)
+    lwz r12, 0(r3)
+    lwz r12, 0x14(r12)
+    mtctr r12 
+    bctrl 
+    cmpwi r3, 2 #if situation = in air, noReaction = true
+    beq true
+false:
+    li r3, 0
+    b %end%
+true:
+    li r3, 1
+}
+
+.include Source/ProjectM/SpecialModes/AllStarVs.asm
+.include Source/ProjectM/SpecialModes/BombRain.asm
+.include Source/ProjectM/SpecialModes/RandomElement.asm
+.include Source/ProjectM/SpecialModes/Rules.asm
+.include Source/ProjectM/SpecialModes/Stamina.asm
+.include Source/ProjectM/SpecialModes/Turbo.asm
+.include Source/ProjectM/SpecialModes/War.asm
+.include Source/ProjectM/SpecialModes/Wild.asm
+.include Source/ProjectM/SpecialModes/Zero2Death.asm
+
+.include Source/Project+/EffectCommands.asm
+.include Source/Project+/EffectsEX.asm
+.include Source/Project+/Attributes.asm
+.include Source/Project+/PokeTrainer.asm
 
 .include Source/Project+/L-Cancel.asm
 .include Source/Project+/InputSystem.asm
-.include Source/Project+/Moonwalk.asm
 .include Source/Project+/AirDodge.asm
-.include Source/Project+/Items.asm
 .include Source/Project+/Pause.asm
 .include Source/Project+/Collision.asm
+.include Source/Project+/BootToCSS.asm
+.include Source/Project+/Boss.asm
+.include Source/Project+/Articles.asm
+.include Source/Project+/IndependentSub.asm
+.include Source/Project+/TrainingMode.asm
+.include Source/Project+/VictoryCamera.asm
+.include Source/Project+/ResultsSkip.asm
+.include Source/Project+/Unlocks.asm
+
+.include Source/LegacyTE/ASLHelper.asm
+.include Source/LegacyTE/UnboundedTeamEngine.asm
+
+.include Source/ProjectM/CustomAI.asm
+.include Source/ProjectM/Events.asm
+.include Source/ProjectM/Handicap.asm
+
+.include Source/Community/MusicSelect.asm
+.include Source/Community/Subspace.asm
+
+.include Source/Community/PSA/Angle.asm
+.include Source/Community/PSA/IC-Basics.asm
+.include Source/Community/PSA/Maths.asm
+.include Source/Community/PSA/PointerWizardry.asm
+.include Source/Community/PSA/PSA.asm
+.include Source/Community/PSA/VariableParameter.asm
+
+#.include Source/Project+/TexFlags.asm	# This code is currently having issues interacting with the Code Menu. Included 
+					# to allow an understanding of how it will mechanically work in the future.
 
 .include Source/P+Ex/AllStar.asm
-.include Source/P+Ex/Angle.asm
-.include Source/P+Ex/Coin.asm
 .include Source/P+Ex/CustomEnding.asm
-.include Source/P+Ex/Maths.asm
 .include Source/P+Ex/Misc.asm
 .include Source/P+Ex/PassiveAnim.asm
-.include Source/P+Ex/PlatformIgnore.asm
-.include Source/P+Ex/PointerWizardry.asm
-.include Source/P+Ex/PSA.asm
 .include Source/P+Ex/SoundbankFix.asm
-.include Source/P+Ex/Subspace.asm
-.include Source/P+Ex/VariableParameter.asm
-.include Source/P+Ex/BigHeadMode.asm
-.include Source/P+Ex/InputBuffer.asm
-.include Source/P+Ex/RandomAngleMode.asm
-.include Source/P+Ex/ScaleModifier.asm
-.include Source/P+Ex/SpeedModifier.asm
-.include Source/P+Ex/WarMode.asm
+.include Source/Community/lavaInjectLoader.asm
 
 #.include Source/Extras/Console.asm	# Only use this on a Wii or Wii U! The codes in this are necessary for the slower specifications of the actual console.
 .include Source/Extras/Netplay.asm	# Only use this in Dolphin! The codes in this will result in bad behavior on the Wii!

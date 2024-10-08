@@ -414,3 +414,25 @@ CE AI Input Fix [ds22]
 * 04B27AD0 809144F0
 * 04B27AE0 809139FC
 * 04B27AE8 80914FD0
+
+CPU Airdodge Fix [Fudgepop01]
+op NOP @ $809202B0
+op NOP @ $80920158
+op NOP @ $80920E10
+op NOP @ $80920710
+op NOP @ $80920C88
+# op NOP @ $80920E8C
+op NOP @ $80920E84
+# op NOP @ $80920ED8
+op NOP @ $80920DE8
+op NOP @ $80920CFC
+# ZSS Special Input
+# op NOP @ $80920A38
+op NOP @ $80920D6C
+op NOP @ $80920CD4
+op NOP @ $80920E5C
+op NOP @ $80920D94
+op NOP @ $80920F1C
+
+Fix Lv9 CPU oversight [(Mr AI) SLuigi123, Fudgepop01]
+op bge 0xC @ $8092A5C8

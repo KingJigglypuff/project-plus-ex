@@ -1,0 +1,8 @@
+<addon name="Melee-style Camera Freeze on Game Finish v1.0.0 [Eon, QuickLava]" shortName="MLEEFREZ">
+	<codeMenuPage shortName="_SPECIAL">
+		<codeMenuToggle name="Melee Game Finish Camera Freeze" shortName="ONOFF">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+</addon>
+

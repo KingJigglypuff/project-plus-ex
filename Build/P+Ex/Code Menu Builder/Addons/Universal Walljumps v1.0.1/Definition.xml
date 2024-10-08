@@ -1,0 +1,11 @@
+<addon name="Universal Walljumps v1.0.1 [Dantarion, QuickLava]" shortName="UNVWLJMP">
+	<codeMenuPage shortName="_SPECIAL">
+		<codeMenuSelection name="Universal Walljump Toggle" shortName="SETTING">
+			<defaultOption index="2" editable="true" />
+			<option value="Disabled" />
+			<option value="Enabled" />
+			<option value="Default" />
+		</codeMenuSelection>
+	</codeMenuPage>
+</addon>
+

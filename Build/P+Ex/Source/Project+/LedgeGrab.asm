@@ -1,14 +1,14 @@
-###################################################################
-[Project+] Normal Ledge Getup Eliminates Ledge Cooldown [DukeItOut]
-###################################################################
+##########################################################################
+[Project+] Normal Ledge Getup Options Eliminate Ledge Cooldown [DukeItOut]
+##########################################################################
 HOOK @ $8087B078
 {
-  mr r4, r3			# Original operation
-  lwz r3, 0x7C(r30)	# \
-  lhz r3, 6(r3)		# / Get the current action
-  cmpwi r3, 0x77	# \
-  bne+ %END%		# | Clear the timer if it is a normal ledge climbing animation
-  li r4, 0x0		# /
+  mr r4, r3						# Original operation
+  lwz r3, 0x7C(r30)				# \
+  lhz r3, 6(r3)					# / Get the current action
+  cmpwi r3, 0x76; blt+ %END%	# \ Check if Ledge Attack, Ledge Climb or Ledge Roll
+  cmpwi r3, 0x78; bgt+ %END%	# |
+  li r4, 0x0					# / Clear the timer if it is a normal ledge climbing animation
 }
 
 ###########################################

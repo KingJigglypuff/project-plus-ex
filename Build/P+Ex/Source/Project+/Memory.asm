@@ -225,19 +225,33 @@ skip:
 }
 
 
-###########################################
-TopN Y and SCD Bottom Reference Fix [Magus]
-###########################################
-HOOK @ $80134200
+#####################################################
+TopN Y and SCD Bottom Reference Fix v2.1 [Magus, Eon] 
+#####################################################
+HOOK @ $8073aa34 
 {
-  lwz r0, 0x18(r5)
-  mflr r10
-  lis r9, 0x8073;  ori r9, r9, 0xAA34;  cmpw r10, r9;   bne+ %END%
-  lwz r10, 0x04(r30);  lbz r9, 8(r10);  cmpwi r9, 0x1;  beq+ %END%
-  lwz r10, 0x64(r10)
-  lwz r10, 0x30(r10)
-  lwz r10, 0x18(r10)
-  lwz r0,  0x10(r10)
+
+  lwz r4, 0x04(r30);  lbz r3, 8(r4);  cmpwi r3, 0x1;  beq end #if not in air, end
+
+  lwz r4, 0x64(r4) #get GroundModule
+  lwz r4, 0x30(r4) #get ModuleAccessor
+  #getType()
+  lwz r3, 0x8(r4)  
+  lwz r12, 0x3C(r3)
+  lwz r12, 0xA4(r12)
+  mtctr r12
+  bctrl
+  cmplwi r3, 1 #type 0/1 = fighter/boss, only apply to fighters and bosses
+  bgt end
+
+  lwz r4, 0x04(r30)
+  lwz r4, 0x64(r4) 
+  lwz r4, 0x30(r4) 
+  lwz r4, 0x18(r4) #get PositionModule?
+  lwz r4,  0x10(r4) #get Y pos
+  stw r4, 0x5C(r1) #set Y pos
+end:
+  lfs f1, 0x58(r1) #original command
 }
 
 ######################################

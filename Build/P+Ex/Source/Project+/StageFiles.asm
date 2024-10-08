@@ -1,8 +1,6 @@
-#################################
-Stage File System Neo [DukeItOut]
-
-# Location of Safety Check Changed
-#################################
+##############################################
+Stage File System Neo v2 [DukeItOut, Kapedani]
+##############################################
 	.BA<-FileFormatSetup
 	.BA->$8053EFE0
 	.BA<-FileNameFolder
@@ -52,20 +50,10 @@ FileNameFormat4:
 FileLoadCode:
 HOOK @ $8094A0F8	# Stage Loading, special case for replays needed
 {
-	lis r12, 0x805B			# \
-	lwz r12, 0x50AC(r12)	# | Retrieve the game mode name
-	lwz r12, 0x10(r12)		# |
-	lwz r4,  0x14(r12)		# | And also the scene stage mode
-	lwz r12, 0x0(r12)		# /
-	lis r3, 0x8070;	
-	ori r0, r3, 0x2B60;	cmpw r0, r12;	beq skip		# Skip if this is "sqAdventure"
-	ori r0, r3, 0x29E8; cmpw r0, r12;	beq skip		# Skip if this is "sqSingleBoss"
-	ori r0, r3, 0x24D0; cmpw r0, r12;   bne notClassic	# This special check only applies to Classic Mode's Master Hand fight
-Classic:
-	cmpwi r4, 13; beq skip		# If the Master Hand fight (Stage 13), then skip this!
-notClassic:	# Classic Mode stages other than the one above are treated more normally
-	lwz r3, 0x40(r31)	# \ Obtain the stage ID
-	lhz r3, 0x1A(r3)	# /
+	lwz r3, 0x40(r31)	# \
+	lhz r3, 0x1a(r3)	# | check loader->globalModeMelee->meleeInitData.stageKind == Stage_Subspace
+	cmpwi r3, 0x3d		# |
+	beq- skip 			# /
 	lis r12, 0x8053
 	ori r12, r12, 0xE000
 	mtctr r12
@@ -85,33 +73,27 @@ skip:
 	mr r3, r27				# Restore register 3
 	cmpwi r30, 0			# Do a test that was overruled, before	
 }
-HOOK @ $8117DF4C	# My Music
+HOOK @ $806ee40c	# sqEvent::setNext
 {
-	mr r3, r7		# Stage ID
-	lis r12, 0x8053			# \ 10-byte row dedicated to individual menu shenanigans
-	ori r4, r12, 0xEF70		# /
-	lis r7, 0x800B			# \
-	ori r7, r7, 0x9EA0		# | Grab the input and store it. We'll use this to prevent the menu shortcuts from failing
-	lhz r7, 2(r7)			# |
-	andi. r7, r7, 0x60		# | by filtering for just the shoulder inputs and 	
-	stw r7, 0(r4)			# /
-	ori r12, r12, 0xE000	#
-	ori r7, r12, 0x24		# Bypass the safety check.
-	mtctr r7
-	bctrl
-	mr r3, r30		# Restore register 3
+	lis r12, 0x8054			#
+	lhz r12, -0x1046(r12)   # Get ASL input from 8053EFBA (copied from 800B9EA2)
+	lis r11, 0x800C 		# \ restore to 800B9EA2 (after CSS in event mode since was wiped from transition between event to CSS)
+	sth r12, -0x615E(r11)	# /
+	lwz r12, 0x8(r3)	# \ GameGlobal->modeMelee.meleeInitData.songId
+	lhz r12, 0x5E(r12)	# /
+	lis r11, 0x8054			# \ Place song ID at 8053CFD4	
+	stw r12, -0x102C(r11) 	# /
+	mr r3, r15	# Original operation
 }
 	
 ###
 # Load Soundbank from Stage File
 HOOK @ $8094BF6C
 {
-    lis r12, 0x805B
-    lwz r12, 0x50AC(r12)
-	lwz r12, 0x10(r12)
-	lwz r12, 0x00(r12)
-	lis r0, 0x8070;	ori r0, r0, 0x2B60; cmpw r0, r12; # "sqAdventure"
-	bne %END%	# Subspace needs to ignore this for special reasons
+	lwz r12, 0x40(r31)	# \
+	lhz r12, 0x1a(r12)	# | check loader->globalModeMelee->meleeInitData.stageKind == Stage_Subspace
+	cmpwi r12, 0x3d		# | Subspace needs to ignore this for special reasons
+	bne %END%			# /
 	mr r3, r31	# Restore register 3	
 	lwz r12, 0x3C(r31)		# \
 	lwz r12, 0x74(r12)		# |
@@ -145,32 +127,36 @@ HOOK @ $80949BEC
 	lhz r4, -0xFEE(r12)		# / Effectbank ID to load @ $8054F012
 	stw r4, 0x94(r3)   	 	# store stage effectbank ID, not read by SSE
 }
+/*
+### NO LONGER USED, LEFT HERE FOR NOW TO REMEMBER HOW IT WAS ACHIEVED
 ###
 # Load RGBA Overlay
 # Suggested values for overlays:
 # 000000FF (0, 0, 0, 255)     for full black
 # 3C6C24B4 (60, 108, 36, 180) for Game Boy green
 # This affects characters, but not stages articles or effects
-HOOK @ $807C9768
+HOOK @ $8083413c	# Fighter::postInitialize
 {
-	lis r12, 0x8054			# \ Stage file RGBA settings @ $8053F00C
-	lwz r12, -0xFF4(r12)	# / (normally uninitialized in Brawl)
-	stw r12, 0x14A(r26)		# /
+	extsb r0, r3	# Original operation
+	lis r4, 0x8054			# \ Stage file RGBA settings @ $8053F00C
+ 	lwzu r12, -0xFF4(r4)	# / (normally uninitialized in Brawl)
 	andi. r12, r12, 0xFF	# Check alpha settings
-	mr  r12, r30
-	beq- clear				# If the alpha was clear, then behave normally and do not provide an overlay
-	lis r4, 0x805B			# \
-	lwz r4, 0x50AC(r4)		# | Get pointer to mode name
-	lwz r4, 0x10(r4)		# |
-	lwz r4, 0x4(r4)			# /
-	lis r27, 0x8070			# \ is the mode "sqAdventure"?
-	ori r27, r27, 0x2E50	# |
-	cmpw r4, r27			# | Don't enable the overlay if it is.
-	beq clear				# /
-	li r12, 1				# Enable overlay
-clear:
-	stb r12, 0x14F(r26)		# Set the overlay toggle (boolean, normally 0)
-}	
+	beq- %end%		# If the alpha was clear, then behave normally and do not provide an overlay
+	lis	r11, 0x805A				# \
+	lwz r11, 0xE0(r11) 			# |
+	lwz r11, 0x8(r11)			# | GameGlobal->globalModeMelee->meleeInitData.stageKind
+	lhz r11, 0x1a(r11)			# /
+	cmpwi r11, 0x3d			# \ check if stage id == adventure
+	beq+ %end%				# /
+	lwz	r3, 0xD8(r29)	# \ moduleAccesser->moduleEnumeration->colorBlendModule
+	lwz	r3, 0xAC(r3)	# /
+	li r5, 1				# Enable overlay
+	lis r12, 0x8083			# \
+	ori r12, r12, 0x4164	# | jump to call setSubColor
+	mtctr r12 				# |
+	bctr					# /
+}
+*/
 ###
 # Load Secondary Stage Name on Slots 0x13 and 0x19
 op NOP @ $8094AB24			# Make all dual pac stages run the same code
@@ -255,33 +241,14 @@ CODE @ $80015568
 }
 
 #############################################################
-Stage Roster Expansion System v3.1 [Phantom Wings, DukeItOut]
+Stage Roster Expansion System v3.2 [Phantom Wings, DukeItOut]
+#
+# 3.2: Modified memory allocation based on Sammi's new File
+#         Patch Code. Parameter entry now defines secondary
+#         allocation, instead. (Only needed for stages based
+#         on Mario Bros., Castle Siege, Lylat Cruise and the
+#         Stage Builder.)
 #############################################################
-# Force Regular Stages To Use Maximum Plausible Allocation, including Expansion Slots 
-
-HOOK @ $8094A1D0
-{
-	mr r29, r3				# Original operation, places allocation size in r29
-	lis r3, 0x805B			# \
-	lwz r3, 0x50AC(r3)		# | Get pointer to mode name
-	lwz r3, 0x10(r3)		# |
-	lwz r3, 0x4(r3)			# /
-	lis r12, 0x8070			# \ is the mode "sqAdventure"?
-	ori r12, r12, 0x2E50	# |
-	cmpw r3, r12			# |	Then use the allocation it expects, don't take chances.
-	beq- %END%				# / 
-	lis r12, 0x8053			# \
-	ori r12, r12, 0xF000	# | Get reserved memory allocation from STEX system
-	lwz r3, 0x24(r12)		# /
-	cmpwi r3, 0				# \ If a value is hardcoded, use it!
-	bne- forceMemory		# /
-	cmpwi r29, -1			# \ To get more reliable memory results, the below only activates for new stage slots.
-	bne- %END%				# /
-	lis r3, 0x37			# The size of a stage should be expanded to if not already at (370000)
-forceMemory:
-	mr r29, r3				# Give it this new memory allocation size.
-}
-
 # Force stage modules to load their filenames from the STEX files. WARNING! Module names can be no longer than 32 characters!!!
 HOOK @ $80043B28
 {
@@ -399,10 +366,66 @@ SpecialCase:
 	b ModifyStageName	
 }
 
-# TODO: Force secondary stage pacs to load
+# Force secondary stage pacs to load based on the parameter
+# 806BC610
+# 805A00E0 0008 001A
+CODE @ $806BE230
+{
+	# Normally access the stage ID from 805A00E0 -> 08 -> 1A to check if Castle Siege or Lylat Cruise
+	lis r12, 0x8054			# Get Dual Load flag at 80530015
+	lbz r12, -0xFEB(r12)	#
+	andi. r12, r12, 8		# Bit flag relevant
+	beq+ 0x10				# Skip setting Dual Load flag!
+}
+# HOOK @ $8094ac18
+# {
+# 	lhz	r0, 0x1A(r4)	# Original operation
+# 	cmpwi r0, 0x3d			# \
+# 	bne+ %end%				# |
+# 	lis r12, 0x8094			# | skip if Subspace
+# 	ori r12, r12, 0xae80	# |
+# 	mtctr r12				# |
+# 	bctr					# /
+# }
+CODE @ $8094AC1C
+{
+	# Normally access the stage ID from 0x40(r3) -> 1A
+	lis r12, 0x8054			# Get Dual Load flag at 80530015
+	lbz r12, -0xFEB(r12)	#
+	andi. r12, r12, 8		# Bit flag relevant
+	beq+ 0x258				# Skip setting Dual Load behavior!
+}
+HOOK @ $806BE22C
+{
+	lhz r0, 0x1A(r3)		# Original operation. Get stage slot ID
+	cmpwi r0, 0x28			# Is this the results screen? 
+	bne NormalStage
+	#cmpwi r0, 0x3D
+	#bne NormalStage
+	lis r12, 0x806B
+	ori r12, r12, 0xE24C
+	mtctr r12
+	bctr					# If it is, it is not a dual-load stage!
+NormalStage:
+}
 
-# TODO: Address stage-specific memory allocation:
-#
+# TODO: Address secondary pac shuffling for Lylat Cruise. Currently checks for substage count at 8094AEA4???
+# TODO: Address secondary pac being randomized.
+
+# Force Regular Stages To Use Secondary Allocation when needed. (See Mario Bros, Lylat Cruise, Castle Siege)
+HOOK @ $80949F40
+{
+	cmpwi r0, 0x3d			# \ stageKind == Stage_Subspace 
+	beq- SSE				# / 
+	lis r12, 0x8054			# \ Get reserved memory allocation from STEX system at 8053F024
+	lwz r3, -0xFDC(r12)		# /
+	cmpwi r3, 0				# \ If a value is hardcoded, use it!
+	bnelr-					# / 
+SSE:
+Normal:
+	cmplwi r0, 39		# Original operation
+}
+
 
 #80949F38 special cases for:
 #39/0x27	?????
@@ -414,7 +437,7 @@ SpecialCase:
 #default: r3 = 0x2000
 
 # Below is a temp fix until I make the above modular
-op cmplwi r0, 5 @ $80949FC0	# Normally 0x1F (Famicom), allows Mario Bros to load properly from Metal Cavern
+# op cmplwi r0, 5 @ $80949FC0	# Normally 0x1F (Famicom), allows Mario Bros to load properly from Metal Cavern
 
 # Miscellaneous stage ID 
 .alias WarioWare = 0x4D
@@ -444,14 +467,73 @@ unusual:				//Those two stage types demand hardcoded pointers
 }	
 	
 ########################################################
-Custom Stage SD File Loader [DukeItOut, Replay Fix by Kapedani]
+Custom Stage SD File Loader [DukeItOut, Kapedani]
 # 
 # This version forces stage reloading if a flag is set, as well as uses the flag to determine if it's a replay
 #
-# Requires CMM SD File Saver
+# Requires:
+# CMM SD File Saver
+# mtRand::randi behaves as mtRand->randi(max)
+#
+# NEW: Random support and character based results/target smash
 #
 # Prerequisite: Stage ID in r3 (retrieves input, itself)
 ########################################################
+
+.alias g_GameGlobal                 = 0x805a00E0
+.alias g_mtRand_net					= 0x805a0420
+.alias ipSwitch__getInstance		= 0x8004a750
+.alias gfFileIORequest__setReadParam	= 0x8002239c
+.alias gfFileIO__readFile			= 0x8001bf0c
+.alias sprintf						= 0x803f89fc
+
+.alias RSS_EXDATA_BONUS				= 0x806AEE18
+.alias ASL_DATA						= 0x8053F000
+.alias TRACKLIST_DATA				= 0x8053F200
+.alias BRAWLEX_FIGHTER_IDS       	= 0x817C8680
+.alias BRAWLEX_FIGHTER_NAMES        = 0x817CD820
+
+.macro lbd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lbz     <reg>, temp_Lo(<reg>)
+}
+.macro lwd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+.macro lwdu(<reg1>, <reg2>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg2>, temp_Hi
+    lwzu    <reg1>, temp_Lo(<reg2>)
+}
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+
 CODE @ $8053E000
 {
 	lhz r0, 0xFB8(r12)
@@ -474,63 +556,152 @@ Reload:
 	mtctr r12				# | preserve registers r14-r31
 	bctrl					# /
 	mr r17, r10
-	lis r12, 0x8053
-	ori r12, r12, 0xF000
+	%lwi (r22, ASL_DATA)
+
 	lis r28, 0x800B 
 	ori r28, r28, 0x9EA0
 	sth r3, 0(r28)			# Store stage ID for future reference
 	mr r7, r3				# Stage ID
 	li r0, 0xFF				# Clear random reroll flag for substages
-	stb r0, -0x7E(r12)		#
-	sth r7, -0x80(r12)		# Store stage ID
+	stb r0, -0x7E(r22)		#
+	sth r7, -0x80(r22)		# Store stage ID
 	addi r3, r1, 0x90
-	lwz r4, -0x20(r12)		# "%s%s%02X%s"
-	lwz r5, -0x1C(r12)		# "/stage/"
-	lwz	r6, -0x18(r12)		# "stageslot/" 
-	lwz	r8, -0x10(r12)		# ".asl"
-	lis r12, 0x803F			# \
-	ori r12, r12, 0x89FC	# | Create the filename string
-	mtctr r12				# |
-	bctrl					# /	
-	lis  r5, 0x8053			# Stage files to 8053F000
-	ori  r5, r5, 0xF000		#
+
+	lwz r4, -0x20(r22)		# "%s%s%02X%s"
+	lwz r5, -0x1C(r22)		# "/stage/"
+	lwz	r6, -0x18(r22)		# "stageslot/" 
+	lwz	r8, -0x10(r22)		# ".asl"
+	lwz	r10, -0x10(r22)		# ".asl"
+
+	cmpwi r7, 0x38			# \ check if targetsmash
+	bne+ notSpecialStage	# /
+	%lwi (r7, 0x80B2EC03)	# "tBreak"
+	%lwd (r12, g_GameGlobal)	
+	lwz r12, 0x8(r12)			# \ g_GameGlobal->modeMelee->playerInitData[0].characterKind
+	lbz r9, 0x98(r12)			# /
+    %lwi (r12, BRAWLEX_FIGHTER_IDS)  # Internal BrawlEX fighter slot info 	
+    mulli r9, r9, 0x10      # Offsets are 0x10 apart
+	lwzx r9, r12, r9		# Fighter slot ID
+    %lwi (r12, BRAWLEX_FIGHTER_NAMES)	# Internal BrawlEX internal fighter names
+    mulli r9, r9, 0x10      # Offsets are 0x10 apart
+    add r9, r12, r9         # r4 now contains a pointer to the character filename when using P+EX
+	%lwi (r4, 0x8048EFF0)	# "%s%s%s%s%s%s"
+	addi r8, r5, 0x6		# "/"
+notSpecialStage:
+	%call (sprintf)			# Create the filename string
+	mr r5, r22				# Stage files to 8053F000
 	addi r3, r1, 0x60
 	addi r4, r1, 0x90
 	li r6, 0x0
 	li r7, 0x0
-	lis r12, 0x8002			# \
-	ori r12, r12, 0x239C	# | set the read parameter
-	mtctr r12				# |
-	bctrl 					# /
+	%call (gfFileIORequest__setReadParam) # set read parameter
 	addi r3, r1, 0x60
 	li r18, 0
 	li r19, 0
-	lis r12, 0x8001			# \
-	ori r12, r12, 0xBF0C	# | load the file
-	mtctr r12				# | 
-	bctrl 					# /
+	%call (gfFileIO__readFile)	# load the file
 
+	addi r23, r22, 8		# Get to the list of inputs and title offsets
+	li r26, 0				# Choice-checking
+	li r29, 0				
+	li r21, 0	
+
+	lhz 	r27, 0(r28)			# Get access to the stage ID
 	lhz		r16, 2(r28)			# / Get the input assigned
-	lhz 	r3, 0(r28)			# Get access to the stage ID
     cmpwi 	r17, 0x52		  #\ Replays require different info
     bne+    Multiplayer       #/
 Replay:
-    lis     r16, 0x9130       #\  Ignore real inputs and only receive them from the replay info.
-    lhz     r16, 0x1F4A(r16)  # | Replays insert them into 91301F4A
-    sth     r16, 2(r28)       #/
-Multiplayer:    
-	lis r22, 0x8053
-	ori r22, r22, 0xF000
-	lhz r23, 4(r22)			# \ Get the slot count
-	mtctr r23 				# /
-	addi r23, r22, 8		# Get to the list of inputs and title offsets
-	li r26, 0				# Choice-checking
-	li r29, 0				# Most accurate choice, defaulting to the start
-	li r21, 0				# How many inputs it shares
-	mr r27, r16				# The input to check against
+   	#li r3, 11					# \
+	#bla 0x0249CC				# / Get replay heap offset
+	#lhz 	r16, 0x44A(r3)		# \ Get Replay ASL value	
+	%call (ipSwitch__getInstance)	# \
+	lwz r3, 0x18(r3)				# |
+	lwz r3, 0x24(r3)				# | ipSwitch->keyRecorder->bufferData->buttonASL
+	lhz r16, 0x34A(r3)				# /
+	sth     r16, 2(r28)       	# /
+	li		r0, 0xFF			# r0 was overwritten, but we still need it!
+	b notRandom
+Multiplayer:    	
+	%lbd (r31, RSS_EXDATA_BONUS)	# \ 
+	andi. r0, r31, 0x10 			# | check if 0x10 bit is on (don't select random)
+	bne- notRandom					# / 
+	andi. r31, r31, 0x6				# \ check if 0x2 or 0x4
+	beq+ notRandom					# /
+	cmpwi r31, 0x6			# \ check if both
+	bne+ startRandomLoop	# /
+	li r4, 0x2						# \
+	%lwdu (r12, r3, g_mtRand_net)	# |
+	lwz r12, 0x18(r12)				# | g_mtRand_net->randi(endIndex - beginningIndex)
+	mtctr r12						# |
+	bctrl 							# /
+	li r31, 0x2
+	cmpwi r3, 0x0
+	beq+ startRandomLoop
+	li r31, 0x4
+startRandomLoop:
+	slwi r31, r31, 13	# shift 0x2/0x4 to make 0x4000/0x8000 mask
+	lhz r12, 4(r22)			# \ Get the slot count
+	mtctr r12 				# /
+randomLoop:
+	# r29 - start index
+	# r21 - count/end index
+	# NOTE: >=0x4000 alts should be ordered sequentially together (and shouldn't be at the very first entry)
+	lhzx r25, r23, r26	
+	cmpwi r29, 0x0		# \ check if already found start of alts
+	bne+ alreadyStarted	# /
+	cmplwi r25, 0xC000		# \ 
+	bge+ endRandomLoop		# | check to see if start of alts was found
+	and. r11, r31, r25		# |
+	beq+ endRandomLoop		# / 
+	mr r29, r21			# get startIndex of alts
+alreadyStarted:
+	cmplwi r25, 0xC000		# \ 
+	bge+ finishRandomLoop	# |
+	and. r11, r31, r25		# | check to see if end of alts was found
+	beq- finishRandomLoop	# /
+endRandomLoop:
+	addi r21, r21, 0x1
+	addi r26, r26, 0x4
+	bdnz+ randomLoop
+finishRandomLoop:
+	li r3, 0			# \
+	cmpwi r29, 0x0 		# | check if any random alts found, default if not
+	beq- noRandomAlts	# /
+	sub r4, r21, r29				# \
+	%lwdu (r12, r3, g_mtRand_net)	# |
+	lwz r12, 0x18(r12)				# | g_mtRand_net->randi(endIndex - beginningIndex)
+	mtctr r12						# |
+	bctrl 							# /
+	add r3, r3, r29		
+noRandomAlts:	 
+	mulli r29, r3, 0x4		
+	b slotFound
+notRandom:
+	lhz r12, 4(r22)			# \ Get the slot count
+	mtctr r12 				# /
+	%lwd (r12, g_GameGlobal)
+    cmpwi r27, 0x28		# \ check if results
+	beq+ isResult		# /
+	cmpwi r27, 0x38		# \ check if target smash
+	bne- loop			# /
+	lwz r12, 0x8(r12)	# \ turn substages into input so bonus stages can have their own param
+	lbz r16, 0x1C(r12)	# / 
+	b loop
+isResult:
+	li r16, 0x0
+	lwz r12, 0x18(r12)		# g_GameGlobal->resultInfo
+	lbz r11, 0x11(r12)		# \
+	cmpwi r11, 0x0			# | check if noContest
+	beq+ loop				# /
+	lbz r11, 0x1f(r12)		# |
+	mulli r11, r11, 0x2ac	# | turn g_GameGlobal->resultInfo->playerResultInfo[winningPlayer].characterKind so that can have per character results screen
+	add r12, r12, r11		# |
+	lbz r16, 0x24(r12)		# |
+	addi r16, r16, 0x1		# /
 loop:	
+	# r29 - Most accurate choice, defaulting to the start
+	# r21 - How many inputs it shares
 	lhzx r25, r23, r26
-	and. r25, r27, r25
+	and. r25, r16, r25
 	beq- not_found
 found:
 	mfctr r0				# Preserve the stage loop
@@ -554,59 +725,50 @@ not_found:
 	addi r26, r26, 4
 	bdnz+ loop
 slotFound:
-    cmpwi r3, 0x28          # Do not save results
-    beq DoNotSaveASL
+    cmpwi r27, 0x26			# \ Do not save if CSS
+	beq DoNotSaveASL		# /
+	cmpwi r27, 0x28         # \ Do not save if results stage
+    beq DoNotSaveASL		# /
     addi r23, r22, 8		# \ Get to the list of inputs and title offsets
     lhzx r25, r23, r29      # /
-    sth r25, 2(r28)         # Store in alt stage helper ASL loc
-    lis r11, 0x815F         # \ Store in ALT_STAGE_VAL_LOC
-    sth r25, -0x7BDE(r11)   # /
-    lis r11, 0x9135         # \ Store in CURRENT_ALT_STAGE_INFO_LOC
-    stw r25, -0x3700(r11)   # /
+	lis r12, 0x8054			#
+	sth r25, -0x1046(r12)   # Set ASL input to 8053EFBA (copied from 800B9EA2)
+	li r12, 0
+	sth r12, 2(r28)         # Reset alt stage helper ASL loc
+    # %call (ipSwitch__getInstance)	# \
+	# lwz r3, 0x18(r3)				# |
+	# lwz r3, 0x24(r3)				# | set ipSwitch->keyRecorder->bufferData->buttonASL
+	# sth r25, 0x34A(r3)				# /
 DoNotSaveASL:
 	addi r29, r29, 0xA		# \ pass the 8-byte header and add 2 to get the offset instead of input
 	lhzx r29, r22, r29		# /
 	lhz r23, 6(r22)			# \ Get offset to param file names
 	add r23, r23, r22		# /
 	add r23, r23, r29		# Get the title address
-	lis r12, 0x8053			# Stage files write to 8053F000
-	ori r12, r12, 0xF000	#	
-	
+
 	addi r3, r1, 0x90
 	lis r4, 0x8048			#
 	ori r4, r4, 0xEFF4		# %s%s%s%s	
-	lwz r5, -0x1C(r12)		# "/stage/"
-	lwz	r6, -0x14(r12)		# "stageinfo/" 
+	lwz r5, -0x1C(r22)		# "/stage/"
+	lwz	r6, -0x14(r22)		# "stageinfo/" 
 	mr r7, r23				# <-r23 filename 
-	lwz	r8, -0xC(r12)		# ".param"
-	lis r12, 0x803F			# \
-	ori r12, r12, 0x89FC	# | Create the filename string
-	mtctr r12				# |
-	bctrl					# /	
+	lwz	r8, -0xC(r22)		# ".param"
+	%call (sprintf)			# Create the filename string
 	
-	lis  r5, 0x8053			# Stage lists are written to 8053F200
-	ori  r5, r5, 0xF000		#
+	mr r5, r22				# Stage params are written to 8053F000 
 	addi r3, r1, 0x60
 	addi r4, r1, 0x90
 	li r6, 0x0
 	li r7, 0x0
-	lis r12, 0x8002			# \
-	ori r12, r12, 0x239C	# | set the read parameter
-	mtctr r12				# |
-	bctrl 					# /
+	%call (gfFileIORequest__setReadParam)	# set the read parameter
 	addi r3, r1, 0x60
 	li r18, 0
 	li r19, 0
-	lis r12, 0x8001			# \
-	ori r12, r12, 0xBF0C	# | load the file
-	mtctr r12				# | 
-	bctrl 					# /
+	%call (gfFileIO__readFile)	# load the file
 
-	lis r12, 0x8053			# \
-	ori r12, r12, 0xF000	# | Get the tracklist file name
-	lwz r8, 0x18(r12)		# |
-	lwz r4, 0x4(r12)		# |
-	add r4, r4, r12			# |
+	lwz r8, 0x18(r22)		# \
+	lwz r4, 0x4(r22)		# | Get the tracklist file name
+	add r4, r4, r22			# |
 	add r8, r8, r4			# /
 	
 TracklistLoading:	
@@ -621,26 +783,16 @@ TracklistLoading:
 	lwz r4, 0x4(r4)						# "%s%s.tlst"
 	mr r6, r8
 	addi r3, r1, 0x60
-	lis r12, 0x803F				# \
-	ori r12, r12, 0x89FC		# | Create the filename string
-	mtctr r12					# |
-	bctrl						# /
-	lis  r5, 0x8053				# Tracklists are written to 8053F200, stage files to 8053F000
-	ori  r5, r5, 0xF200			#
+	%call (sprintf)		# Create the filename string
+	addi r5, r22, 0x200 # Tracklists are written to 8053F200, stage files to 8053F000
 	addi r3, r1, 0x30
 	addi r4, r1, 0x60
 	li r6, 0x0
 	li r7, 0x0
-	lis r12, 0x8002			# \
-	ori r12, r12, 0x239C	# | set the read parameter
-	mtctr r12				# |
-	bctrl 					# /
+	%call (gfFileIORequest__setReadParam)	# set the read parameter
 	addi r3, r1, 0x30
 	li r6,0					# Necessary to prevent a max filesize override by the File Patch Code!
-	lis r12, 0x8001			# \
-	ori r12, r12, 0xBF0C	# | load the file
-	mtctr r12				# | 
-	bctrl 					# /
+	%call (gfFileIO__readFile)	# load the file
 	lwz r4, 0x8(r1)
 	lwz r5, 0xC(r1)
 	lwz r6, 0x10(r1)
@@ -661,159 +813,66 @@ FinishedTracklistLoading:
 	blr
 }
 
-#######################################################################
-If No Song Titles Are Found, Obtain Them From The TLST File [DukeItOut]
-#######################################################################
+#################################################################################
+If No Song Titles Are Found, Obtain Them From The TLST File [DukeItOut, Kapedani]
+#################################################################################
 .alias tlstHeaderSize = 0xC		# Data block size for the header
 .alias tlstSongSize = 0x10		# Data block size for each available song
 # 
 op b -0x158 @ $800DE81C # Go to below
 op li r5, -2 @ $800DE6D4
+op nop @ $800de6c8
 # Force it to read for a title, even if the title section isn't present in the info pac file
-HOOK @ $800DE6C4
-{
-	bne+ wasFound
-	lwz r12, 0(r1)
-	lwz r12, 0(r12)
-	lwz r12, 4(r12)
-	lis r5, 0x8095		# \ Check if battle is starting
-	ori r5, r5, 0x1214 	# /
-	cmpw r12, r5
-	beq forceRead
-	lis r5, 0x8095
-	ori r5, r5, 0x11D8
-	cmpw r12, r5
-	beq forceRead
-	lwz r12, 4(r1)
-	lis r5, 0x8117
-	ori r5, r5, 0xF428
-	cmpw r12, r5
-	bne defaultBehavior
-forceRead:
-	lwz r3, 0x164(r30)
-	li r4, 0
-	li r5, -2
-	lis r12, 0x800D
-	ori r12, r12, 0xE6D8
-	mtctr r12
-	bctr 
-defaultBehavior:
-	cmpwi r3, 0			# reset conditions
-wasFound:	
-	mr r5, r3			# Original operation
-}
+
 ###
 HOOK @ $800B91F0 
 {
-	li r3, 0		# Normally tells it that it is false
 	cmpwi r5, -2	# Check if this is a custom tracklist title request
-	bne+ %END%		#
-entertingMyMusic:
+	bne+ end		# 
 enteringBattle:
 
-	stwu r1, -0x10(r1)
-	stw r4, 0x8(r1)
 	lis r12, 0x8053			# \ Location of tracklist file.
 	ori r12, r12, 0xF200	# /
 	lwz r5, 4(r12)			# \ Get the song count
 	mtctr r5				# /
 	li r6, 0
-	addi r12, r12, tlstHeaderSize		# Beginning of song data
-	# lwz r4, 0x698(r25)				# Get song ID
-	lis r4, 0x8054						# \ Get song ID from mirror 8053EFD4
-	lwz  r4, -0x102C(r4)				# /
+	addi r11, r12, tlstHeaderSize		# Beginning of song data
+	lis r10, 0x8054						# \ Get song ID from mirror 8053EFD4
+	lwz  r10, -0x102C(r10)				# /
 songLoop:
-	lwzx r5, r12, r6
-	cmpw r4, r5
+	lwzx r5, r11, r6
+	cmpw r10, r5
 	beq- foundSong
 	addi r6, r6, tlstSongSize	# Size of each song parameter block
 	bdnz+ songLoop
-	li r3, 0				# Location was unsuccessful if it reached this point
-	addi r1, r1, 0x10
-	b %END%			
+	b end		# Location was unsuccessful if it reached this point
 foundSong:
-	#lis r4, 0x8054				# \ Title already placed here.
-	#lwz r4, -0x1028(r4)		# /
-	mr r4, r12
-	subi r12, r4, tlstHeaderSize #
-	add r5, r4, r6				# Offset of the song
+	add r5, r11, r6				# Offset of the song
 	lwz r6, 0xC(r5)				#
 	stw r6, -0x254(r12)			# Set song pinch mode statuses (16-bit timer, bool for pinch mode in stock contexts,
 								#									bool for if a song is hidden from the tracklist
-	lhz r3, 0xA(r12)			# Pointer to string table
+	lhz r9, 0xA(r12)			# Pointer to string table
 	lhz r6, 0xA(r5)				# Offset for title
-	cmplwi r6, 0xFFFF
-	bne hasTitle
-	lis r4, 0x8047				# \ "ERROR" title
-	ori r4, r4, 0xF4E9			# /
-	b setTitle
-hasTitle:
-	add r6, r6, r3
-	add r4, r12, r6
-setTitle:
-	stw r4, -0x0228(r12)
-	
-	stw r4, 0xC(r1)			# Preserve this offset!
-	
-	mr r3, r29 
-	lwz r4, 0x8(r1)			# Retrieve r4 for initialization
-	
-	lis r12, 0x800B
-	ori r12, r12, 0x8EE8
-	mtctr r12
-	bctrl
-	mr r4, r31
-	mr r5, r30
-	
-	lwz r4, 0xC(r1)			# Where to write from
-	li r5, 0
-IllBeBack:
-	lbzx r3, r4, r5
-	cmpwi r3, 0
-	beq foundTerminator
-	addi r5, r5, 1
-	b IllBeBack
-foundTerminator:
-	lwz r3, 0x8(r29)		# \
-	lwz r31, 0x1D0(r3)		# |
-	lwz r0, 0x4C(r31)		# |
-	lwz r3, 0x50(r31)		# |
-	add r3, r3, r0			# / Where to write to
-	cmpwi r5, 0				# \ r5 contains the string length to write
-	bne hasLength
-	stb r5, 0(r3)			# Still guarantee the title doesn't get corrupted if 0
-	b finishProcess
-hasLength:
-	lwz r0, 0x4C(r31)
-	add r0, r0, r5
-	stw r0, 0x4C(r31)
-	lis r12, 0x8000			# \
-	ori r12, r12, 0x4338	# | Write title
-	mtctr r12				# |
-	bctrl 					# /
-finishProcess:	
-	addi r1, r1, 0x10
+
+	add r6, r6, r9
+	add r5, r12, r6
+	bla 0x0b9230		# MuMsg::printf
 
 	li r3, 1				# Force it to assume it is successful
+	b %end%
+end:
+	li r3, 0		# Normally tells it that it is false
+
 }
 # Force My Music to load titles from the TLST (modified by Desi to remove song limit on My Music)
 #
-# Fixed issue where altering the My Music menu too extensively would break compatibility with this code
-HOOK @ $8117F418
-{
-	addi r4, r3, 0x40			#\Get Song ID, but load from 8053F200 instead of 81521880
-	subf r4, r4, r25			#|
-	mulli r4, r4, 0x4			#|
-	lis r5, 0x8053				#|
-	ori r5, r5, 0xF20C			#|
-	add r4, r5, r4				#|
-	lwz r5, 0 (r4)				#/
-	lis r4, 0x8054				# \ Place the song ID
-	stw r5, -0x102C(r4)			# /	
-	li r4, 0					#
-	li r5, -2					# Activate behavior acknowledging no title file
-}
 
+HOOK @ $8010fe28	# stGetStageParameter
+{
+	oris r0, r30, 0xFF00	# Original operation
+	lis r12, 0x8054		 	# \ Place song ID at 8053CFD4 	
+	stw r30, -0x102C(r12) 	# /
+}
 # Redirect the title information to the TLST
 HOOK @ $80079334
 {
@@ -956,7 +1015,7 @@ forceSkip:
 }
 	
 .include source/Project+/MyMusic.asm		# Integrated heavily into the above!
-.include source/Project+/Random.asm			# Custom random code to load expansion and non-striked slots, properly
+.include source/Project+/Random.asm		# Custom random code to load expansion and non-striked slots, properly
 
 #####################################################################################################
 [Legacy TE] Hold Y on Smashville to Guarantee a Concert V2 (requires ASL Helper and SFSN) [DukeItOut]
@@ -1004,11 +1063,53 @@ op b -0x4	@ $8010FDFC		# Makes Slot
 # 8010FE04 sets ID 26FF Online Practice Stage
 # 8010FE18 sets ID 2712 Break the Targets
 
-#######################################################################################
-SSSRES:Stage Selection Screen Roster Expansion System (RSBE.Ver) v1.1 [JOJI, DukeItOut]
+#################################################################################################
+SSSRES:Stage Selection Screen Roster Expansion System (RSBE.Ver) v1.3 [JOJI, DukeItOut, Kapedani]
 #
 # 1.1: fixed issue where page 3 wouldn't load all stages if page 1 had less, overall
-#######################################################################################
+# 1.2: fixed issue where the wrong button was displayed when no custom stages 
+#			were present
+# 1.3: Compatibility with new random
+#################################################################################################
+.alias g_muSelectStageFileTask		= 0x806BB388
+.alias STAGELIST_TYPE				= 0x806AEE1A
+
+.alias MaxPages = 3			# Amount of normal expansion stage pages
+.alias BackFrame = 4		# Frame that the last page will use to indicate the next is page 1
+.alias CustomFrame = 3		# Frame for the Stage Builder
+
+.macro lbd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lbz     <reg>, temp_Lo(<reg>)
+}
+.macro lwd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro branch(<addr>)
+{
+    %lwi(r12, <addr>)
+    mtctr r12
+    bctr
+}
+
 HOOK @ $806B1F04				# Forces it to fill the amount of stage slots to max possible to avoid an error with expansion pages
 {
 	li r3, 39					# \ Use this as a max possible for a page. Do not raise above this!
@@ -1056,61 +1157,135 @@ loc_0x60:
 loc_0x64:
   li r18, 0x0
 }
+HOOK @ $806b22a8	# muSelectStageTask::dispPage
+{	bctrl 			# Original operation
+	mr r29, r27		# Store next page number
+}
+
+op sth r0, 0x398(r28) @ $806b7fec	# muSelectStageFileTask::__ct
+HOOK @ $806b8b6c	# muSelectStageFileTask::mainStepNANDListing
+{
+	stw	r3, 0x50(r30)	# Original operation
+	cmpwi r3, 0x0	# \ check if there is any stages
+	beq+ %end%		# /
+	%lbd (r12, STAGELIST_TYPE)	# \
+	cmpwi r12, 0x0				# | check if normal default stagelist type
+	bne+ %end%					# /
+	li r12, 1			# \ keep track that at least one custom stage exists
+	stb r12, 0x399(r30)	# /
+}
+HOOK @ $806b8c18	# muSelectStageFileTask::mainStepSDListing
+{
+	stw	r3, 0x8(r30)	# Original operation
+	cmpwi r3, 0x0	# \ check if there is any stages
+	beq+ %end%		# /
+	%lbd (r12, STAGELIST_TYPE)	# \
+	cmpwi r12, 0x0				# | check if normal default stagelist type
+	bne+ %end%					# /
+	li r12, 1			# \ keep track that at least one custom stage exists
+	stb r12, 0x341(r30)	# /
+}
+HOOK @ $806b5934	# muSelectStageTask::buttonProc
+{
+	%lwd (r12, g_muSelectStageFileTask)	# \ check if any stage builder stages exist (go to custom page if it is)
+	lbz r0, 0x399(r12)					# /
+}
 HOOK @ $806B2310		# Updates the page number texture icon
 {
-	lis r3, 0x8049		# \ Page Number as is observed by the new SSS system
-	lbz r0, 0x6000(r3)	# /
-	lwz r3, 0x228(r29)	# Page Number as is observed by Brawl
-	cmpwi r3, 2			# Is it the Brawl custom stage page?
-	bne+ normalStage
-	li r3, 4
-	b %END%
-normalStage:
-	mr r3, r0			# \ Unorthodox increment due to limitations of register 0
-	addi r0, r3, 1		# /
+	lis r12, 0x8049		# \ Page Number as is observed by the new SSS system
+	ori r12, r12, 0x6000#
+
+	# lwz r3, 0x228(r29)	# Page Number as is observed by Brawl
+	cmpwi r29, 2			# Is it the Brawl custom stage page?
+	beq- LastPage
+
+	li r4, 2			# Max amount of normal pages in Brawl
+	lbz r5, 0x0(r12)	# Active Page
+	lbz r3, 0x2(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 3 (if any)
+	lbz r3, 0x3(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 4 (if any)
+	lbz r3, 0x4(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 5 (if any)
+notAny:	
+	addi r0, r5, 1
+	cmpw r0, r4			# If this isn't relevant due to being less than the latest normal page
+	blt %END%			# Then don't bother.
+	li r0, CustomFrame
+	%lwd (r5, g_muSelectStageFileTask)	# \ 
+	cmpwi r5, 0x0						# | 
+	beq+ LastPage 						# | Get if there is at least one stage builder stage (and if muSelectStageFileTask is NULL)
+	lbz r12, 0x399(r5)					# /
+	cmpwi r12, 0	# \ Check if there are zero
+	bne- %END%		# / Don't have the button point to a stage builder page if nothing is on it!
+LastPage:
+	li r0, BackFrame
 }
-HOOK @ $806B3834		# Updates the page number texture icon, but every frame
-{
-	lis r3, 0x8049
-	lbz r5, 0x6000(r3)
-	lwz r3, 0x228(r31)
-	cmpwi r3, 2
-	bne+ normalStage
-	li r3, 4
-	b %END%
-normalStage:
-	addi r5, r5, 1
-}
-HOOK @ $806B0AB8
+# HOOK @ $806B3834		# Updates the page number texture icon, but every frame
+# {
+# 	lis r3, 0x8049
+# 	lbz r5, 0x6000(r3)
+# 	lwz r3, 0x228(r31)
+# 	cmpwi r3, 2
+# 	bne+ normalStage
+# 	li r5, 4
+# 	b %END%
+# normalStage:
+# 	addi r5, r5, 1
+# }
+op nop @ $806b3850	# Disable updating page number texture icon based on stage builder
+
+HOOK @ $806B0AB8	# muSelectStageTask::__ct
 {
   stw r30, 0x228(r29)		# Original operation
   lis r16, 0x8049			# \
-  ori r16, r16, 0x6000		# | Set page number
-  stb r30, 0(r16)			# /
+  stb r30, 0x6000(r16)		# / Set page number
+  stb r0, 0x605A(r29)	# Set page number for stagelists to -1
 }
 
-HOOK @ $806B5910
+HOOK @ $806B5910	# muSelectStage::buttonProc
 {
+  lis r22, 0x806C
   lis r16, 0x8049			# \
   ori r16, r16, 0x6000		# | Load page number
   lbz r17, 0(r16)			# /
-  cmpwi r17, 0x1;  blt- page_1
-  cmpwi r17, 0x1;  beq- page_2
+  lbz r0, -0x6D64(r22)	# Get num pages from page 1 (default)
+  cmpwi r17, 0x1
+  blt- %end%
+  beq- page_2
+page_extra:
   lbzx r0, r16, r17			# Load byte value from 80496002-80496004 for amount of stages on this page if page 3 or higher
-  b setStageCount
-
-page_1:
-  lis r22, 0x806B				# \
-  ori r22, r22, 0x929C			# | Obtain stage count from table "# Page 1" below.
-  lbz r0, 0(r22)				# /
-  b setStageCount
-
+  b %end%
 page_2:
-  lis r22, 0x806B				# \ 
-  ori r22, r22, 0x92A4			# | Obtain stage count from table "# Page 2" below.
-  lbz r0, 0(r22)				# /
+  lbz r0, -0x6D5C(r22)	# Get num pages from page 2
+}
+
+HOOK @ $806b1f7c	# muSelectStage::dispPage
+{
+	subi r16, r16, 28648	# Original operation
+	%lbd (r12, STAGELIST_TYPE)	# \
+	cmpwi r12, 0x0				# | check if not builder stagelist
+	bne+ notBuilderStagelist	# /
+	li r12, 0			# set hazard on when page switches
+	lbz r11, 0x46(r26)	# \
+	cmpwi r11, 0x2		# | Unless all hazards off
+	bne+ notHazardOff	# /
+	li r12, 1
+notHazardOff:
+	stb r12, 0x45(r26)	
+notBuilderStagelist:
+  	lis r9, 0x806C
+	lis r12, 0x8049			# \
+  	ori r12, r12, 0x6000		# | Load page number
+  	lbz r11, 0(r12)			# /
+	lbz r10, -0x6D64(r9)	# Get num pages from page 1 (default)
+  	cmpwi r11, 0x1  
+	blt- setStageCount
+	beq- page_2
+page_extra:
+  	lbzx r10, r12, r11			# Load byte value from 80496002-80496004 for amount of stages on this page if page 3 or higher
+  	b setStageCount
+page_2:
+	lbz r10, -0x6D5C(r9)	# Get num pages from page 2
 setStageCount:
-  stb r0, 0x230(r29)			#
+  	stb r10, 0x230(r26)			
 }
 
 HOOK @ $806B8F60
@@ -1123,39 +1298,6 @@ HOOK @ $806B8F60
 }
 
 op li r0, 4 @ $806B50B0
-HOOK @ $806B41C8
-{
-  lis r16, 0x8049
-  ori r16, r16, 0x6000
-  li r15, 0x4												# \
-  lbz r17, 0x4(r16);  cmpwi r17, 0x0;  bne- loc_0x3C		# / Skip page 5 if it has no additions
-  li r15, 0x3												# \
-  lbz r17, 0x3(r16);  cmpwi r17, 0x0;  bne- loc_0x3C		# / Skip page 4 if it has no additions
-  li r15, 0x2												# \
-  lbz r17, 0x2(r16);  cmpwi r17, 0x0;  bne- loc_0x3C		# / Skip page 3 if it has no additions
-  li r15, 0x1												# Page 2 is the highest it will go to if the above 3 are deemed empty.
-
-loc_0x3C:
-  lbz r17, 0xC(r16);  cmpw r17, r15;  bne- loc_0x50			
-  li r17, 0x0												# Set page button back to 0 if at the highest one.
-  b loc_0x54
-
-loc_0x50:
-  addi r17, r17, 0x1										# Increment page button texture
-
-loc_0x54:
-  stb r17, 0xC(r16)											# 8049600C contains page animation value as a byte
-  subi r30, r30, 0x6FE8										# Different from the original operation for unknown reasons
-}
-
-HOOK @ $806B36C0
-{
-  stw r0, 0x224(r30)		# Original operation.
-  lis r16, 0x8049			# \
-  ori r16, r16, 0x6000		# |
-  li r17, 0xFF				# | Set to invalid value in certain contexts 
-  stb r17, 0xE(r16)			# /
-}
 
 ############################################
 Expansion Stages in All-Star Fix [DukeItOut]
@@ -1177,18 +1319,31 @@ Crush anywhere anytime [Eon]
 op nop @ $8083b1ac 
 
 #####################################################################################
-Crush effect in ef_StgBattleField outside of SSE [DukeItOut]
+Crush effect in ef_StgBattleField outside of SSE v2 [DukeItOut, Kapedani]
 #
 #Requires a special ef_StgBattleField pac file to be included in the stage to show up
 #Requires "Crush anywhere anytime [Eon]" to function
 #####################################################################################
-HOOK @ $8087C838
+.alias g_GameGlobal                 = 0x805a00E0
+
+.macro lwd(<reg>, <addr>)
 {
-	ori r4, r4, 18		# Get SSE effect
-	lis r3, 0x80B8
-	lwz r3, 0x7C28(r3)
-	lbz r0, 0x68(r3)
-	cmplwi r0, 1; beq+ %END% 	# Branch if in SSE
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+
+HOOK @ $8087C838	# ftStatusUniqProcessDead::initStatus
+{
+	ori r4, r3, 18		# Get SSE effect
+	%lwd(r12, g_GameGlobal)
+	lwz r12, 0x8(r12)	# \
+	lhz r12, 0x1a(r12)	# | check g_GameGlobal->globalModeMelee->meleeInitData.stageKind == Stage_Subspace
+	cmpwi r12, 0x3d		# /
+	beq+ %END% 	# Branch if in SSE
 	lis r4, 0x32; ori r4, r4, 1		# First effect ID in ef_StgBattlefield 
 }
 
@@ -1271,4 +1426,626 @@ op lwz r4, 0x5D00(r4)	@ $800AF6E0
 
 .include Source/Project+/StageTable.asm
 
+###########################################################
+SSS Stage Lists and Alt Stage Display [DukeItOut, Kapedani]
+###########################################################
 
+.alias muSelectStageSwitch__selectRandom		= 0x806b74f0
+.alias muSelectStageSwitch__dispPreview			= 0x806b6ab4
+.alias g_muSelectStageFileTask					= 0x806BB388
+.alias muSelectStageFileTask__deleteAllFileData	= 0x806b8768
+.alias MuStageTblAcces_GetStageKind				= 0x806b8f50
+.alias muMenu__exchangeMuStageKindToSrStageKind	= 0x800af614
+.alias MuObject__setFrameNode					= 0x800b7798
+.alias g_gfPadSystem							= 0x805A0040
+.alias gfPadSystem__getSysPadStatus				= 0x8002ae48
+.alias MuObject__changeClrAnimN					= 0x800b50cc
+.alias g_sndSystem                  		 	= 0x805A01D0
+.alias sndSystem__playSE             			= 0x800742b0
+.alias g_GameGlobal                 			= 0x805a00E0
+.alias sprintf									= 0x803f89fc
+.alias strcat 									= 0x803fa384
+.alias __memfill                    			= 0x8000443c
+
+.alias PAGE_INDEX						= 0x8049601E
+.alias STAGELIST_STAGEKIND				= 0x806AEE19
+.alias STAGELIST_TYPE					= 0x806AEE1A
+.alias STAGELIST_FOLDER_NAME			= 0x806AEE1E
+.alias STAGELIST_FILE_NAME				= 0x80423674
+.alias _pf               				= 0x80507b70
+.alias MOD_FOLDER        				= 0x80406920
+.alias STAGE_FOLDER 					= 0x8053EFE4
+.alias ASL_BUTTON						= 0x800B9EA0
+.alias STAGE_STRIKE_TABLE				= 0x806AEDFA
+.alias RSS_HAZARD_DATA					= 0x806AEDBE
+.alias RSS_EXDATA_BONUS					= 0x806AEE18
+.alias CURRENT_PAGE						= 0x80496000
+.alias MUSIC_SELECT_STEP				= 0x80002810
+
+.macro lbd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lbz     <reg>, temp_Lo(<reg>)
+}
+.macro lbdu(<reg1>, <reg2>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg2>, temp_Hi
+    lbzu    <reg1>, temp_Lo(<reg2>)
+}
+.macro lwd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+.macro sbd(<reg1>, <reg2>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg2>, temp_Hi
+    stb     <reg1>, temp_Lo(<reg2>)
+}
+.macro sbdu(<reg1>, <reg2>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg2>, temp_Hi
+    stbu     <reg1>, temp_Lo(<reg2>)
+}
+.macro swd(<storeReg>, <addrReg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <addrReg>, temp_Hi
+    stw     <storeReg>, temp_Lo(<addrReg>)
+}
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+.macro branch(<addr>)
+{
+    %lwi(r12, <addr>)
+    mtctr r12
+    bctr
+}
+
+HOOK @ $806b0aa4	# muSelectStageTask::__ct
+{
+	stb r31, 0x44(r29)	# Original operation
+	stb r31, 0x45(r29)	# Initialize 0x45 field for stage hazard on/off
+	stb r31, 0x46(r29)	# Initialize 0x46 field for all hazards default/on/off
+}
+
+HOOK @ $806b1300	# muSelectStageTask::initProcWithScreen
+{
+	lfs	f1, 0x0(r30)	# \
+	lwz r3, 0x80(r26)	# |
+	lwz r3, 0x14(r3)	# | 
+	lwz r3, 0xc(r3)		# |
+	lwz r12, 0x0(r3)	# | this->previewMuObject->modelAnim->SetUpdateRate(0.0)
+	lwz r12, 0x28(r12)	# |
+	mtctr r12			# |
+	bctrl 				# /
+	%lwd(r12, MUSIC_SELECT_STEP)	# \
+	cmpwi r12, 0x7					# | check if returning from MyMusic
+	bne+ end						# /
+	%lbd(r12, RSS_EXDATA_BONUS)
+	srawi r3, r12, 6
+	andi. r0, r12, 0xC0
+	beq+ end
+	lis r8, 0x806B
+	ori r4, r8, 0x93B3	# SelmapRandom
+	andi. r3, r3, 0x02
+	stb r3, 0x46(r26)	# store all hazards  
+	beq+ changeRandomClr
+	ori r4, r8, 0x93B9	# Random
+changeRandomClr:
+	lwz r3, 0x1FC(r26)
+	%call(MuObject__changeClrAnimN)
+end:
+	lwz	r3, 0x40(r26)	# Original operation
+}
+
+string "%s%s%s%sstagelist/%02X_%s/" @ $806AEE1E 
+
+HOOK @ $806b6b38	# muSelectStageTask::dispPreview
+{
+	%lwd(r12, MUSIC_SELECT_STEP)	# \
+	cmpwi r12, 0x7					# | check if returning from MyMusic
+	bne+ notMusicSelect				# /
+	%lwd(r12, g_GameGlobal)	# \
+	lwz	r12, 0x14(r12)		# | g_GameGlobal->selStageData->hazard
+	lbz r3, 0x25(r12)		# /
+	b forceHazard 
+notMusicSelect:
+	lbz r3, 0x46(r29)	# \ check if mixed hazards
+	cmpwi r3, 0x1		# /
+	srawi r3, r3, 1		# shift bit to the right so that all hazards = 0x0, no hazards = 0x1
+	bne+ forceHazard 	
+	subi r3, r28, 0x2
+	%lbd (r4, CURRENT_PAGE)
+	%call(muSelectStageSwitch__selectRandom)	# get if hazard from hazard switch
+forceHazard:
+	lis r12, 0x806B
+	ori r4, r12, 0x94EC	# MenSelMapCursorB
+	cmpwi r3, 0x0
+	bne+ noHazard
+	ori r4, r12, 0x94EF # SelMapCursorB
+noHazard:
+	stb r3, 0x45(r29)	# Set hazard in unused field in muSelectStageTask
+	lwz	r3, 0x204(r29)	# this->menSelmapCursorB
+	%call(MuObject__changeClrAnimN)
+	subic. r5, r28, 2 # Original operation
+}
+
+HOOK @ $806b6930	# muSelectStageTask::pointPointerEditList
+{
+	lwz	r25, 0x1C8(r24)	# Original operation
+	mr r3, r25 
+	lis r10, 0x806B
+	ori r4, r10, 0x93F0	# MenSelmapEdit0002_TopN
+	lbz r12, 0x45(r29)
+	cmpwi r12, 0
+	bne+ notHazard
+	ori r4, r10, 0x93F3	# SelmapEdit0002_TopN
+notHazard:
+	%call(MuObject__changeClrAnimN)
+}
+
+op stwu r1, -0x90(r1) @ $806b626c
+op stw r0, 0x94(r1) @ $806b6274
+HOOK @ $806b6564	# muSelectStageTask::pointPointer
+{	
+	%lwd (r3, g_gfPadSystem)
+	lwz r4, 0x278(r30)
+	addi r5, r1, 0x40
+	%call (gfPadSystem__getSysPadStatus)
+	li r28, 0x0
+	lwz r12, 0x44(r1)
+	andi. r0, r12, 0x0040	# \ Check if L
+	bne+ isL				# /
+	andi. r0, r12, 0x0020	# \ Check if R
+	beq- setFrame			# /
+isR:
+	li r28, 0x52
+	b setFrame
+isL:
+	li r28, 0x4c
+setFrame:
+	lis r0, 0x4330			# \
+	stw r0, 0x40(r1)		# |
+	xoris r0, r12, 0x8000	# | 
+	stw r0, 0x44(r1)		# | convert to input to float
+	lfd f0, 0x40(r1)		# |
+	lfd f1, 0x10(r29)		# |
+	fsubs f1, f0, f1		# /
+	lwz r3, 0x80(r30)	# this->previewMuObject
+	%call (MuObject__setFrameNode)
+
+	lwz r9, 0x244(r30)	
+	lwz r10, 0x228(r30)	# get page	
+	cmplwi r9, 0x36
+	beq+ checkForSetHazard
+	cmpwi r10, 0x2			# \ check for custom page
+	beq- checkForSetHazard 	# /
+	lwz r12, 0x248(r30)	# \
+	cmplwi r12, 0x35	# |
+	bge- dontSetHazard	# | Check if pointing to a stage
+	cmplwi r9, 0x35		# |
+	bge- dontSetHazard	# /
+checkForSetHazard:
+	lwz r12, 0x4C(r1)
+	andi. r0, r12, 0x0010		# 0x0010 # Gamecube Z
+	bne+ setHazard  
+	rlwinm. r0, r12, 0, 10, 10	# 0x00200000	# Classic Controller ZL/ZR
+	beq+ dontSetHazard 
+setHazard:
+	lis r8, 0x806B
+	li r11, 0
+	cmpwi r10, 0x2 
+	bne+ dontResetPointerIndex	
+	stw r11, 0x244(r30)		# reset pointer index on custom page so cursors can change colour
+	b notRandom
+dontResetPointerIndex:
+	cmplwi r9, 0x36
+	bne+ notRandom
+	lbz r11, 0x46(r30)
+	subi r11, r11, 0x1
+	cmpwi r11, 0x1
+	beq+ defaultHazards
+	cmpwi r11, 0x0
+	beq+ allHazards
+noHazards:	
+	li r11, 0x2
+	ori r4, r8, 0x93B9	# Random
+	b selectedRandomClr
+defaultHazards:
+	ori r4, r8, 0x93B0	# MenSelmapRandom
+	b selectedRandomClr
+allHazards:
+	ori r4, r8, 0x93B3	# SelmapRandom
+selectedRandomClr:
+	stb r11, 0x46(r30)
+	lwz r3, 0x1FC(r30)
+	b changeClr
+notRandom:
+	lwz	r3, 0x204(r30)
+	ori r4, r8, 0x94EF	# SelMapCursorB
+	lbz r12, 0x45(r30)
+	cmpwi r12, 0
+	bne+ hazard
+	li r11, 1
+	ori r4, r8, 0x94EC	# MenSelMapCursorB
+hazard:
+	stb r11, 0x45(r30) 
+changeClr:
+	%call(MuObject__changeClrAnimN)
+	lwz r10, 0x228(r30)		# \
+	cmpwi r10, 0x2			# | check for custom page
+	bne- notCustomPage 		# /
+	lwz r3, 0x1FC(r30)
+	lbz r12, 0x45(r30)	# get hazard setting
+	lis r8, 0x806B
+	ori r4, r8, 0x93B9	# Random
+	cmpwi r12, 0
+	bne+ changeRandomClr
+	ori r4, r8, 0x93B3	# SelmapRandom
+changeRandomClr:
+	%call(MuObject__changeClrAnimN)
+	lfs f1, 0x0(r29)	# \
+	lwz r3, 0x1FC(r30)	# |
+	lwz r3, 0x14(r3)	# |
+	lwz r3, 0x18(r3)	# |
+	lwz r12, 0x0(r3)	# | this->menSelmapRandom->modelAnim->anmObjMatClrRes->setUpdateRate(0.0)
+	lwz r12, 0x28(r12)	# |
+	mtctr r12			# |
+	bctrl 				# /
+notCustomPage:
+	li r4, 0x24                 # play scroll sound
+    %lwd (r3, g_sndSystem)      # \
+    li r5, -0x1                 # |
+    li r6, 0x0                  # | g_sndSystem->playSE(0x24, -0x1, 0x0, 0x0, -0x1);
+    li r7, 0x0                  # |
+    li r8, -0x1                 # |
+    %call (sndSystem__playSE)   # /
+dontSetHazard:
+
+	%lwd (r12, g_muSelectStageFileTask)
+	cmpwi r12, 0x0	# \ check if g_muSelectStageFileTask exists (i.e. is this MyMusic)
+	beq- end		# /
+
+	cmpwi r31, 0x35
+	%lbdu (r10, r31, STAGELIST_TYPE)
+	bne+ dontLoadStageBuilderStages
+	lbz r11, 0x605A(r30)
+	cmpwi r11, 0xff 
+	bne+ dontLoadStageBuilderStages	
+	cmpwi r10, 0x0
+	beq+ dontLoadStageBuilderStages
+	
+	lbz r11, 0x58(r12)
+	andi. r0, r11, 0x40
+	beq+ dontLoadStageBuilderStages
+	andi. r11, r11, 0xBF
+	stb r11, 0x58(r12)
+	lbz r11, 0x48(r12)
+	andi. r11, r11, 0xBF
+	stb r11, 0x48(r12)
+
+	li r11, 0x0 
+	stb r11, -0x1(r31)
+	stb r11, 0x0(r31)
+
+dontLoadStageBuilderStages:
+	lwz r3, 0x228(r30)	# \
+	cmplwi r3, 0x1		# | check if page 2
+	bgt- end			# /
+	lwz r11, 0x248(r30)
+	cmpwi r11, 0x0
+	blt- end
+	rlwinm r0, r3, 3, 0, 28
+	add r4, r30, r0
+	lbz r0, 0x230(r4)
+	cmplw r11, r0
+	blt- loc_notCustom
+	li r3, 0x29
+loc_notCustom:
+	lwz r4, 0x22c(r4)
+	lbzx r4, r4, r11
+	%call (MuStageTblAcces_GetStageKind)
+	%call (muMenu__exchangeMuStageKindToSrStageKind)
+	cmpwi r28, 0x0	# \ check if holding L/R
+	beq- end		# /	
+	lbz r9, -0x1(r31)
+	cmpw r3, r9
+	bne+ changeStageList
+	lbz r10, 0x0(r31)
+	cmpw r10, r28
+	beq- end
+	
+changeStageList:
+	%lwd (r12, g_muSelectStageFileTask)
+	lbz r10, 0x58(r12)
+	andi. r0, r10, 0x40
+	beq+ end
+	andi. r10, r10, 0xBF
+	stb r10, 0x58(r12)
+	lbz r10, 0x48(r12)
+	andi. r10, r10, 0xBF
+	stb r10, 0x48(r12)
+
+	stb r3, -0x1(r31)
+	stb r28, 0x0(r31)
+
+end:
+	lwz r0, 0x94(r1)
+}
+op addi	r1, r1, 0x90 @ $806b657c
+
+HOOK @ $806b5c60	# muSelectStageTask::buttonProc
+{	
+	stw	r3, 0x258(r29)	# Original operation
+	lwz r10, 0x134(r1)		# get input mask
+	andi. r0, r10, 0x1000	# \ Check if start is pressed
+	beq+ %end% 				# /
+	li r11, 0x4c			# \
+	andi. r0, r10, 0x0040	# | Check if L
+	bne+ displayStageList	# /
+	li r11, 0x52			# \
+	andi. r0, r10, 0x0020	# \ Check if R
+	beq- %end%				# /
+displayStageList:
+	%lwd (r12, g_muSelectStageFileTask)
+	cmpwi r12, 0x0	# \ check if g_muSelectStageFileTask exists (i.e. is this MyMusic)
+	beq- %end%		# /
+	lbz r10, 0x58(r12)					# \
+	andi. r0, r10, 0x40					# | Check if loaded
+	beq- notReady						# /
+	lwz r0, 0x60(r12)
+	cmpwi r0, 0x0
+	beq+ notReady
+
+	%lbdu (r10, r12, STAGELIST_STAGEKIND)	# \ 
+	cmpw r3, r10							# | Check if loaded stagelist is same as selected stage kind
+	bne+ notReady							# /
+	lbz r10, 0x1(r12)
+	cmpw r11, r10
+	bne+ notReady
+ready:
+	mr r3, r29									# \
+	li r4, 0x35									# | set preview to 0x35 (page button) to make preview not appear in stage builder page
+	%call (muSelectStageSwitch__dispPreview)	# /
+	lwz r4, 0x228(r29)		# \
+	stb r4, 0x605A(r29)		# | go to stage builder 
+	li r4, 0x2				# |
+	%branch (0x806b5940)	# /
+notReady:
+	%branch (0x806b6000)
+}
+
+HOOK @ $806b1fb0	# muSelectStageTask::dispPage
+{
+	lwz r3, 0x1FC(r26)	# \
+	cmpwi r3, 0x0		# | check if this->menSelmapRandom == NULL
+	beq+ end			# /
+	lis r10, 0x806B
+	cmpwi r27, 2			
+	beq+ isNotCustomPage
+	lbz r11, 0x46(r26)
+	cmpwi r11, 0x1
+	beq+ defaultHazards
+	cmpwi r11, 0x0
+	beq+ allHazards
+noHazards:	
+	ori r4, r10, 0x93B9	# Random
+	b changeClr
+defaultHazards:
+	ori r4, r10, 0x93B0	# MenSelmapRandom
+	b changeClr
+allHazards:
+	ori r4, r10, 0x93B3	# SelmapRandom
+	b changeClr
+isNotCustomPage:
+	ori r4, r10, 0x93B9	# Random
+	lbz r12, 0x45(r26)
+	cmpwi r12, 0
+	bne+ changeClr
+	ori r4, r10, 0x93B3	# SelmapRandom
+changeClr:
+	%call(MuObject__changeClrAnimN)
+	lfs f1, 0x0(r16)	# \
+	lwz r3, 0x1FC(r26)	# |
+	lwz r3, 0x14(r3)	# |
+	lwz r3, 0x18(r3)	# |
+	lwz r12, 0x0(r3)	# | this->menSelmapRandom->modelAnim->anmObjMatClrRes->setUpdateRate(0.0)
+	lwz r12, 0x28(r12)	# |
+	mtctr r12			# |
+	bctrl 				# /
+end:
+	lwz	r0, 0x40(r26)	# Original operation
+}
+
+HOOK @ $806b5684	# muSelectStageTask::buttonProc
+{
+	li r5, -1	# Original operation
+	lbz r12, 0x605A(r29)	# \
+	cmpwi r12, 0xff			# |
+	beq+ notStagelistPage 	# | return to previous page
+	lbz r4, 0x605A(r29)		# |
+	stb r5, 0x605A(r29)		# |
+	%branch (0x806b5940)	# /
+notStagelistPage:
+	%lwi(r10, STAGE_STRIKE_TABLE)   # \
+    li r12, 0						# |
+loopThroughStrikes:					# |
+	lhzx r0, r10, r12				# |
+	cmpwi r0, 0						# | check if any stages are striked
+	bne+ clearStageStrikes			# |
+	addi r12, r12, 0x2				# |
+	cmpwi r12, 0x1e 				# |
+	blt- loopThroughStrikes			# |
+	b %end%							# |
+clearStageStrikes:					# /
+	%branch(0x806b56a0)		# Don't back out if no stages are strike				
+}
+
+HOOK @ $806b58e8	# muSelectStageTask::buttonProc
+{
+	lwz	r4, 0x228(r29)	# Original operation
+	lbz r12, 0x605A(r29)	# \
+	cmpwi r12, 0xff			# |
+	beq+ %end% 				# | return to previous page
+	li r12, 0xff			# |
+	lbz r4, 0x605A(r29)		# |
+	stb r12, 0x605A(r29)	# |
+	%branch (0x806b5940)	# /
+}
+HOOK @ $806b0e8c	# muSelectStageTask::exit
+{
+	stw	r0, -0x4C78(r31)	# Original operation
+	%sbdu (r0, r12, STAGELIST_TYPE)	# \ reset stagelist
+	stb r0, -0x1(r12)				# /
+}
+
+HOOK @ $8003b91c	# gfCollectionIO::_processList
+{
+	addi r3, r1, 0x48	# Original operation
+	cmpwi r25, 0x3	# \ check if retrieving stagelist
+	bne+ %end%		# /
+	%lbd (r10, STAGELIST_TYPE)	# \
+	cmpwi r10, 0x0				# | check if not builder stagelist
+	beq+ %end%					# /
+	addi r3, r3, 0x1	# Mess up string so don't return custom stages from nand
+}
+HOOK @ $8003b944 	# gfCollectionIO::_processList
+{
+	addi r3, r1, 0x48	# Original operation
+	cmpwi r25, 0x3	# \ check if retrieving stagelist
+	bne+ %end%		# /
+	%lbdu (r0, r10, STAGELIST_TYPE)
+	cmpwi r0, 0x0
+	beq+ %end%
+	%lwi (r4, STAGELIST_FOLDER_NAME)
+	subi r5, r13, 32060		# "sd:"
+	%lwi (r6, MOD_FOLDER)	# /modFolderName/
+	%lwi (r7, _pf)			# "pf"
+	%lwd (r8, STAGE_FOLDER)	# "/stage/"
+	lbz r9, -0x1(r10)	# stage slot
+	%call (sprintf)
+	addi r3, r1, 0x48
+	%lwi (r4, STAGELIST_FILE_NAME)
+	%call (strcat)
+	%branch (0x8003b99c)
+}
+HOOK @ $8003af24	# gfCollectionIO::_processLoad
+{
+	addi r3, r1, 80		# Original operation
+	cmpwi r24, 0x3	# \ check if retrieving stagelist
+	bne+ %end%		# /
+	%lbdu (r0, r10, STAGELIST_TYPE)
+	cmpwi r0, 0x0
+	beq+ %end%
+	%lwi (r4, STAGELIST_FOLDER_NAME)
+	subi r5, r13, 32060		# "sd:"
+	%lwi (r6, MOD_FOLDER)	# /modFolderName/
+	%lwi (r7, _pf)			# "pf"
+	%lwd (r8, STAGE_FOLDER)	# "/stage/"
+	lbz r9, -0x1(r10)	# stage slot
+	%call (sprintf)
+	%branch (0x8003af74)
+}
+
+HOOK @ $806b3a14	# muSelectStageTask::editListCompare
+{
+	mr r4, r31	# Original operation
+	%lbd (r12, STAGELIST_TYPE)	# \
+	cmpwi r12, 0x0				# | check if not builder stagelist
+	beq+ %end%					# /
+	mr r4, r3	# \ reverse filename comparison so it gets listed in ascending order
+	mr r3, r31	# /
+}
+HOOK @ $806b4580	# muSelectStageTask::selectingProc
+{
+	lwz	r6, 0x6068(r27)		# Original operation
+	%lbd (r12, STAGELIST_TYPE)	# \
+	cmpwi r12, 0x0				# | check if not builder stagelist
+	beq+ %end%					# /
+	li r11, 0x0							# \
+	stw r11, 0x6140(r27)				# | Skip waiting for loading	
+	%branch (0x806b4648)				# /
+}
+
+HOOK @ $806c8f88	# scSelStage::process
+{
+	lwz	r0, 0x254(r3)	# Original operation
+	lbz r8, 0x46(r3)	# \ 
+	cmpwi r8, 0x1		# |
+	blt+ allHazards		# | check if default/all hazards/no hazards
+	beq+ %end%			# /
+allNoHazards:
+	li r11, 0x80
+	b end
+allHazards:
+	li r11, 0x40
+end:
+	%sbd(r11, r10, RSS_EXDATA_BONUS)
+}
+HOOK @ $806c8f9c	# scSelStage::process
+{
+	addi r4, r30, 108	# Original operation
+	%lbdu (r0, r12, STAGELIST_TYPE)	
+	li r9, 0x8000					# \
+	cmpwi r0, 0x4c					# | check if L stagelist
+	beq- isLStagelist				# /
+	li r9, 0x4000					# \ 
+	cmpwi r0, 0x52					# | check if R stagelist
+	bne+ %end%						# /
+isRStagelist:
+	li r11, 0x32
+	b isNotBuilderStagelist
+isLStagelist:
+	li r11, 0x34
+isNotBuilderStagelist:
+	%sbd(r11, r10, RSS_EXDATA_BONUS)
+	lwz	r10, 0x03AC(r31)
+	li r11, 0x1			# \ set as normal stage
+	stw r11, 0x254(r10)	# /
+	lwz r11, 0x258(r10) 	# get selected id	
+	add r11, r11, r9			# | set ASL_BUTTON = type + selectedid
+	%swd (r11, r8, ASL_BUTTON)	# /
+	lbz r11, -0x1(r12)	# \ set stagekind 
+	stw r11, 0x258(r10)	# /
+}
+
+## TODO: Classic/All Star Mode ASL from certain range (use all L-alts?)
+## TODO: Also investigate random substage handling with replays
+## TODO: Song id in results based on costume id?
+## TODO: Investigate same song id playing during endless friendlies?
+## TODO: Fix Replays always saying Home Run Contest?

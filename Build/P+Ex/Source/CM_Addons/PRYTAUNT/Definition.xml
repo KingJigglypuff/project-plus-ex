@@ -1,0 +1,8 @@
+<addon name="Parry Taunts v1.1.0" shortName="PRYTAUNT">
+	<codeMenuPage shortName="_SPECIAL">
+		<codeMenuToggle name="Parry Taunts" shortName="ONOFF">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+</addon>
+

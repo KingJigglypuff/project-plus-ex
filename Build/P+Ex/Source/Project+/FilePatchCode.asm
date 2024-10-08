@@ -660,226 +660,11 @@ op  blr  @ $8001eb94
 
 .RESET
 
-##############################################################################################################################
-[Project+] RSBE v1.30 (/Project+/pf/sfx, can load soundbank clones for stages) (requires CSSLE) [InternetExplorer, DukeItOut]
-##############################################################################################################################
-* 80000000 80406920
-* 80000001 805A7D18
-address $805A7D18 @ $805A7D00
-string[2] "/P+EX/././pf/sfx/%03X",".sawnd" @ $805A7D18
-* 045A7D10 919B6600		# What is this?
-HOOK @ $801C8370																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										
-{
-  stwu r1, -0x80(r1)
-  stmw r3, 8(r1)
-  lis r3, 0x805A
-  ori r3, r3, 0x7000
-  stwu r1, 8(r3)		# place r1 in 805A7008
-  mr r1, r3
-  addi r26, r26, 0x7	# add 7 to the soundbank ID for who knows what reason.
-  lis r3, 0x805A
-  ori r3, r3, 0x7D00
-  stw r26, -0x20(r3)	# place r26 in 805A7CE0 after adding 7 to it. This will be the soundbank.
+.include Source/P+Ex/ReplacementSoundbankEngine.asm
 
-  li r4, 0x0
-  stw r4, 0xC(r1)		# zero 805A700C, 805A7010 and 805A7018
-  stw r4, 0x10(r1)		#\
-  stw r27, 0x14(r1)		# | save r27 to 805A7014 
-  stw r4, 0x18(r1)		#/
-  li r4, 0xFFFF			#\-1 at 805A701C
-  stw r4, 0x1C(r1)		#/
-  addi r3, r1, 0x24		#\
-  stw r3, 8(r1)			#/store 805A7020 to 805A7008 #points to "/private/wii/app/RSBE/pf/sfx/%03X."
-  lis r4, 0x805A		#\set r4 to 805A7D18
-  ori r4, r4, 0x7D18	#/
-  subi r5, r26, 7		#move the soundbank to r5, but remove the 7 that wasn't needed before
-  lis r12, 0x803F		#\
-  ori r12, r12, 0x89FC	# |
-  mtctr r12				# |branch to 803F89FC (sprintf/printf.o)
-  bctrl 				#/
-  cmpwi r26, 0x53		#\ Skip if not a normal stage soundbank
-  blt+ NormalBank		# |
-  cmpwi r26, 0x77		# |Stage soundbanks are range 0x53-0x77	(really 0x4C-70)
-  bgt+ NormalBank		#/
-  
-  mr r4, r5				#
-  lis r5, 0x5F00		# \ Concatenate "_"
-  stw r5, 0x20(r1)		# /
-  addi r4, r1, 0x20		#
-  addi r3, r1, 0x24		# place the string character in r1+0x24
-  lis r12, 0x803F		#
-  ori r12, r12, 0xA384	# strcat
-  mtctr r12				#
-  bctrl 				#
-  addi r3, r1, 0x24
-  
-  lis r12, 0x8053		# \ STEX pointer
-  ori r12, r12, 0xF000	# /
-  lwz r4, 0x1C(r12)		# Pointer to offset in string block for filename
-  lwz r5, 0x4(r12)		# Pointer to string block
-  add r4, r4, r12		# \ Obtain address for string of stage filename
-  add r4, r4, r5		# /
-  addi r3, r1, 0x24
-  bctrl					# strcat again
-  
-  lis r4, 0x805A		# ".sawnd"	
-  ori r4, r4, 0x7D2E	# 
-  bctrl 				# strcat, yet again!
-  addi r4, r1, 0x24		# r4 contains string containing the offset
-  mr r3, r27
-  li r5, 0x0
-  li r6, 0x0
-  lis r12, 0x805A		# \ use file patch code to retrieve file 
-  ori r12, r12, 0x7900	# |
-  mtctr r12				# |
-  bctrl 				# /
-  cmpwi r3, 0x0			# \ but if it exists . . . . 
-  beq+ gotSawnd			# /
-  addi r3, r1, 0x24 	# \
-  stw r3, 8(r1)			# / store the pointer to the string to r1+0x8 
-  lis r4, 0x805A		# \	
-  ori r4, r4, 0x7D18	# / get the pointer to "/legacyte/pf/sfx/%03X"
-  subi r5, r26, 7		# r5 contains the decimal value of the soundbank ID . . . . which was given 7 earlier
-  lis r12, 0x803F		# \
-  ori r12, r12, 0x89FC	# | sprintf
-  mtctr r12				# |
-  bctrl 				# / 
-
-NormalBank:
-  addi r3, r1, 0x24		# r3 contains the pointer to where the string should be written  
-  lis r12, 0x803F		# \
-  ori r12, r12, 0xA384	# | move strcat to the count register 
-  mtctr r12				# /
-  lis r4, 0x805A		
-  ori r4, r4, 0x7D2E	# ".sawnd"
-  bctrl 				# strcat! 
-  addi r4, r1, 0x24		# retrieve the string 
-  mr r3, r27			
-  li r5, 0x0			#\
-  li r6, 0x0			#/ zero out r5 and r6
-  lis r12, 0x805A		#\
-  ori r12, r12, 0x7900	# | File Patch Code	
-  mtctr r12				# |
-  bctrl 				#/
-  cmpwi r3, 0x0			#\
-  bne- noSawnd			#/ If this file doesn't exist, load from the BRSAR.
-
-gotSawnd:
-  lis r3, 0x805A
-  ori r3, r3, 0x7D00
-  lwz r4, -0x170(r1)
-  stw r4, -0x30(r3)
-  mr r4, r27
-  subi r4, r4, 0x3
-  lis r6, 0x5257		# \
-  ori r6, r6, 0x5344	# /  "RWSD"
-
-findRWSD:
-  addi r4, r4, 0x4
-  lwz r9, 0(r4)
-  cmpw r9, r6
-  bne+ findRWSD
-  sub r4, r4, r27
-  stw r4, -0x40(r3)
-  lis r9, 0x90E6
-  ori r9, r9, 0xF10
-  lwz r9, 0(r9)
-  mr r4, r9
-  mr r6, r4
-  addi r6, r6, 0x8
-  lwz r5, 0x2C(r4)
-  add r4, r4, r5
-  addi r4, r4, 0x8
-  lis r7, 0x805A
-  ori r7, r7, 0x7D00
-  lwz r11, -0x20(r7)
-
-loc_0x24C:
-  addi r4, r4, 0x8
-  lwz r5, 0(r4)
-  add r5, r5, r6
-  lwz r7, 0(r5)
-  cmpw r7, r11
-  bne+ loc_0x24C
-  mr r4, r9
-  lwz r6, 0x24(r5)
-  add r5, r4, r6
-  addi r5, r5, 0x8
-  lwz r7, 0(r5)
-  addi r5, r5, 0x8
-  mr r3, r27
-  addi r3, r3, 0x9
-
-loc_0x284:
-  lwz r6, 0(r5)
-  add r6, r4, r6
-  subi r7, r7, 0x1
-  lwz r10, 0(r3)
-  stw r10, 8(r6)
-  lwz r10, 4(r3)
-  stw r10, 20(r6)
-  lwz r10, 8(r3)
-  stw r10, 24(r6)
-  addi r3, r3, 0xC
-  addi r5, r5, 0x8
-  cmpwi r7, 0x0
-  bgt+ loc_0x284
-  lis r3, 0x805A
-  ori r3, r3, 0x7D00
-  lwz r4, -48(r3)
-  lwz r5, -64(r3)
-  sub r4, r4, r5
-  mr r6, r27
-  add r7, r6, r5
-
-loc_0x2D4:
-  lbz r8, 0(r7)
-  stb r8, 0(r6)
-  addi r6, r6, 0x1
-  addi r7, r7, 0x1
-  subi r4, r4, 0x1
-  cmpwi r4, 0x0
-  bgt+ loc_0x2D4
-  li r3, 0x0
-
-noSawnd:
-  cmpwi r3, 0x0			# if r3 is zero, skip loading later
-  lis r5, 0x805A		# \
-  ori r5, r5, 0x7D00	# | store soundbank 
-  stw r3, -0x10(r5)		# /
-  lis r1, 0x805A		# \
-  ori r1, r1, 0x7000	#  | Retrieve old registers 
-  lwz r1, 8(r1)			#  |
-  lmw r3, 8(r1)			#  |
-  addi r1, r1, 0x80		# /
-  mtctr r12
-  beq- skipBRSAR		# see above
-  bctrl 				# read from BRSAR
-  b %END%
-skipBRSAR:
-  mr r3, r7
-}
-HOOK @ $801C8658
-{
-  lis r16, 0x805A		    #\
-  ori r16, r16, 0x7D00		#/load 805A7D00, the hacked area
-  lwz r17, -0x10(r16)		#\
-  cmpwi r17, 0x0		    #/check if the sawnd is 0. It shouldn't be!
-  bne- loc_0x20
-  mr r3, r7
-  li r25, 0x0
-  beq- %END%
-
-loc_0x20:
-  bctrl 
-  li r18, 0x1
-  stw r18, -0x10(r16)
-  nop 
-}
-
-########################
-SDHC Extension 1.1[Bero]
-########################
+####################################
+SDHC/SDXC Extension 2.0 [Bero, Jako]
+####################################
 .macro LoadAddress(<arg1>,<arg2>)	// Simple register address load math
 {
 	.alias temp_Hi = <arg2> / 0x10000 
@@ -910,11 +695,24 @@ HOOK @ $803EEE18
   lwz r3, 0x14(r1)
   rlwinm. r3, r3, 0, 9, 9
   beq- loc_0x30
+  lhz r3, 0xE(r1)
+  rlwinm r3, r3, 16, 10, 15
+  lhz r0, 0x10(r1)
+  or r3, r3, r0
+  cmplwi r3, 0xFFFF
   li r0, 0x9
   lwz r3, 0xC(r1)
   rlwinm r3, r3, 24, 16, 31
   addi r3, r3, 0x1
-  mulli r6, r3, 0x400
+  bgt- sdxc
+  b sdhc
+sdxc:
+  mulli r6, r3, 0x4000  # | Now supports FAT32-formatted SDXC cards! They use sector size(?) of 0x4000
+  b done
+sdhc:
+  mulli r6, r3, 0x400 # | SDHC cards use sector size(?) of 0x400
+  b done
+done:
   %MakeJump(r3,0x803EEE58) # | Jump to address 803EEE58 instead of going to 803EEE1C
 loc_0x30:
   lwz r5, 0xC(r1)
@@ -997,4 +795,109 @@ HOOK @ $803EE0BC
   %LoadAddress(r3,0x805A9350)
   stw r0, 0(r3)
   lis r3, 0x805A
+}
+
+
+###############################
+checkModSDFile [DukeItOut] 
+#
+# Gives an easy way to check
+# if a file is in the SD card
+# for the mod WITHOUT checking 
+# first if it is on the DVD. 
+#
+# r3 returns 0 if FOUND
+# NOT if FALSE
+###############################
+HOOK @ $8001F598
+{
+	addi r1, r1, 0xA0		# Make room for the following hook
+	blr
+}
+HOOK @ $8001F59C			# call this function
+{
+	stwu r1, -0x100(r1)
+	mflr r0
+	stw r0, 0x104(r1)
+	mr r7, r3				# string of file requested
+	addi r3, r1, 0x20
+	lis r4, 0x8048			# \ %s%s%s
+	ori r4, r4, 0xEFF6      # /
+	lis r5, 0x8040			# \ mod name folder
+	ori r5, r5, 0x6920		# / 
+	lis r6, 0x8050			# \ pf
+	ori r6, r6, 0x7B70		# /
+	
+	lis r12, 0x803F			# \
+	ori r12, r12, 0x89FC	# | sprintf
+	mtctr r12				# |
+	bctrl 					# /		
+	addi r3, r1, 0x20
+	stw r3, 0xC(r1)
+	addi r3, r1, 0x0C
+	lis r12, 0x8001			# \ 
+	ori r12, r12, 0xF5A0	# | checkFileSD
+	mtctr r12				# |
+	bctrl					# /
+	lwz r0, 0x104(r1)
+	mtlr r0
+	addi r1, r1, 0x100
+	blr
+}
+
+##########################################################
+Store Heap Level for Common Sawnds [Sammi Husky, Kapedani]
+##########################################################
+
+.alias SOUND_GROUP_0D6_HEAP_LEVEL_ADDR = 0x80B52550
+.alias SOUND_GROUP_000_HEAP_LEVEL_ADDR = 0x80B52554 
+.alias SOUND_GROUP_0D5_HEAP_LEVEL_ADDR = 0x80B52558 
+.alias SOUND_GROUP_0D7_HEAP_LEVEL_ADDR = 0x80B5255C 
+.alias SOUND_GROUP_0D8_HEAP_LEVEL_ADDR = 0x80B52560 
+.alias SOUND_GROUP_027_HEAP_LEVEL_ADDR = 0x80B52564
+
+.macro swd(<storeReg>, <addrReg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <addrReg>, temp_Hi
+    stw     <storeReg>, temp_Lo(<addrReg>)
+}
+
+HOOK @ $806bf8d4
+{
+  %swd(r3, r12, SOUND_GROUP_0D6_HEAP_LEVEL_ADDR)
+  lwz r3, 0x01D0(r27)      # Original operatation
+}
+
+HOOK @ $806bf8fc
+{
+  %swd(r3, r12, SOUND_GROUP_000_HEAP_LEVEL_ADDR)
+  lwz r3, 0x01D0(r27)      # Original operatation  
+}
+
+HOOK @ $806bf910
+{
+  %swd(r3, r12, SOUND_GROUP_0D5_HEAP_LEVEL_ADDR)
+  lwz r3, 0x01D0(r27)      # Original operatation  
+}
+
+HOOK @ $806bf924
+{
+  %swd(r3, r12, SOUND_GROUP_0D7_HEAP_LEVEL_ADDR)
+  lwz r3, 0x01D0(r27)      # Original operatation  
+}
+
+HOOK @ $806bf938
+{
+  %swd(r3, r12, SOUND_GROUP_0D8_HEAP_LEVEL_ADDR)
+  lwz r3, 0x01D0(r27)      # Original operatation  
+}
+
+HOOK @ $806bf94c
+{
+  %swd(r3, r12, SOUND_GROUP_027_HEAP_LEVEL_ADDR)
+  li r0, 0                 # Original operatation  
 }

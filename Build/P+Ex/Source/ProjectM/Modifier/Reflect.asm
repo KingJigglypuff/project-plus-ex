@@ -58,7 +58,7 @@ loc_0xB4:
   cmpw r5, r12;		blt- loc_0x110
   cmpw r5, r8;		bge- loc_0x110  
   lwz r5, 0x110(r5)	# /
-  cmpwi r5, 0x7F;  bge- loc_0x110
+  cmpwi r5, 0x37;  bge- loc_0x110
   lwz r8, 0x14(r4)
   lwz r8, 0x58(r8)
   ori r8, r8, 0x8000
@@ -122,7 +122,7 @@ HOOK @ $80753FA4
   lwz r3, 0x2D0(r3)	# |
   lwz r3, 0x08(r3)	# |
   lwz r3, 0x110(r3)	# /
-  cmpwi r3, 0x7F;  bge- loc_0x80	# Bail if too high to be a normal character (modify this value if using BrawlEX)
+  cmpwi r3, 0x37;  bge- loc_0x80	# Bail if too high to be a normal character (modify this value if using BrawlEX)
   lwz r4, 0x7C(r11)
   lhz r4, 0x36(r4)
   lwz r7, 0x14(r11)

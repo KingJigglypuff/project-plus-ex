@@ -21,7 +21,7 @@ HOOK @ $8002D500
 	ori r4, r4, 0xEFF8			# /
 	lis r5, 0x8040				# \ Mod name folder
 	ori r5, r5, 0x6921			# /
-	lis r6, 0x8055				# \ Pointer to "BOOST.GCT"
+	lis r6, 0x8055				# \ Pointer to "NETBOOST.GCT"
 	lwz r6, 0(r6)				# /
 	lis r12, 0x803F				# \
 	ori r12, r12, 0x89FC		# | Compile name

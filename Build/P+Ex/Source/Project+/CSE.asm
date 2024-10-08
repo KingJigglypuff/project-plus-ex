@@ -36,7 +36,7 @@
 # Volume does not need to be set for brstm files read off of the disc. Song start delays, however, must be manually
 #	set for all song IDs that utilize them!
 ####################################################################################################
-[Project+] Custom Sound Engine v4.2 [Dantarion, PyotrLuzhin, DukeItOut]
+[Project+] Custom Sound Engine v4.2c [Dantarion, PyotrLuzhin, DukeItOut]
 ####################################################################################################
 .alias exMusicRange_Lo = 0xF000 # lowest custom music ID possible 
 .alias exMusicRange_Hi = 0xFFFF # highest custom music ID possible
@@ -127,8 +127,8 @@ HOOK @ $806D2164			# process/scMelee
 	lbz r0, -0xC82(r12)    		# \
 	cmpwi r0, 1        			# | The above also applies to Wild Brawl
 	beq skipToggle        		# /
-    lbz r0, -0xC81(r12)			# \
-    cmpwi r0, 1					# | As well as Bomb Rain Mode
+    lbz r0, 0xF36(r12)			# \
+    cmpwi r0, 6					# | As well as Bomb Rain Mode
     beq skipToggle				# /
 	
 	lis r12, 0x805A				# \
@@ -136,8 +136,10 @@ HOOK @ $806D2164			# process/scMelee
 	lwz r12, 0x4(r12)			# |
 	lwz r4, 0x54(r12)			# |
 	lwz r12, 0x4C(r12)			# |\
-	cmpwi r12, 0				# || Check if valid
-	beq skipToggle				# |/
+	andis. r0, r12, 0xEC00		# || Validate Address: Specifically, checks if address is within
+	rlwinm r0, r0, 16, 16, 31   # || 0x80000000 - 0x84000000
+	cmplwi r0, 0x8000           # || 0x90000000 - 0x94000000
+	bne skipToggle				# |/ 
 	lwz r12, 0x40(r12)			# |\ Check if in Sudden Death
 	cmpwi r12, 0				# ||
 	bne skipToggle				# |/
@@ -292,7 +294,12 @@ skipToggle:
 	lwz r5, 0x64(r3)			# Restore r5
 	lhz r4, 0xF4(r3)			# Original operation
 }
-
+HOOK @ $80079190
+{
+	lis r12, 0x8054 		# \ Preemptively store song ID to prevent replays
+	stw r4, -0x102C(r12)	# / from having the titles break
+	lwz r3, -0x4250(r13)	# Original operation
+}
 
 
 HOOK @ $801C7D00 		# ReadSoundInfo/[nw4r3snd6detail22SoundArchiveFileReaderCFUI]
@@ -389,8 +396,10 @@ actualFile:
 	lwz r12, 0x60(r12)			# |
 	lwz r12, 0x4(r12)			# |
 	lwz r12, 0x4C(r12)			# |
-	cmpwi r12, 0				# |
-	beq doNotForce				# |
+	andis. r0, r12, 0xEC00		# | Validate Address: Specifically, checks if address is within
+	rlwinm r0, r0, 16, 16, 31   # | 0x80000000 - 0x84000000
+	cmplwi r0, 0x8000           # | 0x90000000 - 0x94000000
+	bne doNotForce				# |
 	lwz r12, 0x40(r12)			# |\
 	cmpwi r12, 0				# ||Check if in Sudden Death
 	bne startWithPinch			# //
@@ -402,8 +411,8 @@ actualFile:
   lbz r0, -0xC82(r12)    		# \
   cmpwi r0, 1        			# | The above also applies to Wild Brawl
   beq startWithPinch        	# /
-  lbz r0, -0xC81(r12)			# \
-  cmpwi r0, 1					# | As well as Bomb Rain Mode
+  lbz r0, 0xF36(r12)			# \
+  cmpwi r0, 6					# | As well as Bomb Rain Mode
   bne doNotForce				# /
 startWithPinch:  
   li r0, 1						# \

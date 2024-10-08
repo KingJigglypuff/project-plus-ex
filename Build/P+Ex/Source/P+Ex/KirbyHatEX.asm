@@ -1,77 +1,114 @@
-#######################################
-[Project+] Kirby CE Hat Prop Fix [ds22]
-#######################################
-.macro KirbyCEHatPropFix
+################################################
+Weapon Data Fix Automatic [ds22, Desi, Kapedani]
+################################################
+# Modified Kirby Module passes copyAbilityKind in r10 to createArray, which is then passed to getWeaponData
+
+op mr r4, r10 @ $808526F4	# Mario Fireball
+op mr r4, r10 @ $80852afc	# Pikachu Thunder Jolt2
+op mr r4, r10 @ $80853ff0	# Ness PK Flash
+op mr r4, r10 @ $80853c0c	# Popo Ice Shot
+op mr r4, r10 @ $80854144	# Koopa Breath
+op mr r4, r10 @ $80854298	# Game Watch Sausage
+op mr r4, r10 @ $80854404	# Toon Link Bow
+op mr r4, r10 @ $80854494	# Toon Link Bow Arrow
+op mr r4, r10 @ $808537fc	# Luigi Fireball
+op mr r4, r10 @ $80852dd4	# Fox Blaster
+op mr r4, r10 @ $80852e68	# Fox Blaster Bullet
+op mr r4, r10 @ $80852fe0	# Falco Blaster
+op mr r4, r10 @ $80853074	# Falco Blaster Bullet
+op mr r4, r10 @ $8085311c	# Wolf Blaster
+op mr r4, r10 @ $808531b0	# Wolf Blaster Bullet
+op mr r4, r10 @ $8085280c	# Link Bow
+op mr r4, r10 @ $8085326c	# Robot Beam
+op mr r4, r10 @ $8085289c	# Link Bow Arrow
+op mr r4, r10 @ $80853364	# Dedede Starmissle
+op mr r4, r10 @ $8085340c	# Diddy Gun
+op mr r4, r10 @ $80853504	# Yoshi Tamago
+op mr r4, r10 @ $808536a8	# Shiek Needle
+op mr r4, r10 @ $8085373c	# Shiek Needle Have
+op mr r4, r10 @ $808538a8	# Lucas PK Flash
+op mr r4, r10 @ $80853D28 	# Samus CShot
+op mr r4, r10 @ $80852a80	# Pikachu Thunder Jolt
+op mr r4, r10 @ $80853ABC	# Pit Bow
+op mr r4, r10 @ $80853B54	# Pit Bow Arrow
+op mr r4, r10 @ $80853994	# Peach Kinopio
+op mr r4, r10 @ $80853F00	# Lucario Aura Ball
+op mr r4, r10 @ $80853a14	# Peach Kinopio Spore
+
+HOOK @ $80a3d6ac	# wnPeachKinopio::__ct
 {
-  lwz r4, 8(r3)
-  lwz r4, 0x70(r4)
-  lwz r4, 0x20(r4)
-  lwz r4, 0xC(r4)
-  lwz r4, 0x120(r4)
+	addi r5, r1, 0x70	# Original operation
+	lwz r12, 0x8(r23)	# \ store copyAbilityKind in unused byte of wnModueleAccesserBuildData
+	stb	r12, 0xD(r5)	# /
+}
+HOOK @ $80a3f1a8	# soModuleAccesserBuilder<wnPeachKinopio>::__ct
+{
+	addi r4, r15, 2040	# Original operation
+	lbz r5, 0xD(r17)	# pass copyAbilityKind as an extra parameter to soGenerateArticleManageModuleBuilder 
+}
+HOOK @ $80a3f48c	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	lwz	r0, 0x18(r3)	# Original operation
+	stb r5, 0x9(r1)		# Store copyAbilityKind on stack
+}
+HOOK @ $80a3f5f0	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r19	# Original operation
+	lbz r10, 0x9(r1)
+}
+HOOK @ $80a3f664	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r18	# Original operation
+	lbz r10, 0x9(r1)
+}
+HOOK @ $80a3f6dc	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r18	# Original operation
+	lbz r10, 0x9(r1)
+}
+HOOK @ $80a3f750	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r18	# Original operation
+	lbz r10, 0x9(r1)
+}
+HOOK @ $80a3f7c8	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r18	# Original operation
+	lbz r10, 0x9(r1)
+}
+HOOK @ $80a3f840	# soGenerateArticleManageModuleBuilder<wnPeachKinopio>::__ct
+{
+	mr r4, r18	# Original operation
+	lbz r10, 0x9(r1)
 }
 
-HOOK @ $80A58448	#Roy Fix
+###########################################
+Kirby Copy Ability ID Conversion [Kapedani]
+###########################################
+## Get conversion from modified module
+
+HOOK @ $80a1a55c	# ftKirbyCopyAbilityIdConverter::convCorrectToOrigId
 {
-	%KirbyCEHatPropFix
+	lwz r3, 0x8(r30)	# \
+	addis r3, r3, 0x2	# |
+	subi r3, r3, 0x48d4	# |
+	lwz r12, 0x0(r3)	# | moduleAccesser->stageObject->copyAbilityModule->convertId()
+	lwz r12, 0x1C(r12)	# |
+	mtctr r12			# |
+	bctrl 				# /
+}
+HOOK @ $80a1a4bc	# ftKirbyCopyAbilityIdConverter::convOrigToCorrectId
+{
+	lwz r3, 0x8(r30)	# \
+	addis r3, r3, 0x2	# |
+	subi r3, r3, 0x48d4	# |
+	lwz r12, 0x0(r3)	# | moduleAccesser->stageObject->copyAbilityModule->convertId()
+	lwz r12, 0x1C(r12)	# |
+	mtctr r12			# |
+	bctrl 				# /
 }
 
-HOOK @ $80A64D74	#Pit Fix 1
-{
-	%KirbyCEHatPropFix
-}
-
-HOOK @ $80A64E08	#Pit Fix 2
-{
-	%KirbyCEHatPropFix
-}
-HOOK @ $80A0B140    #Zero Suit Samus Fix
-{
-    %KirbyCEHatPropFix
-}
-
-######################################
-Weapon Data Fix Automatic [ds22, Desi]
-######################################
-#Move the CharacterID from another register to R4 for when the game gets the KirbyBinID
-#The Lucario one is by ds22 and was in another code, and it did the same thing as these so it's also here.
-#I'm hoping to use that method for future hats as it's more consistent.
-
-op lwz r4, 0x24(r1) @ $80853F00		#Lucario Fix
-op lwz r4, 0x24(r1) @ $80853D28 	#Samus Fix
-op mr r4, r25 @ $80854144			#Bowser Fix
-op mr r4, r25 @ $808526F4			#Mario Fix
-op mr r4, r25 @ $80853ABC			#Pit Fix
-op lwz r4, 0x24(r1) @ $80853B54		#Pit Fix 2
-op lwz r4, 0x24(r1) @ $80854298     #Zero Suit Samus Fix
-#op lwz r4, 0x24(r1) @ $808536AC	#Sheik Fix
-#op lwz r4, 0x24(r1) @ $8085373C	#Sheik Fix 2
-
-###############################
-Kirby Hat Float Fix [dantarion]
-###############################
-.macro HatFloatFix(<CloneID>,<BaseID>)
-{
-	cmpwi r6, <CloneID>
-	bne- 0x8
-	li r6, <BaseID>
-}	
-
-#Edit here by copy/pasting the Macro and putting in your own IDs
-HOOK @ $80A1A5B0
-{
-	%HatFloatFix(0x27, 0x11)	#Roy/Marth
-	%HatFloatFix(0x26, 0x21)	#Mewtwo/Lucario
-	%HatFloatFix(0x2A, 0x21)	#Ridley/Lucario
-	%HatFloatFix(0x28, 0x17)	#Waluigi/Pit
-	%HatFloatFix(0x40, 0x03)	#Dark Samus/Samus
-	%HatFloatFix(0x6A, 0x09)	#Red Alloy/Captain Falcon
-	mulli r0, r4, 0xDC
-}
-
-####################################
-KirbyID Conversion Fix for EX [Desi]
-####################################
-op cmpwi r6, 0x80 @ $80A1A5A0
+## TODO: Investigate the neccessity of the codes below
 
 ####################################
 Kirby Hats EX Shadow Fix [Desi]
@@ -174,143 +211,3 @@ EX Hat DESTROY Fix [Desi]
 #Thing is, i don't think it's masking the character ID, so i don't know why this works, but it does.
 op rlwinm. r0, r3, 26, 30, 30 @ $800273F4
 
-##########################
-KirbyHat.kbx Loader [Desi]
-##########################
-# This loads the file that contains the action/subaction stuff for Kirby Hats
-# I was gonna move the transactors into the beginning of the file, but i learned that it was easier to just load them from the module with a slight code edit.
-# Module Changes: 0x1DD8C and 0x1D7BC had their comparison range changed from 0x37 to 0x80. 0x1C78C branches to code that loads the Transactor Offset from KirbyHat.kbx, then loads the transactor from Section 4. Offset 0xD4F0 had its comparison range changed to 80 (KJP found this one).
-# The Module Command Info for 0x1D7C4/1D7C8/1D7D4/1D7D8/1DDA0/1DDA4 were deleted, and these all directely point to the KirbyHat.kbx file.
-# The transactor/article stuff locations are now packed in where the SubActions were previously in section 4, and are retrieved via an offset set inside the file.
-# 0x1FA20 branches out to the cleared out subaction area in Section 4. These are related to transactors.
-# The folowing is what i had used to move the transactors. Its a good reference for what offset should be used.
-# https://docs.google.com/spreadsheets/d/1h1MkPS2WvEdyoRYMBwuVVkqzt0vogRxnZDXLnmZzUpo/edit?usp=sharing
-# The following is the quick start guide for adding hats.
-# https://docs.google.com/document/d/17B462eugiS45PcSsie1iIr8gDl-bQM-gjIT17TIfl6Q/edit?usp=sharing
-	.BA<-FileName
-	.BA->$80562200
-	.RESET
-	.GOTO->LoadFile
-	
-	FileName:
-	string "P+EX/././pf/BrawlEX/KirbyHat.kbx"
-	
-LoadFile:
-
-HOOK @ $8002D514
-{
-stw r0, -4(r1)         #\Stack Frame 
-mflr r0                #|
-stw r0, 4(r1)          #|
-mfctr r0               #|
-stw r0, -8(r1)         #|
-stwu r1, -132(r1)      #|
-stmw r3, 8(r1)         #/
-
-lis r31, 0x8056			#\Setup File Loader at 80564880
-ori r31, r31, 0x2200	#|
-lis r30, 0x8056			#|
-ori r30, r30 0x2220		#|
-stw r30, 12(r31)		#/
-
-li r30, 0x0				#\Initialize Data
-stw r30, 4(r31)			#|
-stw r30, 8(r31)			#|
-stw r30, 16(r31)		#/
-
-mr r3, r31				#\Load File (KirbyHat.kbx)
-lis r0, 0x8001			#|
-ori r0, r0, 0xCBF4		#|
-mtctr r0				#|
-bctrl 					#/
-
-lmw r3, 8(r1)			#\Return Stack Frame
-addi r1, r1, 0x84		#|
-lwz r0, -8(r1)			#|
-mtctr r0				#|
-lwz r0, 4(r1)			#|
-mtlr r0					#|
-lwz r0, -4(r1)			#/
-
-mr r27, r4				#Original function
-}
-
-
-############################################
-!Weapon Data Fix Manual (Broken Hats) [Desi]
-############################################
-#This code is disabled, and is primarily for debugging purposes. 
-.macro GetKirbyBinId(<arg1>)
-{
-lis r3, 0x80B8
-lwz r3, 0x7C50 (r3)
-li r4, <arg1>
-rlwinm r0, r4, 2, 0, 29
-add r3, r3, r0
-lwz r3, 0x460 (r3)
-li r31, 0x0
-ori r31, r31, 0xFFFF
-cmpw r3, r31
-bne- end
-}
-
-HOOK @ $80853804	#Luigi. Air N-B works, grounded does not.
-{
-	%GetKirbyBinId(0x08)
-	%GetKirbyBinId(0x5A)
-	end:
-}
-
-HOOK @ $8085399C	#Peach. Part 1. Press B to Freeze.
-{
-	%GetKirbyBinId(0x0C)
-	%GetKirbyBinId(0x5A)
-	end:
-}
-
-HOOK @ $80853A1C	#Peach. Part 2.
-{
-	%GetKirbyBinId(0x0C)
-	%GetKirbyBinId(0x5A)
-	end:
-}
-
-HOOK @ $8085350C	#Yoshi. Press B to Freeze
-{
-	%GetKirbyBinId(0x04)
-	%GetKirbyBinId(0x5A)
-	end:
-}
-
-#####################################
-!Weapon Data Fix Manual Double [Desi]
-#####################################
-.macro GetKirbyBinId(<arg1>, <arg2>)
-{
-lis r3, 0x80B8
-lwz r3, 0x7C50 (r3)
-li r4, <arg1>
-rlwinm r0, r4, 2, 0, 29
-add r3, r3, r0
-lwz r3, 0x460 (r3)
-li r31, 0x0
-ori r31, r31, 0xFFFF
-cmpw r3, r31
-li r4, <arg2>
-bne- end
-}
-
-
-HOOK @ $808536B0	#Shiek Part 1. Press B to Freeze.
-{
-	%GetKirbyBinId(0x0E, 0x0E)
-	%GetKirbyBinId(0x5A, 0x0E)
-	end:
-}
-
-HOOK @ $80853744	#Shiek Part 2. Press B to Freeze.
-{
-	%GetKirbyBinId(0x0E, 0x0E)
-	%GetKirbyBinId(0x5A, 0x0E)
-	end:
-}

@@ -34,3 +34,18 @@ float[10] |
  1.2, 0.0,|
  0.5, 0.0,|
 @ $80F9FCF0
+
+
+##########################################################################
+[Project+] Screen Shake Type 2 Intensity Multiplier 0.5 -> 0.2 [DukeItOut]
+##########################################################################
+# This screen shake type is used on Dream Land in PM
+#
+# It uses the camera animation of Type 3 / Screenshake 0, 
+# but with reduced intensity. This does not affect
+# character PSAs, which use different shake IDs.
+#
+# This also does not affect knockback screen shake or the screen shake
+# from crossing a blast zone
+##########################################################################
+float 0.2 @ $805A1DDC

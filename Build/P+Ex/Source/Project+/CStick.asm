@@ -321,3 +321,11 @@ CODE @ $80FAF85C
 Cstick Neutral range = Cstick input range [Eon]
 #removes where cstick is in neutral but not close enough to allow a new cstick input
 op cmpwi r29, 2500 @ $80048bd0
+
+################################
+C-Stick backwards fsmash bug fix [Eon]
+################################
+word 0x1 @ $80FB2A6C #scalar
+scalar 0.0 @ $80FB2A70 #0.0 
+
+word 0x000E0000 @ $80FC2508 #else instead of special check they do

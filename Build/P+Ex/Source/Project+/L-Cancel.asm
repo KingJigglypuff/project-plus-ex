@@ -1,4 +1,6 @@
+#########################
 L-Cancelling Rework [Eon]
+#########################
 .macro getInt(<id>)
 {
     %workModuleCmd(<id>, 0x18)
@@ -152,10 +154,14 @@ end:
 }
 
 
-
-L-Cancel Landing Lag and Success Rate and Score Display is Auto L-Cancel Option + White L-cancel Flash v3.0 [Magus, Standardtoaster, wiiztec, Eon]
+#########################################################################################################################################################################
+L-Cancel Landing Lag and Success Rate and Score Display is Auto L-Cancel Option + White L-cancel Flash v3.1a [Magus, Standardtoaster, wiiztec, Eon, DukeItOut, QuickLava]
+#
+# 3.1: Added replay support
+# 3.1a: Fixed Multiman Brawl Alloy crash.
+#########################################################################################################################################################################
 #check frame = 6 and disable flash
-# Code Menu mod made by Desi, based on Per Player versions by Wiiztech
+# Code Menu mod made by Desi, based on Per Player versions by wiiztec
 
 .alias CodeMenuStart = 0x804E
 .alias CodeMenuHeader = 0x02A8       #Offset of word containing location of the player 1 toggle. Source is compiled with headers for this.
@@ -182,6 +188,17 @@ op nop @ $8081BE8C
 HOOK @ $8087459C
 {
 loc_0x0:
+                            # Multiman Brawl Fix
+  lwz r11, 28(r31)          # \
+  lwz r11, 40(r11)          # |
+  lwz r11, 16(r11)          # | Obtain Player ID...
+  lbz r11, 85(r11)          # /
+  cmplwi r11, 0x3           # \ ... and check if it corresponds to a valid slot.
+  ble+ validPlayerID        # / If it does, continue through L-Cancel code.
+  fdivs f31, f31, f0        # If it doesn't, just do the normal operation...
+  b %END%                   # ... and exit.
+  
+validPlayerID:
 #get LA-Basic[90]
   lwz r3, 0xD8(r31)
   lwz r3, 0x64(r3)
@@ -221,11 +238,12 @@ checkForAutoLcancel:
   beq applyLCancelRedFlash
   cmpwi r11, 0x2
   beq applyModifiedLCancelFlash
-  lis r11, 0x9017
-  ori r11, r11, 0xF36B
-  lbz r11, 0(r11)
-  cmpwi r11, 0x1
-  beq applyLcancel  #Skip applying fail flash if universal option is on
+  lis r11, 0x805A
+  lwz r11, 0xE0(r11)	
+  lwz r11, 0x08(r11)		
+  lbz r11, 0xE5(r11)	# 0x4D (+ 0x98)
+  andi. r11, r11, 1	# bit used for ALC
+  bne applyLcancel  #Skip applying fail flash if universal option is on
   lhz r11, 0 (r6)
   add r6, r11, r6   #Load up next toggle (Modifier)
   lhz r11, 0 (r6)
@@ -395,10 +413,14 @@ applyFlash:
   blr
 }
 
+##############################################
 Disable Aerial Attack Landing Lag IASA [Magus]
+##############################################
 * 04FAF168 800000FF
 
+########################################
 Remove grabbing Items with Aerials [Eon]
+########################################
 CODE @ $80FC2798
 {
   word 0x00020000; word 0
@@ -406,7 +428,9 @@ CODE @ $80FC2798
   word 0x00020000; word 0
 }
 
+#############################################
 Aerial Staling Set before Subaction Set [Eon]
+#############################################
 #nair
 CODE @ $80FC2820
 {
@@ -453,4 +477,53 @@ CODE @ $80546120
 CODE @ $80FC1C58
 {
   word 0x00070100; word Teeter_Loc
+}
+
+##############################################
+Ignore Damage Gauge Setting [InternetExplorer]
+##############################################
+op li r3, 1 @ $8005063C
+
+#####################################################################
+Damage Gauge Toggles 3-Frame Buffer 1.1 [InternetExplorer, DukeItOut]
+#
+# 1.1: Added replay support
+#####################################################################
+HOOK @ $8085B784
+{
+	lis r12, 0x805A
+	lwz r12, 0xE0(r12)
+	lwz r12, 0x08(r12)
+	lbz r3, 0xE5(r12)	# 0x4D (+ 0x98)
+	andi. r3, r3, 2	# bit used for buffer
+	li r3, 0		# \ If the handicap damage gauge rule is enabled . . . 
+	beq- %END%		# /
+	li r3, 3		# Set the buffer to 3 frames instead of 0
+}
+
+###################################################
+ALC and Buffer Are Preserved in Replays [DukeItOut]
+###################################################
+HOOK @ $8004FF64
+{
+	lis r12, 0x805A
+	lwz r12, 0xE0(r12)
+	lwz r12, 0x08(r12)
+	lbz r6, 0xE5(r12)	# 0x4D (+ 0x98)
+	andi. r6, r6, 0xFC	# Clear lowest two bits
+	lis r4, 0x9018; 
+	
+	lbz r5, -0xC94(r4)	# 9017F36C
+	cmpwi r5, 1
+	bne noBuffer
+	ori r6, r6, 0x02	# this bit is being used for buffer
+noBuffer:
+	lbz r5, -0xC95(r4)	# 9017F36B
+	cmpwi r5, 1
+	bne noALC
+	ori r6, r6, 0x01	# this bit is being used for auto L-cancel
+noALC:
+	stb r6, 0xE5(r12)	# store this information somewhere a replay can observe it!
+	
+	lbz r0, 0x1C(r30)	# Original operation
 }

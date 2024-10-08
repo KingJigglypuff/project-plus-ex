@@ -1,0 +1,8 @@
+<addon name="Hitfalling Toggle v1.0.1 [Eon, mawwwk, QuickLava]" shortName="WIPMHTFL">
+	<codeMenuPage shortName="_SPECIAL">
+		<codeMenuToggle name="Hitfalling Toggle" shortName="ONOFF">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+</addon>
+

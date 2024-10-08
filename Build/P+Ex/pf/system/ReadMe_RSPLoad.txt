@@ -1,5 +1,0 @@
-An alternate common3 file, named "common3_RSPLoad.pac", is here for if users wish to compromise console compatibility (on console, the CSS will lag when cycling through characters and costumes), in exchange for removing the need to add CSPs inside the sc_selcharacter.pac (pf/menu2), and instead exclusively use the RSP brres files that are normally only used on the Results Screen (pf/menu/common/char_bust_tex).
-
-Just backup the existing common3.pac by renaming it (or delete it if you have no intentions on going back), then rename "common3_RSPLoad.pac" to "common3.pac".
-
-Additionally, go to P+Ex/Source/P+Ex, and open the "Misc.asm" in a text editor of your choice (Notepad++ recommended), and enable the "RSP Load Character Swap Fix" code by deleting the "!" that's in-front of it (save the file after making the edit). Afterwards, rebuild BOOST.gct by dragging and dropping BOOST.txt over GCTRealMate. Make sure to delete the existing BOOST.gct prior to prevent replacement-based oddities.
