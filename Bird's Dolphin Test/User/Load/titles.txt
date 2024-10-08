@@ -1,4 +1,4 @@
-RSBE01 = Set me as default! Use the .elf file to play!
+RSBE01 = Set me as default! Use the .dol file to play!
 RSBP01 = Project+ does not work with the PAL copy of Brawl! Only the NTSC-U copy of Brawl works with Project+!
 RSBJ01 = Project+ does not work with the NTSC-J copy of Brawl! Only the NTSC-U copy of Brawl works with Project+!
 RSBK01 = Project+ does not work with the NTSC-K copy of Brawl! Only the NTSC-U copy of Brawl works with Project+!

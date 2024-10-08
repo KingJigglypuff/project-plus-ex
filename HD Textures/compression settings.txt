@@ -1,0 +1,5 @@
+Optimized with OxiPNG - 3 Tests Performed
+BC7 - Output Format
+Auto-Repair Dimensions 0.65 Scale-Fix Threshold
+Compressonator
+Auto - BC7 Quality
