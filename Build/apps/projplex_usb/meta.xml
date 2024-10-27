@@ -6,9 +6,9 @@
 	<coder>Project+Ex Dev Team</coder>	\\Kirbeast, waffeln, Bird
 	<short_description>Project+Ex USB Loader</short_description>
 <long_description>
-Project+Ex v1.5. All changes are not final.
+Project+Ex v1.5.1. All changes are not final.
 
-This is a modified version of CFG USB Loader designed for instantly loading Project+Ex via USB.
+This is a modified version of CFG USB Loader designed for instantly loading Project+Ex via USB. [CURRENTLY NON-FUNCTIONAL]
 </long_description>
 <ahb_access/>
 <arguments>

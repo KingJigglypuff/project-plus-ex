@@ -1,6 +1,6 @@
 
 #################################################
-ItemEx Clone Engine v2.5 [Sammi Husky, Kapedani]
+ItemEx Clone Engine v2.51 [Sammi Husky, Kapedani]
 #################################################
 # Stages can override items
 # Character specific items
@@ -31,6 +31,7 @@ ItemEx Clone Engine v2.5 [Sammi Husky, Kapedani]
 .alias g_itKindVariationNums                = 0x80ADB548
 .alias g_itKindRemovableItKind              = 0x80ADBE58
 .alias g_itKindEmissions                    = 0x80adc120
+.alias g_itNullCustomizer                   = 0x80b8b1f0
 .alias BaseItem__resetDamage                = 0x8099a068
 .alias soExternalValueAccesser__getStatusKind 	= 0x80797608
 .alias soExternalValueAccesser__getPos      = 0x807973e8
@@ -1010,6 +1011,13 @@ HOOK @ $809b23b0    # itManager::removeItemSub
     mr r4, r30
 end:
     lbz	r30, 0x8D5(r4)  # Original operation (pass original itKind)
+}
+
+HOOK @ $8098e3b4    # BaseItem::deactivate
+{
+    bctrl   # Original operation
+    %lwi(r12, g_itNullCustomizer)   # \ set itCustomizer to itNullCustomizer
+    stw r12, 0x8D0(r30)             # / (prevents potential deloaded itCustomizers from fighter module from being called after game end)
 }
 
 # HOOK @ $80a6f680    # ftDiddyStatusUniqProcessSpecialPopGun::execFixPos
@@ -3405,6 +3413,38 @@ notFighter:
     %call (ftManager__getTeam)  # /
 }
 op b 0x30 @ $80844694
+
+####################################################
+Touch Items Notify Outside Event Get Item [Kapedani]
+####################################################
+.alias ftOutsideEventPresenter__notifyOutsideEventGetItem     = 0x80864e54
+
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+
+op b 0x2C @ $80844644   # Skip since being called below anyways
+HOOK @ $80844d6c    # Fighter::touchItem
+{
+    addi r3,r25,0x13c   # this->outsideEventPresenter
+    lwz r4, 0x8c0(r29)  # item->kind
+    lwz r5, 0x8c4(r29)  # item->varation
+    lwz r6, 0x3d28(r29) # item->genParamId
+    lwz r7, 0x8bc(r29)  # item->instanceId
+    %call (ftOutsideEventPresenter__notifyOutsideEventGetItem)
+    lwz	r12, 0x3C(r25)  # Original operation
+}
+
 
 ###########################################
 Every Item Can Have Collision v2 [Kapedani]

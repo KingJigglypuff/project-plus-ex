@@ -19,18 +19,24 @@ op lwz r7, 0x0A14 (r28) @ $8084CFB8 # Load pointer to ".pac" string!
 op lwz r6, 0x0A18 (r28) @ $8084CE28 # Load pointer to "Dark" string!
 op lwz r7, 0x0A14 (r28) @ $8084CE30 # Load pointer to ".pac" string!
 
-#################################################
-Hidden Alt Costume Sets Rework v1.0.1 [QuickLava]
-#################################################
-.alias AltIDRangeStart          = 50
-.alias AltRID                   = 61
-.alias AltZID                   = 62
-.alias NumAltIDsStart           = 78
-.alias NumAltIDsEnd             = 127
+#################################################################################################
+Hidden Alt Costume Sets Rework v1.1.5 [QuickLava]
+# v1.1.5
+# - Raised AltIDRangeStart to 60 to maintain support for Costume IDs 50-59
+# - Lowered NumAltIDsStart to 68 so IDs 50-59 have corresponding Alt IDs
+# - Introduced proper NumAlt ID Range Check, so NumAlt Behavior can be limited to a range of IDs (or disabled if NumAltIDsEnd set to 0).
+# - Introduced AltIDRangeEnd, so Alt behavior can be disabled past a certain ID.
+#################################################################################################
+.alias AltIDRangeStart          = 60    # \ Costume IDs within this (inclusive) range are considered reserved for Alts!
+.alias AltIDRangeEnd            = 127   # / Any below IDs that fall outside of this range *will not* be loaded!
+.alias AltRID                   = 61    # R-Alt Costume ID
+.alias AltZID                   = 62    # Z-Alt Costume ID
+.alias NumAltIDsStart           = 68    # \ Costume IDs within this (inclusive) range are considered reserved for NumAlts! NumAlt ID for any
+.alias NumAltIDsEnd             = 127   # / non-alt costume is ID + NumAltIDsStart! Requests to load NumAlts with IDs above NumAltIDsEnd are ignored!
 .alias getSysPadStatus          = 0x8002AE48
-.alias ftConvertKind            = 0x808545ec
-.alias strcpy                   = 0x803fa280
-.alias sprintf                  = 0x803f89fc
+.alias ftConvertKind            = 0x808545EC
+.alias strcpy                   = 0x803FA280
+.alias sprintf                  = 0x803F89FC
 .alias PacPathPtrArray          = 0x817C7C00
 .alias FPC_checkModSDFile       = 0x8001F59C
 .macro lwi(<reg>, <val>)
@@ -64,6 +70,20 @@ Hidden Alt Costume Sets Rework v1.0.1 [QuickLava]
     lis r11, 0x8070                     # \
     ori r11, r11, 0x2B60                # | Compare that against the location of the "sqAdventure" string constant...
     cmplw cr7, r11, r12                 # / ... and store the result in CR7, so the result can be reused if necessary!
+}
+# Sets 
+.macro IDWithinAltRange(<IDReg>, <DestCRF>, <WorkCRF>, <DestCRBit>)
+{
+  .alias tmp1 = <DestCRF> + <DestCRF>
+  .alias DestCRF_LTBit = tmp1 + tmp1
+  .alias DestCRF_ResultBit = DestCRF_LTBit + <DestCRBit>
+  .alias tmp2 = <WorkCRF> + <WorkCRF>
+  .alias tmp3 = tmp2 + tmp2
+  .alias WorkCRF_GTBit = tmp3 + 1
+  
+  cmplwi cr<DestCRF>, <IDReg>, AltIDRangeStart             # \ 
+  cmplwi cr<WorkCRF>, <IDReg>, AltIDRangeEnd               # / Check if the requested File ID is within the Alt Range,
+  crnor DestCRF_ResultBit, DestCRF_LTBit, WorkCRF_GTBit    # ... and store result in the specified bit!
 }
 # These skip the code for loading .pcs files.
 op b 0x1C @ $8084CE34                   # [in "req/[ftDataProvider]/ft_data_provider.o" @ $8084C368, Ghidra: $8085ADC0] Skips G&W Dark .pcs Load
@@ -140,8 +160,8 @@ exit:
 HOOK @ $809463EC               # [in  "processBegin/[stLoaderPlayer]/st_loader_player.o" @ $80946004, Ghidra: $809540cc]
 {
   lbz r5, 0x05(r3)                      # Restore Original Instruction: Get character's Costume File ID.
-  cmplwi r5, AltIDRangeStart            # \ 
-  bge %END%                             # / If an alt is already applied, we can leave, ID is already right.
+  %IDWithinAltRange(r5, 0, 1, 2)        # \
+  beq %END%                             # / If an Alt is already applied, skip the code cuz the ID is already right!
   
   lwz r12, 0x48(r30)                    # Otherwise, get player slot from stLoaderPlayer struct!
   %lwd(r11, LocalMemoryAddrLoc)         # Then grab the address for our Local Memory from the Addr Loc.
@@ -149,8 +169,12 @@ HOOK @ $809463EC               # [in  "processBegin/[stLoaderPlayer]/st_loader_p
   cmplwi r12, 0x00                      # \
   beq %END%                             # / If no Alt is being requested, we can leave.
   
-  cmplwi r12, 0x03                      # If we wanted Alt3, we'll encode that with numbers 78 through 127...
-  addi r5, r5, NumAltIDsStart           # ... so we'll just add 78 to the requested ID and use that...
+  cmplwi r12, 0x03                      # If we wanted NumAlts though...
+  addi r5, r5, NumAltIDsStart           # ... we'll encode that by adding the base NumAltID to the requested ID!
+  cmplwi cr7, r5, NumAltIDsEnd          # Validate that the resulting ID is within the allowed NumAlt Range...
+  ble+ cr7, numAltGood                  # ... and if it is, then our adjusted ID is good! Leave it in place and continue!
+  subi r5, r5, NumAltIDsStart           # If it *is* too high though, consider the adjusted ID invalid and restore the original!
+numAltGood:
   bge exit                              # ... and branch to the exit.
 
   cmplwi r12, 0x02                      # If instead we wanted R-Alt...
@@ -159,7 +183,11 @@ HOOK @ $809463EC               # [in  "processBegin/[stLoaderPlayer]/st_loader_p
 
   li r5, AltZID                         # And lastly, if we wanted Z-Alt load that ID. No branch needed though, we're already here.
 exit:
-  stb r5, 0x5(r3)                       # Store our modified value on the way out!
+  %IDWithinAltRange(r5, 0, 1, 2)        # \ Verify that the final Alt ID is within the valid range...
+  beq storeID                           # / ... and if it is, continue to storing it!
+  lbz r5, 0x05(r3)                      # Otherwise, our Alt ID was bad, restore the original value!
+storeID:
+  stb r5, 0x5(r3)                       # Store our final modified ID on the way out!
 }
 # If we're requesting an Alt, check if the file actually exists before attempting to switch!
 .alias NameBuf1StackOff = 0x08
@@ -169,9 +197,9 @@ HOOK @ $80946424               # [in  "processBegin/[stLoaderPlayer]/st_loader_p
 {
   cmplw r3, r0                          # Restore Original Instruction: Compare Stored Costume ID w/ Incoming Costume ID...
   beq %END%                             # ... and if they're the same, we can skip this code!
-
-  cmplwi cr7, r0, AltIDRangeStart       # \ Additionally, skip the code if the Costume ID isn't within the Alt Range!
-  blt cr7, %END%                        # / (Compare in CR7 to avoid overwriting the previous comparison result)
+  
+  %IDWithinAltRange(r0, 6, 7, 2)        # \ Additionally, check if the Costume ID is within the Alt Range...
+  bne cr6, %END%                        # / ... and if it isn't, skip! Compare in CR6/7 to avoid overwriting the previous comparison!
   
   stwu r1, -0x70(r1)                    # Push some extra space onto the stack, for if we need to build our strings here!
   
@@ -247,16 +275,16 @@ HOOK @ $8084CEE0               # [in "req/[ftDataProvider]/ft_data_provider.o" @
   bne+ cr7, notSSE                      # If not in SSE, skip Dark check.
   cmplwi r23, 12                        # \
   b %END%                               # / Otherwise, do the normal check and exit.
+  
 notSSE:
-  cmplwi r23, AltIDRangeStart           # Compare the File ID against 50, since that and up are what we're using for alts!
-  crnor 2, 0, 0                         # Then, invert and move the LT bit from CR0 into the EQ bit, so we stay in the Dark branch if an alt was signaled!
+  %IDWithinAltRange(r23, 0, 1, 2)       # Check if ID is in Alt Range, store result in CR0 EQ to stay in the Dark branch if Alt signaled!
 }
 # Swap in Alt strings before sprintf!
 HOOK @ $8084CF54               # [in "req/[ftDataProvider]/ft_data_provider.o" @ $8084C368, Ghidra: $8085AEE0]
 {
   addi r4, r29, 0xAC0                   # Restore Original Intruction: Setup default formatting string!
-  cmplwi r23, AltIDRangeStart           # Compare the requested FileID against the beginning of the Alt IDs range...
-  blt+ %END%                            # ... and if we're below that, then we aren't requesting an Alt, so exit!
+  %IDWithinAltRange(r23, 0, 1, 2)       # \
+  bne %END%                             # / Check if the Costume ID is within the Alt Range, and if it isn't skip!
 
   %lwd(r11, LocalMemoryAddrLoc)         # Then grab the address for our Local Memory from the Addr Loc.
   addi r6, r11, AltZStrLocalMemOff      # Assume to start that we're requesting the Z Alt, so point r6 to the "AltZ" string!
@@ -281,9 +309,9 @@ HOOK @ $8084CDDC               # [in "req/[ftDataProvider]/ft_data_provider.o" @
   bne+ cr7, notSSE                      # If not in SSE, skip Dark check.
   cmplwi r23, 12                        # \
   b %END%                               # / Otherwise, do the normal check and exit.
+  
 notSSE:
-  cmplwi r23, AltIDRangeStart           # Compare the File ID against 50, since that and up are what we're using for alts!
-  crnor 2, 0, 0                         # Then, invert and move the LT bit from CR0 into the EQ bit, so we stay in the Dark branch if an alt was signaled!
+  %IDWithinAltRange(r23, 0, 1, 2)       # Check if ID is in Alt Range, store result in CR0 EQ to stay in the Dark branch if Alt signaled!
 }
 op bne cr7, 0x104 @ $8084CDE4           # To avoid duplicating stuff, if we enter the Alt branch while not in SSE, branch to the general logic we use for other characters!
 
@@ -301,12 +329,16 @@ notSSE:
   subi r8, r23, NumAltIDsStart          # /  (Also, compare into CR7 so we can reuse the result in the following HOOK!)
   crandc 2, 2, 2                        # If we aren't in SSE, then AND the EQ bit with its compliment to ensure we always load a hat!
 }
-op rlwinm r5, r8, 0, 25, 31 @ $8084DED4 # If we're loading costume-specific hats, sprintf the File Number using our adjusted ID from the above hook!
+HOOK @ $8084DED8               # [in "req/[ftDataProvider]/ft_data_provider.o" @ $8084C368, $8085BE64]
+{
+  crclr	6, 6                            # Restore Original Instruction
+  rlwinm r5, r8, 0, 25, 31              # If we're loading costume-specific hats, sprintf the File Number using our adjusted ID from the above hook!
+}
 HOOK @ $8084DF28                # [in "req/[ftDataProvider]/ft_data_provider.o" @ $8084C368, $8085BEB4]
 {
   addi r6, r1, 0x20		                # Restore Original Instruction, r6 to the ID string we sprintf'd before.
-  cmplwi r23, AltIDRangeStart           # Check against our File ID to see if we're requesting an alt...
-  blt+ %END%                            # ... and if we aren't, we can just exit, we don't need to do special.
+  %IDWithinAltRange(r23, 0, 1, 2)       # \
+  bne %END%                             # /  Check if the Costume ID is within the Alt Range, and if it isn't skip!
   
   %lwd(r11, LocalMemoryAddrLoc)         # If instead we *are* looking at an Alt, grab the pointer to our local memory, cuz we'll stage our string there.
   lwz r12, 0x00(r6)                     # Assume we want a Num Alt to start, so load the printed ID into r12 before we change r6.

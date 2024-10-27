@@ -1,7 +1,8 @@
-########################################
-Reduce InfoInstance in SSE [Sammi Husky]
-########################################
+#######################################################
+Reduce InfoInstance in SSE v2 [Sammi Husky, Kapedani]
+######################################################
 word 0x12B440 @ $80421f9c
+word 0x12B440 @ $8042204C # Great Maze save room
 
 #################################################
 Don't clear memory on game launch [Sammi Husky]

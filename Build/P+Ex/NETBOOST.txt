@@ -104,6 +104,7 @@ true:
 .include Source/P+Ex/PassiveAnim.asm
 .include Source/P+Ex/SoundbankFix.asm
 .include Source/Community/lavaInjectLoader.asm
+#.include Source/Community/Character-CostumeSwapper.asm # Disabled by default, as there's no characters in base P+Ex who utilize this function. This code is simply here for people to make use of for their own builds.
 
 #.include Source/Extras/Console.asm	# Only use this on a Wii or Wii U! The codes in this are necessary for the slower specifications of the actual console.
 .include Source/Extras/Netplay.asm	# Only use this in Dolphin! The codes in this will result in bad behavior on the Wii!

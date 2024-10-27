@@ -208,7 +208,7 @@ HOOK @ $80A0AAA8
 	mtctr r12					#|
 	bctrl 						#/
 FighterIDCheck:
-    %GFXFix(0x69, 0x169)		#Samus Clone Test, ef_custom32
+    #%GFXFix(0x69, 0x169)		#Samus Clone Test, ef_custom32
     lis r4, 0x04				#If not defined, use ef_samus
 end:
 	lwz r12, 0x0(r30)
@@ -243,7 +243,7 @@ HOOK @ $80A0AB1C
 	mtctr r12						#|
 	bctrl 							#/
 HatIDCheck:
-    %GFXFix(0x40, 0x95)				#EXFighter40, ef_tautau
+    #%GFXFix(0x69, 0x169)			#Samus Clone Test, ef_custom32
     lis r4, 0x108					#If not defined, use ef_KbSamus
 end:
 	lwz r12, 0x0(r30)
@@ -681,7 +681,7 @@ Bowser Clone Fire Breath Bone Fix [KingJigglypuff]
 }
 HOOK @ $80A391F8        #Use Register 28, followed by Fighter ID and Bone ID
 {
-    %BoneIDFix(0x69, 0x21)        #Bowser Clone Test
+    #%BoneIDFix(0x69, 0x21)        #Bowser Clone Test
     li r5, 0x33                   #If not defined, use Bowser
 }
 * 06A391FC 0000000C
@@ -829,7 +829,7 @@ ENDINGTABLE:
 		46, 47, -1, -1, -1, 31, -1, 43, |   # 31 used by Mewtwo, 43 used by Knuckles!
     	12, -1, 39, 36, -1, 38, -1, -1, |	# 36 used by Waluigi! 39 used by Ridley!
 		-1, -1, -1, -1, -1, -1, -1, -1, |
-		-1, -1, -1, -1, -1, -1, -1, -1, |	
+		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1, |

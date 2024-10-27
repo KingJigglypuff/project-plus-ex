@@ -1,10 +1,31 @@
-######################################################
-Custom GenerateAndThrowItem PSA command [Sammi Husky]
-######################################################
+###############################################################
+Custom GenerateAndThrowItem PSA command [Sammi Husky, MarioDox]
+###############################################################
+.macro getFloat()
+{
+    lis     r12,0x80AE
+    ori     r12,r12,0x0E28
+    stw     r12,0x158(r1)
+    stw     r5,0x15C(r1)
+    stw     r3,0x160(r1)
+    stw     r0,0x164(r1)
+    stw     r7,0x168(r1)
+    li      r0,0x0
+    stb     r0,0x16C(r1)
+    addi    r3,r1,0x158
+    li      r4,0x0
+    lis     r12,0x8077      # \ getFloat/[soAnimCmdArgList]
+    ori     r12,r12,0xE0CC  # | 
+    mtctr   r12             # |
+    bctrl                   # /
+    li      r0,0x0
+}
+
 HOOK @ $807c6fb8
 {
     cmplwi   r0, 0x12
     bne      _end
+    mr       r7,r5	# save this for later
     
     # get arg list
     lwz      r12, 0x0(r26)
@@ -34,7 +55,7 @@ HOOK @ $807c6fb8
     
     lwz r28, 0x4(r3)
     
-    # get args[1]
+    # get args[2]
     lwz      r12,0x298(r1) # arg list
     addi     r3,r1,0x298
     li       r4,0x2
@@ -51,16 +72,9 @@ HOOK @ $807c6fb8
     lwz      r12,0x10(r12)
     mtctr    r12
     bctrl
-    
-    # scalar to float conversion
-    lfd        f2,0x18(r31) # 4330000080000000h
-    lwz        r0,0x4(r3)
-    lfs        f0,0x10(r31) # 60000
-    xoris      r0,r0,0x8000
-    stw        r0,0x2bc(r1)
-    lfd        f1,0x2b8(r1)
-    fsubs      f1,f1,f2
-    fdivs      f29,f1,f0
+
+    %getFloat()
+    fmr      f29,f1
     
     # get args[4]
     lwz      r12,0x298(r1) # arg list
@@ -70,15 +84,8 @@ HOOK @ $807c6fb8
     mtctr    r12
     bctrl
     
-    # scalar to float conversion
-    lfd        f2,0x18(r31) # 4330000080000000h
-    lwz        r0,0x4(r3)
-    lfs        f0,0x10(r31) # 60000
-    xoris      r0,r0,0x8000
-    stw        r0,0x2bc(r1)
-    lfd        f1,0x2b8(r1)
-    fsubs      f1,f1,f2
-    fdivs      f30,f1,f0
+    %getFloat()
+    fmr      f30,f1
 
     # get args[5]
     lwz      r12,0x298(r1) # arg list
@@ -88,15 +95,8 @@ HOOK @ $807c6fb8
     mtctr    r12
     bctrl
     
-    # scalar to float conversion
-    lfd        f2,0x18(r31) # 4330000080000000h
-    lwz        r0,0x4(r3)
-    lfs        f0,0x10(r31) # 60000
-    xoris      r0,r0,0x8000
-    stw        r0,0x2bc(r1)
-    lfd        f1,0x2b8(r1)
-    fsubs      f1,f1,f2
-    fdivs      f31,f1,f0
+    %getFloat()
+    fmr      f31,f1
     
     _throw:
         lwz        r12,0x0(r25)
@@ -136,3 +136,41 @@ HOOK @ $807c33ec    # soItemManageModuleImp::createThrowItem
     fcmpu 0,f0,f28      # /        
 }
 op beq- 0x70 @ $807c33f0
+
+##############################################################
+CreateThrowItem passes creator centerPos as safePos [MarioDox]
+##############################################################
+HOOK @ $807c33ac    # soItemManageModuleImpl::createThrowItem
+{
+    li r4,0x0
+    lwz r3,0x68(r31)    # \
+    lwz r3,0xD8(r3)        # |
+    lwz r3,0x10(r3)        # | soGroundModuleImpl
+    lwz r12,0x0(r3)        # |
+    lwz r12,0x158(r12)    # | getCenterPos
+    mtctr r12        # |
+    bctrl            # /
+    stw r3,-0x20(r1)    # \ store Vec2f temporarily in the stack (they get replaced later anyway)
+    stw r4,-0x1C(r1)    # /
+    addi r4,r1,-0x20
+    mr r3,r29        # get the BaseItem
+    lis r12,0x8099        # \ BaseItem::setSafePos
+    ori r12,r12,0xA980    # |
+    mtctr r12        # |
+    bctrl            # /
+end:
+    lwz r3,0x68(r31)    # original op
+}
+
+###############################################################
+CreateThrowItem follows attack staling [MarioDox]
+###############################################################
+HOOK @ $807c3460    # soItemManageModuleImpl::createThrowItem
+{
+    mr r3,r29
+    lwz r12,0x3C(r29)
+    lwz r12,0x254(r12)
+    mtctr r12
+    bctrl
+    li r3,0x1    # original op
+}
