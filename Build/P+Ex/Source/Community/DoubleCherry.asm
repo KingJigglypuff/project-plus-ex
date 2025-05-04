@@ -1,6 +1,6 @@
 
 #############################
-Cherry Double v1.1 [Kapedani]
+Cherry Double v1.2 [Kapedani]
 #############################
 .alias g_GameGlobal                         = 0x805a00E0
 .alias g_itManager                          = 0x80B8B7F4
@@ -105,7 +105,7 @@ HOOK @ $8083ae24    # Fighter::getOwner
     cmpwi r12, 6
     blt+ notParasite
     %lwd(r12, g_ftManager)
-    lbz r12, 0x91(r3)   # get entryId for parasite 
+    lbz r12, 0x91(r12)   # get entryId for parasite 
     li r3, 3
     cmpwi r12, 0xFF    # \ check if -1
     bne- parasite       # / 
@@ -221,7 +221,7 @@ HOOK @ $80843210    # Fighter::setMetal
     cmpwi r12, 6
     blt+ notParasite
     %lwd(r12, g_ftManager)
-    lbz r12, 0x91(r3)   # get playerNo for parasited player
+    lbz r12, 0x91(r12)   # get playerNo for parasited player
     cmpwi r12, 0xFF     # \ check if -1
     bne- parasite       # / 
 notParasite:
@@ -246,7 +246,7 @@ HOOK @ $80843294    # Fighter::setMetal
     cmpwi r12, 6
     blt+ end
     %lwd(r12, g_ftManager)
-    lbz r12, 0x91(r3)   # get playerNo for parasited player
+    lbz r12, 0x91(r12)   # get playerNo for parasited player
     cmpwi r12, 0xFF     # \ check if -1
     bne- parasite       # / 
     lwz r4, 0x28(r29)	# fighter->taskId
@@ -482,7 +482,7 @@ HOOK @ $8081c934    # ftOwner::getFinalContinue
     beqlr+                  # /
 }
 
-HOOK @ $80844378    # Fighter::touchItem
+HOOK @ $80844378    # Fighter::touchItem 
 {
     bctrl   # Original operation
     cmpwi r3, 0x55      # \
@@ -490,6 +490,8 @@ HOOK @ $80844378    # Fighter::touchItem
     lwz r12, 0x8c4(r29) # | check if Double Cherry
     cmpwi r12, 0x0      # |
     bne- %end%          # /
+    # TODO: Move this in a function like setCurry so other things can create a double
+
     li r28, 0x1
     li r27, 0x1
 
@@ -658,23 +660,65 @@ HOOK @ $8082f384    # ftInstanceManager::create
     addi r11, r11, 0x1      # |
     stb r11, 0x7D(r12)      # /
 }
-HOOK @ $8082f454    # ftInstanceManager::remove
+HOOK @ $8082f464    # ftInstanceManager::remove
 {
-    stw r3, 0xC(r1)     
-    lwz r4, 0x28(r3)    # fighter->taskId
-    %lwd(r3, g_ftManager)
-    addi r5, r1, 0x8
-    %call(ftManager__getEntryIdFromTaskId)
+    lwz r30, 0x10C(r3)  # fighter->entryId
+    lwz r12, 0x28(r3)   # fighter->taskId
+    stw r12, 0x8(r1)
+    bctrl   # Original operation
+    mr r4, r30      # entryId
+    %lwd(r3, g_ftEntryManager)
+    %call(ftEntryManager__getEntity)
+    addi r30, r3, 0x34  # &ftEntry->instances.fighter
+
+    lwz r4, 0x8(r1)          # taskId
+    %lwd(r3, g_ftManager) 			
+	addi r5, r1, 0x8	# outInstanceIndex
+	%call(ftManager__getEntryIdFromTaskId) 
     lwz r3, 0x8(r1) # \
     cmpwi r3, 3     # | check if outInstanceIndex == 3 (i.e it is a double fighter)
-    bne+ end        # /
+    beq+ double     # /
+    %lwd(r3, g_ftManager)
+    lbz r4, 0x91(r3)   # get playerNo for parasited fighter
+    cmpwi r4, -1       # \ check if parasite is active
+    beq+ end    # /
+    lwz r12, 0x24(r30)  # \
+    cmpw r4, r12       # | check player is parasited
+    beq+ parasited     # /  
+    cmpwi r12, 6        # \ check if parasite
+    blt+ end            # /
+    b getFighter       # get parasited fighter
+parasited:
+    li r4, 0x6                      # \
+getFighter:
+    %call(ftManager__getEntryId)    # | get parasite fighter 
+    cmpwi r3, -1                    # |
+    beq- end                        # |
+    mr r4, r3                       # /
+    %lwd(r3, g_ftManager)         
+    li r5, -1
+    %call(ftManager__getFighter)
+    b rebindAnim
+double: 
     %lwd(r12, g_ftManager)  # \
     lbz r11, 0x7D(r12)      # | ftManager->numDoubles--
     subi r11, r11, 0x1      # |
     stb r11, 0x7D(r12)      # /
+    lbz r12, -0x2a(r30) # \
+    mulli r12, r12, 0x8 # | instance[ftEntry->activeInstanceIndex].fighter
+    lwzx r3, r30, r12   # /
+rebindAnim:  
+    cmpwi r3, 0x0   # \ check if fighter is null
+    beq+ end        # /
+    li r4, 0x0          # \
+    lwz r5, 0x60(r3)    # | 
+    lwz r3, 0xd8(r5)    # |
+    lwz r3, 0x8(r3)     # | fighter->moduleAccesser->moduleEnumeration->motionModuleImpl->notifyEventConstructInstance(0, fighter->moduleAccesser)
+    lwz r12, 0x0(r3)    # |
+    lwz r12, 0x208(r12) # |
+    mtctr r12           # |
+    bctrl               # /
 end:
-    lwz r3, 0xC(r1)
-    lwz	r12, 0x3C(r3)   # Original operation
 }
 
 HOOK @ $809b0a38    # itManager::checkCreatableItem

@@ -27,9 +27,11 @@ HOOK @ $800659F0
 	cmplw r29, r0		# Original operation
 	beq- %END%			# If it was already going to not branch then don't read below!
 	lwz r3, 0x98(r31)	# Custom Trace ID variable
-	cmplwi cr1, r3, 0xC;	blt+ cr1, ForcePause	# \ normal R.O.B. laser traces
+	cmplwi cr1, r3, 0x1; 	beq- cr1, %END%			# Link's Arrows
+	cmplwi cr1, r3, 0x7D;	beq- cr1, %END%			# Toon Link's Arrows
+	cmplwi cr1, r3, 0xC;	blt- cr1, ForcePause	# \ normal R.O.B. laser traces
 	cmplwi cr1, r3, 0xD;	ble- cr1, %END%			# /
-	cmplwi cr1, r3, 0x1EB;	blt- cr1, ForcePause	# \ ef_custom23 (R.O.B.)
+	cmplwi cr1, r3, 0x1EB;	blt+ cr1, ForcePause	# \ ef_custom23 (R.O.B.)
 	cmplwi cr1, r3, 0x1F4;  ble- cr1, %END%			# / 
 ForcePause:
 	crnot 2, 2			# inverts the "bne" determination from the first operation comparison
@@ -74,8 +76,8 @@ HOOK @ $800662dc #renderXlu/[ecTrace]
     li         r3, 0x0             # Cull Mode 0 (CULL_NONE)
     stwu     r1, -0x10(r1)
     mflr     r0
-    lis     r12, 0x801F         # \
-    ori     r12, r12, 0x136C     # | GXSetCullMode/[GXGeometry]
+    lis     r12, 0x801F           # \
+    ori     r12, r12, 0x136C      # | GXSetCullMode/[GXGeometry]
     mtctr     r12                 # |
     bctrl                         # /
     addi     r1, r1, 0x10

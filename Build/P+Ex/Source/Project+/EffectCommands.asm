@@ -7,7 +7,7 @@ PSA command 11210X00 sets next GFX anim index [Eon, DukeItOut]
 # 11210400: PAT arg 2, CLR arg 3, VIS arg 4
 #
 # When options 200, 300 and 400 are used, the VIS, PAT and CLR
-# animations will frozen in place and use the value as a frame
+# animations are frozen in place and use the value as a frame
 # index to the first animation instead of as an animation ID!
 ##############################################################
 HOOK @ $807A55F0

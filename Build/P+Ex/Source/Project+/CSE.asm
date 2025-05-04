@@ -136,10 +136,8 @@ HOOK @ $806D2164			# process/scMelee
 	lwz r12, 0x4(r12)			# |
 	lwz r4, 0x54(r12)			# |
 	lwz r12, 0x4C(r12)			# |\
-	andis. r0, r12, 0xEC00		# || Validate Address: Specifically, checks if address is within
-	rlwinm r0, r0, 16, 16, 31   # || 0x80000000 - 0x84000000
-	cmplwi r0, 0x8000           # || 0x90000000 - 0x94000000
-	bne skipToggle				# |/ 
+	cmpwi r12, 0				# || Check if valid
+	beq skipToggle				# |/
 	lwz r12, 0x40(r12)			# |\ Check if in Sudden Death
 	cmpwi r12, 0				# ||
 	bne skipToggle				# |/
@@ -396,10 +394,8 @@ actualFile:
 	lwz r12, 0x60(r12)			# |
 	lwz r12, 0x4(r12)			# |
 	lwz r12, 0x4C(r12)			# |
-	andis. r0, r12, 0xEC00		# | Validate Address: Specifically, checks if address is within
-	rlwinm r0, r0, 16, 16, 31   # | 0x80000000 - 0x84000000
-	cmplwi r0, 0x8000           # | 0x90000000 - 0x94000000
-	bne doNotForce				# |
+	cmpwi r12, 0				# |
+	beq doNotForce				# |
 	lwz r12, 0x40(r12)			# |\
 	cmpwi r12, 0				# ||Check if in Sudden Death
 	bne startWithPinch			# //

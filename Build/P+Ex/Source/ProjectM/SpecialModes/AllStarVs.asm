@@ -1,4 +1,6 @@
-[Legacy TE] All Star Versus 1.32 LTE [wiiztec] (Knuckles added in [Eon])
+[Legacy TE] All Star Versus 1.33 LTE [wiiztec] 
+#(Knuckles added in [Eon])
+#(Training mode Battle Portrait fix [DukeItOut])
 * 4A000000 90000000
 * 08588099 000000FF
 * 000300A0 00000000
@@ -8,7 +10,7 @@
 * 08588368 00000000
 * 20030070 00000000
 
-* C2946354 00000004
+* C2946354 00000004	# Runs every frame?
 * 899E0053 1D8C0080
 * 397E005A 7D6B6214
 * 3D808059 916C82F4
@@ -22,7 +24,7 @@ loc_0x0:
   lis r12, 0x9018
   lbz r12, -3201(r12)
   cmpwi r12, 0x2
-  bne- loc_0x15C
+  bne- loc_0x15C			# Check if in All-Star Vs.
   lis r14, 0x8058
   ori r14, r14, 0x8003
   lis r15, 0x9018
@@ -178,7 +180,7 @@ exit:
 }
 
 #game start
-* C26DEFD4 0000000F
+* C26DEFD4 0000000F		# Related to launching ASV
 * 9421FF80 BC410008
 * 3D809018 898CF37F
 * 2C0C0002 9817009E
@@ -195,22 +197,22 @@ exit:
 * B8410008 38210080
 * 60000000 00000000
 
-* C26DEF94 00000003
+* C26DEF94 00000003		# Related to launching ASV
 * 3D809018 898CF37F
 * 2C0C0002 41820008
 * 887800B8 00000000
 
-* C26DEF98 00000003
+* C26DEF98 00000003		# Related to launching ASV
 * 3D809018 898CF37F
 * 2C0C0002 41820008
 * 98770098 00000000
 
-* C26DEFCC 00000003
+* C26DEFCC 00000003		# Related to launching ASV
 * 3D809018 898CF37F
 * 2C0C0002 41820008
 * 9877009D 00000000
 
-* C269680C 00000020
+* C269680C 00000020		# Related to which character to place token on
 * 3D808058 618C8000
 * 817E01B0 1D6B00A0
 * 7D8C5A14 896C009C
@@ -244,13 +246,13 @@ exit:
 * 7D0C59AE 996C009C
 * 9B9E0444 00000000
 
-* C2696610 00000004
+* C2696610 00000004		# Related to which character to place token on
 * 3D809019 898CA0E5
 * 2C0C0001 40820008
 * 38600000 2C030000
 * 60000000 00000000
 
-* C26965F8 0000000C
+* C26965F8 0000000C		# Related to which character to place token on
 * 83E301BC 3D808058
 * 618C8300 817E01B0
 * 1D6B0070 7D8C5A14
@@ -264,7 +266,7 @@ exit:
 * 7D0C5B2E 396B0002
 * 996C0068 00000000
 
-* C269A2FC 00000011
+* C269A2FC 00000011		# Related to team color
 * 809F01B8 3D809018
 * 898CF37F 2C0C0002
 * 40820074 2C0A0030
@@ -283,7 +285,7 @@ exit:
 * 996C0068 39E000FC
 * 99EC0069 00000000
 
-* C2699A9C 00000014
+* C2699A9C 00000014		# Related to character color in team
 * 809B01B8 3D809018
 * 898CF37F 2C0C0002
 * 4082008C 2C040028
@@ -305,7 +307,7 @@ exit:
 * 996C0068 39E000FC
 * 99EC0069 00000000
 
-* C268CBA0 00000011
+* C268CBA0 00000011	# Related to adding/removing members of squad
 * 80A301B8 3D809018
 * 898CF37F 2C0C0002
 * 40820074 3D808058
@@ -324,7 +326,7 @@ exit:
 * 92F7B020 3977AF80
 * 91770010 00000000
 
-* C26970EC 00000009
+* C26970EC 00000009 # Related to choosing a character on the CSS
 * 80DE01BC 3D809018
 * 898CF37F 2C0C0002
 * 40820030 3D808058
@@ -335,7 +337,7 @@ exit:
 * 39E000AC 99EC0069
 * 60000000 00000000
 
-* C281C528 0000000F
+* C281C528 0000000F	# Upon loading. Related to stock count
 * 3D809018 898CF37F
 * 2C0C0002 40820060
 * 2C083FED 4082000C
@@ -352,7 +354,7 @@ exit:
 * 90880034 8803000A
 * 60000000 00000000
 
-* C29586B4 00000008
+* C29586B4 00000008 # Related to share stock?
 * 80747C28 3D808058
 * 618C809B 1D7B00A0
 * 39E0009B 7DEC59AE
@@ -362,7 +364,7 @@ exit:
 * 7DEC58AE 39EF0001
 * 7DEC59AE 00000000
 
-* C281BC74 0000000A
+* C281BC74 0000000A	# Upon loading
 * 3D809018 898CF37F
 * 2C0C0002 4082002C
 * 8183006C 398C0001
@@ -375,30 +377,58 @@ exit:
 * 90E30078 00000000
 * 0481BCCC 48000010
 
-* C26D1CA0 00000003
+* C26D1CA0 00000003	# Unknown
 * 2C000008 41820008
 * 38000000 3863A378
 * 60000000 00000000
-* 0495506C 60000000
-* 04957DEC 60000000
-* 04947958 60000000
+
+* 0495506C 60000000	# Related to stock matches
+* 04957DEC 60000000	# Related to team stock matches
+
+HOOK @ $80947958
+{
+  lis r12, 0x9018
+  lbz r12, -3201(r12)
+  cmpwi r12, 0x2; beq- %END%		# Check if in All-Star Vs.
+  bla 0x0E1384	# remove battle portraits if not in ASV and removing a character slot!
+}
+
 * E0000000 80008000
 
-All star VS: proper respawn 1.0d [wiiztec,Magus]
-* C281EDDC 00000005
-* 8803000C 3D809018
-* 898CF37F 2C0C0002
-* 40820010 2C000002
-* 40820008 38000000
-* 60000000 00000000
-* C294FFE4 00000009
-* 3D809018 898CF37F
-* 2C0C0002 40820030
-* 815F0050 812A0044
-* 3D000300 61080100
-* 7C094000 40A20018
-* 88EA0057 2C070002
-* 4082000C 38E00001
-* 98FF0040 881F0040
-* 60000000 00000000
+################################################
+All Star VS: proper respawn 1.0d [wiiztec,Magus]
+################################################
+HOOK @ $8081EDDC		# When starting a match
+{
+  lbz r0, 0xC(r3)
+  
+  lis r12, 0x9018
+  lbz r12, -3201(r12)
+  cmpwi r12, 0x2; bne- %END%		# Check if in All-Star Vs.
+  cmpwi r0, 0x2;  bne- %END%		# Currently unknown
+  li r0, 0x0
+}
+HOOK @ $8094FFE4		# Runs every frame?!
+{
+  lis r12, 0x9018
+  lbz r12, -0xC81(r12)
+  cmpwi r12, 0x2
+  bne- loc_0x3C			# Check if in All-Star Vs.
+  
+  lwz r10, 0x50(r31)
+  lwz r9, 0x44(r10)
+  lis r8, 0x300
+  ori r8, r8, 0x100
+  cmpw r9, r8
+  bne+ loc_0x3C
+  lbz r7, 0x57(r10)
+  cmpwi r7, 0x2
+  bne- loc_0x3C
+  li r7, 0x1
+  stb r7, 0x40(r31)
+
+loc_0x3C:
+  lbz r0, 0x40(r31)		# Original operation.
+
+}
 

@@ -8,6 +8,7 @@ P+ Stamina REDUX v1.3 [wiiztec, DukeItOut, Kapedani]
 .alias ftManager__getPlayerNo					= 0x80815ad0
 .alias ftManager__getOwner						= 0x808159e4
 .alias ftManager__lostCoin						= 0x808169ec
+.alias Fighter__warp							= 0x80847274
 .alias g_ftEntryManager                     	= 0x80B87c48
 .alias ftEntryManager__getEntity            	= 0x80823b24
 .alias ftEntryManager__getEntryIdFromTaskId 	= 0x80823f90
@@ -22,6 +23,7 @@ P+ Stamina REDUX v1.3 [wiiztec, DukeItOut, Kapedani]
 .alias g_Stage									= 0x80B8A428
 .alias g_ftStatusUniqProcessDead				= 0x80b8989c
 .alias ftStatusUniqProcessDead__decCoin			= 0x8087dc18
+.alias soExternalValueAccesser__getLr 			= 0x807974c8
 .alias soExternalValueAccesser__getStatusKind 	= 0x80797608
 .alias soExternalValueAccesser__getWorkFlag  	= 0x80797710
 .alias soExternalValueAccesser__getWorkInt		= 0x807976d8
@@ -99,6 +101,10 @@ HOOK @ $80839248	# Fighter::processFixPosition
 	%call (soExternalValueAccesser__getWorkFlag)
 	cmpwi r3, 0
 	beq+ end
+	mr r3, r26
+	%call (soExternalValueAccesser__getStatusKind)
+	cmpwi r3, 0xBD
+	beq+ end 
 
 	mr r3, r26         	# \
     lwz	r12, 0x3C(r26) 	# |
@@ -141,37 +147,8 @@ HOOK @ $80839248	# Fighter::processFixPosition
 	andi. r0, r3, 0x3		# \ 
 	cmpwi r0, 0x3			# | check if attack + special is pressed
 	bne+ notSelfDestruct	# /
-	%lwd (r12, g_ftManager)	# \
-	lbz r12, 0x6a(r12)		# | check if g_ftManager->gameRule is coin mode
-	cmpwi r12, 0x2 			# |
-	bne+ selfDestruct		# /
-	# Remove coins on self destruct 
-	%lwi (r3, g_ftStatusUniqProcessDead)
-	mr r4, r28
-	%call (ftStatusUniqProcessDead__decCoin)
-	stw r3, 0x8(r1)
-	mr r3, r26
-	%lwi (r4, 0x10000000)
-	%call (soExternalValueAccesser__getWorkInt)
-	mr r4, r3
-	%lwd (r3, g_ftManager)
-	%call (ftManager__getOwner)
-	%call (ftOwner__isDropOnlyBill)
-	mr r9, r3
-	lwz r7, 0x8(r1)
-	%lwd (r3, g_itManager)
-	li r12, 0x0				# \
-	stw r12, 0x8(r1)		# |
-	%lwi (r12, 0x3f800000)	# | Speed [0.0, 1.0]
-	stw r12, 0xc(r1)		# /
-	lwz r4, 0x28(r26)		# fighter->taskId
-	lwz r12, 0xd8(r28)	# \
-	lwz r12, 0xc(r12)	# | &moduleAccesser->moduleEnumeration->postureModule->pos
-	addi r5, r12, 0xc	# /
-	addi r6, r1, 0x8	
-	li r8, 0x1			
-	%call (itManager__createMoney)
-
+destructSelf:
+	li r4, 5
 	b selfDestruct
 notSelfDestruct:
 
@@ -391,49 +368,18 @@ noSmashbreaker:
 	mtctr r12			# |
 	bctrl 				# /
 	cmpwi r3, 0x1		# \ check if subOwner (i.e. clone)
-	beq- selfDestruct	# /
+	beq- destructSelf	# /
 
 	lwz r25, 0x0(r25) 
     lwz r10, 0x34(r25)  # \
     cmplwi r10, 0x1     # | Check if ftOwnerData->stockCount == 0
     blt+ keepBody   	# /
+destruct:
+	li r4, 6			# \ 
 selfDestruct:
-	lwz r25, 0xd8(r28)		# moduleAccesser->moduleEnumeration
-	lwz r8, 0x4(r25)		# \ moduleEnumeration->modelModule->modelScale
-	lfs f0, 0x4C(r8)		# /
-	lwz r8, 0xc(r25)		# \ moduleEnumeration->postureModule->baseScale
-	lfs f1, 0x3c(r8)		# /
-	fmuls f0, f0, f1		# \ Multiply modelScale with baseScale
-	stfs f0, 0x8(r1)		# /
-	%lwd (r3, g_ecMgr)
-	addi r5, r8, 0xc		# &postureModule->pos
-	mr r24, r5
-	li r6, 0				# pointer to XYZ rotate data (0 = not read)
-	addi r7, r1, 0xc		# pointer to XYZ scale data
-	lis r4, 0x3F00			# \ 0.5x multiplier
-	stw r4, 0x0(r7)			# |
-	lfs f1, 0x0(r7)			# |
-	fmuls f0, f0, f1 		# |
-	stfs f0, 0x0(r7)		# |
-	stfs f0, 0x4(r7)		# |
-	stfs f0, 0x8(r7)		# /
-	li r4, 0x4C				# Firecracker explosion (bank 0, ID 0x4C)
-	%call (ecMgr__setEffect)
-	%lwd (r3, g_ecMgr) 
-	mr r5, r24
-	li r6, 0
-	addi r7, r1, 0xc
-	lfs f0, 0x8(r1)			# Model Scale
-	stfs f0, 0x0(r7)
-	stfs f0, 0x4(r7)
-	stfs f0, 0x8(r7)
-	lis r4, 0x104
-	ori r4, r4, 0xD  		# Blue Flash (bank 0x104, ID 0xD)
-	%call (ecMgr__setEffect)
-	li r4, -1			# \ 
 	mr r3, r26          # |
     lwz	r12, 0x3C(r26)  # | 
-	lwz r12, 0x280(r12)	# | fighter->toDead(-1)
+	lwz r12, 0x280(r12)	# | fighter->toDead(5/6)
 	mtctr r12			# |
 	bctrl				# /
 	b end
@@ -1211,44 +1157,13 @@ setPos:
 	## Prevents sticking to ground collision 
 	## Known Oddities:
 	# Falco side b due to how the move is designed stretches to where he is causing a screen wide hitbox
-	addi r4, r1, 0xc	# \
-	li r5, 0			# |
-	lwz r3, 0xd8(r31)	# |
-	lwz r3, 0x10(r3)	# | moduleAccesser->moduleEnumeration->groundModule->relocate(&pos, 0)
-	lwz r12, 0x8(r3)	# |
-	lwz r12, 0x2C(r12)	# |
-	mtctr r12			# |
-	bctrl 				# /
 
-	addi r4, r1, 0xc	# \
-	lwz r3, 0xd8(r31)	# |
-	lwz r3, 0xc(r3)		# |
-	lwz r12, 0x0(r3)	# | moduleAccesser->moduleEnumeration->postureModule->initPos(&pos)
-	lwz r12, 0x14(r12)	# |
-	mtctr r12			# |
-	bctrl 				# /
-
-	mr r3, r30			# \
-	lwz r12, 0x3c(r30)	# |
-	lwz r12, 0xb4(r12)	# | fighter->updateNodeSRT()	
-	mtctr r12			# |
-	bctrl 				# /
-
-	li r4, 0			# \
-	lwz r3, 0xd8(r31)	# |
-	lwz r3, 0x10(r3)	# | moduleAccesser->moduleEnumeration->groundModule->attachGround(0)
-	lwz r12, 0x8(r3)	# |
-	lwz r12, 0x1C8(r12)	# |
-	mtctr r12			# |
-	bctrl 				# /
-
-	li r4, 1			# \
-	lwz r3, 0xd8(r31)	# |
-	lwz r3, 0x10(r3)	# | moduleAccesser->moduleEnumeration->groundModule->update(1)
-	lwz r12, 0x8(r3)	# |
-	lwz r12, 0x34(r12)	# |
-	mtctr r12			# |
-	bctrl 				# /
+	mr r3, r30
+	%call(soExternalValueAccesser__getLr)
+	mr r3, r30
+	addi r4, r1, 0xc
+	li r5, 0x2
+	%call (Fighter__warp)
 
 	%lwd (r12, g_ftManager)	# \
 	lbz r12, 0x6a(r12)		# | check if g_ftManager->gameRule is coin mode
@@ -1424,37 +1339,6 @@ noLink:
 	mtctr r12 			# |
 	bctrl				# /
 noAddDamage:
-
-	## Prevents hitboxes interpolating during warp
-	mr r3, r30        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x14(r12)	# |	fighter->processUpdate()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r30        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x18(r12)	# |	fighter->processPreMapCorrection()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r30        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x1C(r12)	# |	fighter->processMapCorrection()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r30        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x24(r12)	# |	fighter->processPreCollision()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r30        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x24(r12)	# |	fighter->processPreCollision()
-	mtctr r12 			# |
-	bctrl				# /
 	
 dontWarp:
 	li r28, -1
@@ -1619,36 +1503,6 @@ setPos:
 	addi r4, r1, 0x20
 	%call(BaseItem__warp)
 
-	## Prevents hitboxes interpolating during warp
-	mr r3, r31        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x14(r12)	# |	item->processUpdate()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r31        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x18(r12)	# |	item->processPreMapCorrection()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r31        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x1C(r12)	# |	item->processMapCorrection()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r31        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x24(r12)	# |	item->processPreCollision()
-	mtctr r12 			# |
-	bctrl				# /
-
-	mr r3, r31        	# \
-    lwz	r12, 0x3C(r3)  	# | 
-	lwz r12, 0x24(r12)	# |	item->processPreCollision()
-	mtctr r12 			# |
-	bctrl				# /
 	li r3, 0x0
 	%branch(0x80994e6c)
 

@@ -1,6 +1,6 @@
-###################################################################################
-Custom Physics Engine (Actions, Subactions FastFall) V1.3 [Magus, Almas, DukeItOut]
-###################################################################################
+####################################################################################
+Custom Physics Engine (Actions, Subactions FastFall) V1.3a [Magus, Almas, DukeItOut]
+####################################################################################
 HOOK @ $8085765C
 {
   lwz r31, 0x70(r29)
@@ -8,7 +8,7 @@ HOOK @ $8085765C
   lwz r31,0x0C(r31)
   lwz r31,0x2D0(r31)
   lwz r31, 0x08(r31)
-  lis r30, 0x9000; cmpw r31, r30; bgtlr
+  lis r30, 0x9340; cmpw r31, r30; bgtlr
   lwz r31,0x110(r31)
   
   cmplwi r31, 0x7F    # \ Change this ID if using Brawl EX
@@ -249,7 +249,18 @@ Custom Physics Data
 # action 0x0D: Multijump
 # action >0x111: Special move
 # first byte for each block is the character
-# second byte is ???
+# second byte is the IC-Basic to intercept?
+# 0x04 (3004): Friction
+# 0x06 (3006): Dash & Run Accel A
+# 0x08 (3008): Dash & Run Terminal Velocity
+# 0x17 (3023): Gravity
+# 0x18 (3024): Terminal Velocity
+# 0x19 (3025): V Air Friction
+# 0x1A (3026): Aerial Max Fall Speed
+# 0x1B (3027): Air Mobility A
+# 0x1C (3028): Air Mobility B
+# 0x1D (3029): Max H Air Mobility
+# 0x1E (3030): H Air Friction
 # half is the action/subaction
 # float is the value to modify into
 PHYSICS_DATA:
@@ -368,6 +379,20 @@ PHYSICS_DATA:
 	byte[2] 0x2F, 0x06; half 4; float 0.28			# Sonic
 	byte[2] 0x2F, 0x06; half 8; float 0.175			#	Turning around
 	byte[2] 0x2F, 0x08; half 3; float 2.5			#	Dashing
+	
+	byte[2] 0x6A, 0x06; half 4; float 0.59			# Red Alloy Ex
+	byte[2] 0x6A, 0x1B; half 0x81D6; float 0.024	# \
+	byte[2] 0x6A, 0x1B; half 0x81D7; float 0.024	# |
+	byte[2] 0x6A, 0x1D; half 0x81D6; float 0.952	# | Falcon Dive physics
+	byte[2] 0x6A, 0x1D; half 0x81D7; float 0.952	# |
+	byte[2] 0x6A, 0x1E; half 0x81D6; float 1.12		# |
+	byte[2] 0x6A, 0x1E; half 0x81D7; float 1.12		# /
+	
+	byte[2] 0x6B, 0x06; half 4; float 0.58			# Blue Alloy Ex
+	
+	byte[2] 0x6C, 0x06; half 4; float 0.38			# Yellow Alloy Ex
+	
+	byte[2] 0x6D, 0x06; half 4; float 0.48			# Green Alloy Ex
 	
 Skip:
 .RESET

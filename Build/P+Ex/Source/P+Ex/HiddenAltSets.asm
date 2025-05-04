@@ -20,12 +20,16 @@ op lwz r6, 0x0A18 (r28) @ $8084CE28 # Load pointer to "Dark" string!
 op lwz r7, 0x0A14 (r28) @ $8084CE30 # Load pointer to ".pac" string!
 
 #################################################################################################
-Hidden Alt Costume Sets Rework v1.1.5 [QuickLava]
+Hidden Alt Costume Sets Rework v1.2.0 [QuickLava]
 # v1.1.5
 # - Raised AltIDRangeStart to 60 to maintain support for Costume IDs 50-59
 # - Lowered NumAltIDsStart to 68 so IDs 50-59 have corresponding Alt IDs
 # - Introduced proper NumAlt ID Range Check, so NumAlt Behavior can be limited to a range of IDs (or disabled if NumAltIDsEnd set to 0).
 # - Introduced AltIDRangeEnd, so Alt behavior can be disabled past a certain ID.
+# v1.1.6
+# - Corrected oversight preventing G&W's Dark costume from loading in SSE 
+# v1.2.0
+# - Per-Costume Entry, Result, and Final.pac properly support alt costumes. 
 #################################################################################################
 .alias AltIDRangeStart          = 60    # \ Costume IDs within this (inclusive) range are considered reserved for Alts!
 .alias AltIDRangeEnd            = 127   # / Any below IDs that fall outside of this range *will not* be loaded!
@@ -71,7 +75,7 @@ Hidden Alt Costume Sets Rework v1.1.5 [QuickLava]
     ori r11, r11, 0x2B60                # | Compare that against the location of the "sqAdventure" string constant...
     cmplw cr7, r11, r12                 # / ... and store the result in CR7, so the result can be reused if necessary!
 }
-# Sets 
+# Sets the DestCRBit of DestCRF to 1 if within range, 0 otherwise.
 .macro IDWithinAltRange(<IDReg>, <DestCRF>, <WorkCRF>, <DestCRBit>)
 {
   .alias tmp1 = <DestCRF> + <DestCRF>
@@ -94,11 +98,11 @@ op b 0x1C @ $8084CFBC                   # [in "req/[ftDataProvider]/ft_data_prov
 .GOTO -> LocalMemoryEnd
 LocalMemoryStart:                       # We're going to use this area as a space to store some variables and constants!
 word 0x00000000                         # These 4 bytes store the requested Alt Type for each player slot!
-string[6] |                             # These are the string constants we'll be using to load different sets of files.
+string[7] |                             # These are the string constants we'll be using to load different sets of files.
 "EtcAlt", "AltZ", "AltR",|
 "/fighter/%s%s%s%s",|
 "/fighter/%s%s%02d%s",|
-"_00"
+"_00", "%s%s%02d"
 LocalMemoryEnd:
 .alias AltRequestLocalMemOff   = 0x00
 .alias EtcAltStrLocalMemOff    = 0x04
@@ -108,6 +112,7 @@ LocalMemoryEnd:
 .alias StrAltFmtStrLocalMemOff = 0x15
 .alias NumAltFmtStrLocalMemOff = 0x27
 .alias KHatAltStrLocalMemOff   = 0x3B
+.alias FlexFmtStrLocalMemOff   = 0x3F
 .BA -> $8084CE38
 .alias LocalMemoryAddrLoc = 0x8084CE38  # We're gonna store the address for this in the area skipped by the first .pcs skip above!
 .RESET                                  # And finally reset BA and PO.
@@ -305,6 +310,7 @@ NumAlt:                                 # If we are though...
 # G&W Alt Costume Compatibility Fix!
 HOOK @ $8084CDDC               # [in "req/[ftDataProvider]/ft_data_provider.o" @ $8084C368, Ghidra: $8085AD68]
 {
+  rlwinm r0, r31, 2, 0, 29              # Restore instruction overwritten by the the `op bne` beneath this hook!
   %sqAdvCheck()
   bne+ cr7, notSSE                      # If not in SSE, skip Dark check.
   cmplwi r23, 12                        # \
@@ -350,6 +356,76 @@ HOOK @ $8084DF28                # [in "req/[ftDataProvider]/ft_data_provider.o" 
   lis r12, 0x5200                       # Only other option is R-Alt, load null-terminated "R" into r12, but no branch cuz we're here already.
 writeToAltStr:
   stw r12, 0x1(r6)
+}
+
+# Per-Costume Final.pac Support
+HOOK @ $8084D53C                # [0x11D4 bytes into symbol "req/[ftDataProvider]/ft_data_provider.o" @ 0x8084C368]
+{
+  %IDWithinAltRange(r23, 0, 1, 2)       # \
+  bne exit                              # /  Check if the Costume ID is within the Alt Range, and if it isn't skip!
+  %lwd(r11, LocalMemoryAddrLoc)         # If instead we *are* looking at an Alt, grab the pointer to our local memory, cuz we'll stage our string there.
+  subi r7, r23, NumAltIDsStart          # Pre-emptively set up NumAlt ID!
+  addi r4, r11, FlexFmtStrLocalMemOff   # Point r4 to our custom format string, since we'll need it here.
+  li r0, 0x00                           # Init r0 to 0x00, which we'll use to cut our format string short if we're not on a num alt.
+  addi r6, r11, AltZStrLocalMemOff      # Set up the "AltZ" string, assuming that's what we want.
+  cmplwi r23, AltZID                    # Then compare against the Z-Alt ID...
+  beq apply                             # ... and if we match, jump down to using that ID.
+  addi r6, r11, AltRStrLocalMemOff      # Otherwise, set up "AltR" string.
+  cmplwi r23, AltRID                    # Compare agaisnt R-Alt ID...
+  beq apply                             # ... and if that matches, skip Num Alt code.
+numAlt:                                 # Otherwise, we *are* looking at a Numbered Alt!
+  li r0, 0x25                           # So set r0 back to '%' to un-cut our format string...
+  addi r6, r11, Alt0StrLocalMemOff      # ... and point r6 to the "Alt" string which we'll need here.
+apply:
+  stb r0, 0x04(r4)                      # Store r0, either cutting or un-cutting our format string.
+exit:
+  crclr 6, 6                            # Restore Original Instruction
+}
+# Per-Costume Entry.pac Support
+HOOK @ $8084D838                # [0x14D0 bytes into symbol "req/[ftDataProvider]/ft_data_provider.o" @ 0x8084C368]
+{
+  %IDWithinAltRange(r23, 0, 1, 2)       # \
+  bne exit                              # /  Check if the Costume ID is within the Alt Range, and if it isn't skip!
+  %lwd(r11, LocalMemoryAddrLoc)         # If instead we *are* looking at an Alt, grab the pointer to our local memory, cuz we'll stage our string there.
+  subi r7, r23, NumAltIDsStart          # Pre-emptively set up NumAlt ID!
+  addi r4, r11, FlexFmtStrLocalMemOff   # Point r4 to our custom format string, since we'll need it here.
+  li r0, 0x00                           # Init r0 to 0x00, which we'll use to cut our format string short if we're not on a num alt.
+  addi r6, r11, AltZStrLocalMemOff      # Set up the "AltZ" string, assuming that's what we want.
+  cmplwi r23, AltZID                    # Then compare against the Z-Alt ID...
+  beq apply                             # ... and if we match, jump down to using that ID.
+  addi r6, r11, AltRStrLocalMemOff      # Otherwise, set up "AltR" string.
+  cmplwi r23, AltRID                    # Compare agaisnt R-Alt ID...
+  beq apply                             # ... and if that matches, skip Num Alt code.
+numAlt:                                 # Otherwise, we *are* looking at a Numbered Alt!
+  li r0, 0x25                           # So set r0 back to '%' to un-cut our format string...
+  addi r6, r11, Alt0StrLocalMemOff      # ... and point r6 to the "Alt" string which we'll need here.
+apply:
+  stb r0, 0x04(r4)                      # Store r0, either cutting or un-cutting our format string.
+exit:
+  crclr 6, 6                            # Restore Original Instruction
+}
+# Per-Costume Result.pac Support
+HOOK @ $8084DB14                # [0x17AC bytes into symbol "req/[ftDataProvider]/ft_data_provider.o" @ 0x8084C368]
+{
+  %IDWithinAltRange(r23, 0, 1, 2)       # \
+  bne exit                              # /  Check if the Costume ID is within the Alt Range, and if it isn't skip!
+  %lwd(r11, LocalMemoryAddrLoc)         # If instead we *are* looking at an Alt, grab the pointer to our local memory, cuz we'll stage our string there.
+  subi r7, r23, NumAltIDsStart          # Pre-emptively set up NumAlt ID!
+  addi r4, r11, FlexFmtStrLocalMemOff   # Point r4 to our custom format string, since we'll need it here.
+  li r0, 0x00                           # Init r0 to 0x00, which we'll use to cut our format string short if we're not on a num alt.
+  addi r6, r11, AltZStrLocalMemOff      # Set up the "AltZ" string, assuming that's what we want.
+  cmplwi r23, AltZID                    # Then compare against the Z-Alt ID...
+  beq apply                             # ... and if we match, jump down to using that ID.
+  addi r6, r11, AltRStrLocalMemOff      # Otherwise, set up "AltR" string.
+  cmplwi r23, AltRID                    # Compare agaisnt R-Alt ID...
+  beq apply                             # ... and if that matches, skip Num Alt code.
+numAlt:                                 # Otherwise, we *are* looking at a Numbered Alt!
+  li r0, 0x25                           # So set r0 back to '%' to un-cut our format string...
+  addi r6, r11, Alt0StrLocalMemOff      # ... and point r6 to the "Alt" string which we'll need here.
+apply:
+  stb r0, 0x04(r4)                      # Store r0, either cutting or un-cutting our format string.
+exit:
+  crclr 6, 6                            # Restore Original Instruction
 }
 
 ######################################################################

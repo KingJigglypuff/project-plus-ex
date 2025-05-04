@@ -155,17 +155,17 @@ end:
 
 
 #########################################################################################################################################################################
-L-Cancel Landing Lag and Success Rate and Score Display is Auto L-Cancel Option + White L-cancel Flash v3.1a [Magus, Standardtoaster, wiiztec, Eon, DukeItOut, QuickLava]
+L-Cancel Landing Lag and Success Rate and Score Display is Auto L-Cancel Option + White L-cancel Flash v3.5 [Magus, Standardtoaster, wiiztec, Eon, DukeItOut, QuickLava]
 #
 # 3.1: Added replay support
 # 3.1a: Fixed Multiman Brawl Alloy crash.
+# 3.5: Removed Purple Flash on Missed L-Cancel w/ Input Buffer On, Reworked Logic so Fail Flash Triggers Only if Enabled!
 #########################################################################################################################################################################
 #check frame = 6 and disable flash
 # Code Menu mod made by Desi, based on Per Player versions by wiiztec
 
-.alias CodeMenuStart = 0x804E
-.alias CodeMenuHeader = 0x02A8       #Offset of word containing location of the player 1 toggle. Source is compiled with headers for this.
-.alias CodeMenuHeaderInputBuffer = 0x2C4
+.alias CM_P1_ALC_LOC_HI = 0x804E
+.alias CM_P1_ALC_LOC_LO = 0x02A8
 
 HOOK @ $80874850 
 {
@@ -185,134 +185,105 @@ end:
 }
 #land and detect lcancel state, set flash and stat appropriately
 op nop @ $8081BE8C
-HOOK @ $8087459C
-{
-loc_0x0:
-                            # Multiman Brawl Fix
-  lwz r11, 28(r31)          # \
-  lwz r11, 40(r11)          # |
-  lwz r11, 16(r11)          # | Obtain Player ID...
-  lbz r11, 85(r11)          # /
-  cmplwi r11, 0x3           # \ ... and check if it corresponds to a valid slot.
-  ble+ validPlayerID        # / If it does, continue through L-Cancel code.
-  fdivs f31, f31, f0        # If it doesn't, just do the normal operation...
-  b %END%                   # ... and exit.
+HOOK @ $8087459C                    # [0x198 bytes into symbol "execStatus/[ftStatusUniqProcessLanding]/ft_status_uniq_pr" @ 0x808746B8]
+{                                   
+  lfs f0, -0x5B98(r2)               # Load default L-Cancel Lag Multiplier, since we may need it later!
+                                    # Get LA-Basic[90]
+  lwz r3, 0xD8(r31)                 # \
+  lwz r3, 0x64(r3)                  # / Get soWorkManageModule* from ModuleAccesser
+  lis r4, 0x1000                    # \
+  ori r4, r4, 90                    # / Prepare LA-Basic[90] ID (0x1000005A) in r4
+  lwz r12, 0x0(r3)                  # \
+  lwz r12, 0x18(r12)                # |
+  mtctr r12                         # | Call getInt to get value!
+  bctrl                             # / 
+  cmpwi cr7, r3, 0                  # Check if returned value is 0 (in CR7, to reuse it later)...
+  ble cr7 checkForAutoLcancel       # ... and if so, L-Cancel input failed, check for Auto L-Cancel!
+                                    
+trueLcancel:                        # Otherwise, the input succeeded!
+  fmuls f30, f30, f0                # Apply Landing Lag Multiplier Reduction
+  lis r0, 0xFFFF                    # \
+  ori r0, r0, 0xFFDC                # / Prepare Flash Color
+  b applyFlashThenCalcStat          # Apply the flash and calc!
+                 
+				 
+checkForAutoLcancel:                
+  li r0, 0x00                       # Assume by default that we don't want Fail Flash, so zero our Flash Color to start!
+                                    # Then, check the Code Menu's settings for this slot!
+  lwz r12, 0xD8(r31)                # \
+  lwz r12, 0x10(r12)                # / Get soGroundModule* from ModuleAccesser...
+  lwz r12, 0x28(r12)                # \ 
+  lwz r12, 0x10(r12)                # |
+  lbz r12, 0x55(r12)                # / ... somehow get Player ID through the soGroundShape Vector?
+  cmplwi r12, 0x04                  # Check if this Fighter is in Slot 4 or higher...
+  bge- checkGlobalALC               # ... and if so, they don't have Code Menu lines to check, so skip to checking Global ALC!
+             
+			 
+handleCodeMenuALCSettings:                   
+  lis r11, CM_P1_ALC_LOC_HI         # \
+  rlwimi r11, r12, 2, 16, 29        # | Get this Fighter's ALC Line Address in r11!
+  lwz r11, CM_P1_ALC_LOC_LO(r11)    # /
+  lwz r12, 0x08(r11)                # Load the current setting from the line.
+  cmplwi cr1, r12, 0x1              # Compare the current setting against 0x1, storing the result in the CR1 for re-use later!
+  lhz r12, 0x00(r11)                # Get the ALC line's size...
+  lhzux r12, r11, r12               # ... LHZUX to push r11 forward to the ALC Modifier Line, while also grabbing its size!
+  ble+ cr1, checkFailFlash          # If the setting is less than or equal to 0x1, we're not on Modified ALC, so skip handling it!
+  lfs f0, 0x08(r11)                 # Otherwise though, replace the default multiplier with the one specified in the ALC Modifier line!
+  lis r0, 0x8000                    # \ 
+  ori r0, r0, 0x8080                # / Additionally, overwrite our Flash Color with Purple to signify we used the Modified Multiplier...
+  b applyCodeMenuALCMult            # ... and skip checking for Fail Flash, cuz we want Modified Flash to overrule that!
+checkFailFlash:                     
+  add r11, r11, r12                 # Jump forward now again to the Fail Flash Line...
+  lwz r12, 0x08(r11)                # ... and load its current setting.
+  cmplwi r12, 0x00                  # Check if it's set to off...
+  beq+ applyCodeMenuALCMult         # ... and if so, just skip to applying the multiplier.
+  lis r0, 0xFF00                    # \ 
+  ori r0, r0, 0x0080                # / Otherwise though, set our Flash Color to Red instead!
+applyCodeMenuALCMult:               
+  blt+ cr1, checkGlobalALC          # Finally, if Code Menu ALC was off, then skip down to checking if Global ALC was instead!
+  fmuls f30, f30, f0                # Otherwise though, apply our Landing Lag Multiplier...
+  b applyFlashThenCalcStat          # ... then apply flash and calc!
+                             
+							 
+checkGlobalALC:                     # Next, check if Global ALC is on!
+  lis r12, 0x805A                   # 
+  lwz r12, 0xE0(r12)	            #
+  lwz r12, 0x08(r12)		        #
+  lbz r12, 0xE5(r12)	            # 0x4D (+ 0x98)
+  andi. r12, r12, 1                 # Check Global ALC Bit...
+  beq applyFlashThenCalcStat        # ... and if it was 0, then Global ALC is off, skip applying our multiplier!
+  fmuls f30, f30, f0                # Otherwise though, apply Landing Lag Multiplier, and flow into applying flash!
+
   
-validPlayerID:
-#get LA-Basic[90]
-  lwz r3, 0xD8(r31)
-  lwz r3, 0x64(r3)
-  lis r4, 0x1000
-  ori r4, r4, 90
-  
-  lwz r12, 0x0(r3)
-  lwz r12, 0x18(r12)
-  mtctr r12
-  bctrl 
-  cmpwi r3, 0
-  ble checkForAutoLcancel
-trueLcancel:
-  #Set R0 to White, branch to Apply Flash
-  lis r0, 0xFFFF
-  ori r0, r0, 0xFFDC
-  bl 0x4  #set LR
-  mflr r11 #Store Link Register in R11
-  addi r11, r11, 0xC
-  bl applyFlash
-  li r6, 1
-  lfs f0, -23448(r2)
-  fmuls f30, f30, f0
-  b calcStat
+applyFlashThenCalcStat:             # Flash then Calc! Set r0 to color (0xRRGGBBAA)!
+  lwz r3, 0xD8(r31)                 # \
+  lwz r3, 0xAC(r3)                  # / Get soColorBlendModule from ModuleAccesser
+  addi r4, r1, 0x18                 # \
+  stw r0, 0(r4)                     # / Setup Initial Colour
+  li r5, 1                          # 
+  lwz r12, 0(r3)                    # \
+  lwz r12, 0x24(r12)                # |
+  mtctr r12                         # | Call setFlash!
+  bctrl                             # / 
+                                    # 
+  lwz r3, 0xD8(r31)                 # \
+  lwz r3, 0xAC(r3)                  # / Get soColorBlendModule from ModuleAccesser again.
+  lis r0, 0x40C0                    # \
+  stw r0, 0x18(r1)                  # | Setup time to transition.
+  lfs f1, 0x18(r1)                  # /
+  lis r0, 0xFFFF                    # \
+  ori r0, r0, 0xFF00                # |
+  addi r4, r1, 0x18                 # | Setup target transition color!
+  stw r0, 0(r4)                     # /
+  li r5, 1                          #
+  lwz r12, 0x0(r3)                  # \
+  lwz r12, 0x28(r12)                # |
+  mtctr r12                         # | Call setFlashColorFrame!
+  bctrl                             # /
 
-checkForAutoLcancel: 
-  lwz r11, 28(r31)          #\Obtain Player ID 
-  lwz r11, 40(r11)          #|
-  lwz r11, 16(r11)          #|
-  lbz r11, 85(r11)          #/
-  mulli r11, r11, 0x4       #Determine which player offset to load
-  lis r6, CodeMenuStart
-  ori r6, r6, CodeMenuHeader    #Load Code Menu Header
-  lwzx r6, r6, r11
-  lbz r11, 0xB(r6)     #Load Option Selection
-  cmpwi r11, 0x1
-  beq applyLCancelRedFlash
-  cmpwi r11, 0x2
-  beq applyModifiedLCancelFlash
-  lis r11, 0x805A
-  lwz r11, 0xE0(r11)	
-  lwz r11, 0x08(r11)		
-  lbz r11, 0xE5(r11)	# 0x4D (+ 0x98)
-  andi. r11, r11, 1	# bit used for ALC
-  bne applyLcancel  #Skip applying fail flash if universal option is on
-  lhz r11, 0 (r6)
-  add r6, r11, r6   #Load up next toggle (Modifier)
-  lhz r11, 0 (r6)
-  add r6, r11, r6   #Load up next toggle (Red Flash on L Cancel)
-  lbz r11, 0xB(r6)     #Load Option Selection
-  cmpwi r11, 0x1
-  beq applyRedFlashNoCancel
-  b checkForInputBuffer
 
-applyRedFlashNoCancel:
-  lis r0, 0xFF00      #Red Flash
-  ori r0, r0, 0x0080
-  bl 0x4  #set LR
-  mflr r11 #Store Link Register in R11
-  addi r11, r11, 0xC
-  bl applyFlash
-  li r6, 0
-  b checkForInputBuffer
-
-applyModifiedLCancelFlash:
-  lhz r11, 0 (r6)
-  add r6, r11, r6
-  lfs f0, 0x8 (r6)
-  fmuls f30, f30, f0
-  lis r0, 0x8000      #Purple Flash for Modified Values
-  ori r0, r0, 0x8080
-  bl 0x4  #set LR
-  mflr r11 #Store Link Register in R11
-  addi r11, r11, 0xC
-  bl applyFlash
-  li r6, 0
-  b calcStat
-
-applyLCancelRedFlash:
-  lis r0, 0xFF00    #RedFlash
-  ori r0, r0, 0x0080
-  bl 0x4  #set LR
-  mflr r11 #Store Link Register in R11
-  addi r11, r11, 0x0C
-  bl applyFlash
-applyLcancel:
-  lfs f0, -23448(r2)
-  fmuls f30, f30, f0
-  li r6, 0
-
-checkForInputBuffer:
-  lwz r11, 28(r31)          #\Obtain Player ID 
-  lwz r11, 40(r11)          #|
-  lwz r11, 16(r11)          #|
-  lbz r11, 85(r11)          #/
-  mulli r11, r11, 0x4       #Determine which player offset to load
-  lis r4, CodeMenuStart
-  ori r4, r4, CodeMenuHeaderInputBuffer    #Load Code Menu Header
-  lwzx r4, r4, r11
-  lbz r4, 0xB(r4)     #Load Option Selection
-  cmpwi r4, 0
-  beq calcStat
-  lis r0, 0xB000    #Apply Purple Flash indicating Input Buffer
-  ori r0, r0, 0xFF80
-  bl 0x4  #set LR
-  mflr r11 #Store Link Register in R11
-  addi r11, r11, 0xC
-  bl applyFlash
-  li r6, 0
-
-#everything past this point is for the stat
-calcStat:
+calcStat:                           # Everything past this point is for the stat!
 #add one to total aerial count
-  cmpwi r6, 0x0
   lis r6, 0x80B8
   ori r6, r6, 0x8394
   lfs f6, 0(r6)
@@ -339,7 +310,7 @@ calcStat:
   addi r5, r5, 0x850
 
 #check lcancel occured
-  ble loc_0x98
+  ble cr7 loc_0x98
 #successful L-cancel
   lis r6, 0x80B8
   ori r6, r6, 0x8394
@@ -372,45 +343,6 @@ loc_0x98:
   fsub f30, f30, f0
   fadds f31, f31, f1
   fdivs f31, f31, f30
-  b %end%
-
-
-applyFlash:
-  #Set r0 to color. First 6 digits are color, last 2 digits are opacity.
-    #start flash effect
-  lwz r3, 0xD8(r31)
-  lwz r3, 0xAC(r3)
-
-  #initial colour
-  addi r4, r1, 0x18
-  stw r0, 0(r4)
-
-  li r5, 1
-  lwz r12, 0(r3)
-  lwz r12, 0x24(r12)
-  mtctr r12
-  bctrl
-
-  lwz r3, 0xD8(r31)
-  lwz r3, 0xAC(r3)
-  #time to transition
-  lis r0, 0x40C0
-  stw r0, 0x18(r1)
-  lfs f1, 0x18(r1)
-  #target colour of transition
-  lis r0, 0xFFFF
-  ori r0, r0, 0xFF00
-  addi r4, r1, 0x18
-  stw r0, 0(r4)
-  #true
-  li r5, 1
-
-  lwz r12, 0x0(r3)
-  lwz r12, 0x28(r12)
-  mtctr r12
-  bctrl
-  mtlr r11
-  blr
 }
 
 ##############################################

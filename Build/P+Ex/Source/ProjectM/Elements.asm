@@ -39,13 +39,14 @@ waterElement:
   lfs f1, 0x10(r2)  # /
 }
 
-#######################
-Green Fire Thaws [ds22]
-#######################
+###############################
+Green Fire and Aura Thaw [ds22]
+###############################
 HOOK @ $8088BA4C
 {
-  cmplwi r0, 5;  beq- %END%
-  cmplwi r0, 15
+  cmplwi r0, 5;  beq- %END% # Is it fire?
+  cmplwi r0, 15; beq- %END% # Is it green fire?
+  cmplwi r0, 21 # Is it aura?
 }
 
 ################################

@@ -4,7 +4,8 @@
 # -it points to Netplay/Net-MyMusic.asm instead of Project+/MyMusic.asm
 # -string "/sound/tracklist/" -> "sound/netplaylist/"
 #
-#################################
+###
+##############################################
 Stage File System Neo v2 [DukeItOut, Kapedani]
 ##############################################
 	.BA<-FileFormatSetup
@@ -488,16 +489,17 @@ Custom Stage SD File Loader [DukeItOut, Kapedani]
 
 .alias g_GameGlobal                 = 0x805a00E0
 .alias g_mtRand_net					= 0x805a0420
+.alias ftInfo__getNamePtr			= 0x808588d8
+.alias ftKindConversion__convertKind = 0x808545ec
 .alias ipSwitch__getInstance		= 0x8004a750
 .alias gfFileIORequest__setReadParam	= 0x8002239c
 .alias gfFileIO__readFile			= 0x8001bf0c
 .alias sprintf						= 0x803f89fc
 
-.alias RSS_EXDATA_BONUS				= 0x806AEE18
+.alias RSS_EXDATA_BONUS				= 0x8042C840 
 .alias ASL_DATA						= 0x8053F000
 .alias TRACKLIST_DATA				= 0x8053F200
-.alias BRAWLEX_FIGHTER_IDS       	= 0x80AD8258 #0x817C8680
-.alias BRAWLEX_FIGHTER_NAMES        = 0x80B511A0 #0x817CD820
+.alias CODEMENU_ASL_LOC				= 0x804E00E8
 
 .macro lbd(<reg>, <addr>)
 {
@@ -577,20 +579,23 @@ Reload:
 	lwz r5, -0x1C(r22)		# "/stage/"
 	lwz	r6, -0x18(r22)		# "stageslot/" 
 	lwz	r8, -0x10(r22)		# ".asl"
-	lwz	r10, -0x10(r22)		# ".asl"
 
 	cmpwi r7, 0x38			# \ check if targetsmash
 	bne+ notSpecialStage	# /
-	%lwi (r7, 0x80B2EC03)	# "tBreak"
 	%lwd (r12, g_GameGlobal)	
 	lwz r12, 0x8(r12)			# \ g_GameGlobal->modeMelee->playerInitData[0].characterKind
-	lbz r9, 0x98(r12)			# /
-    %lwi (r12, BRAWLEX_FIGHTER_IDS)  # Internal BrawlEX fighter slot info 	
-    mulli r9, r9, 0x10      # Offsets are 0x10 apart
-	lwzx r9, r12, r9		# Fighter slot ID
-    %lwi (r12, BRAWLEX_FIGHTER_NAMES)	# Internal BrawlEX internal fighter names
-    mulli r9, r9, 0x10      # Offsets are 0x10 apart
-    add r9, r12, r9         # r4 now contains a pointer to the character filename when using P+EX
+	lbz r3, 0x98(r12)			# /
+	addi r4, r1, 0x90
+	%call (ftKindConversion__convertKind)
+	lwz r4, 0x90(r1)
+	li r3, 0x0
+	%call (ftInfo__getNamePtr)
+	mr r9, r3
+	addi r3, r1, 0x90
+	lwz r5, -0x1C(r22)		# "/stage/"
+	lwz	r6, -0x18(r22)		# "stageslot/"
+	lwz	r10, -0x10(r22)		# ".asl"
+	%lwi (r7, 0x80B2EC03)	# "tBreak"
 	%lwi (r4, 0x8048EFF0)	# "%s%s%s%s%s%s"
 	addi r8, r5, 0x6		# "/"
 notSpecialStage:
@@ -627,6 +632,14 @@ Replay:
 	li		r0, 0xFF			# r0 was overwritten, but we still need it!
 	b notRandom
 Multiplayer:    	
+	li r31, 0x2 
+	%lwd(r12, CODEMENU_ASL_LOC)		# Attempt to grab the address of the Alt Stage line from the Code Menu.
+	cmplwi r12, 0x00				# If the line doesn't exist though...
+	beq skipToCheck					# ... skip trying to load its value, cuz we'd crash otherwise.
+	lwz r12, 0x08(r12)				# If it *does* exist though, load its value!
+skipToCheck:
+	cmpwi r12, 0x1
+	beq+ startRandomLoop
 	%lbd (r31, RSS_EXDATA_BONUS)	# \ 
 	andi. r0, r31, 0x10 			# | check if 0x10 bit is on (don't select random)
 	bne- notRandom					# / 
@@ -685,8 +698,11 @@ notRandom:
 	lhz r12, 4(r22)			# \ Get the slot count
 	mtctr r12 				# /
 	%lwd (r12, g_GameGlobal)
+	lwz r10, 0x18(r12)		# g_GameGlobal->resultInfo
     cmpwi r27, 0x28		# \ check if results
 	beq+ isResult		# /
+	cmpwi r27, 0x39				# \ check if cRoll
+	beq+ getCharacterKind		# /
 	cmpwi r27, 0x38		# \ check if target smash
 	bne- loop			# /
 	lwz r12, 0x8(r12)	# \ turn substages into input so bonus stages can have their own param
@@ -694,14 +710,14 @@ notRandom:
 	b loop
 isResult:
 	li r16, 0x0
-	lwz r12, 0x18(r12)		# g_GameGlobal->resultInfo
-	lbz r11, 0x11(r12)		# \
+	lbz r11, 0x11(r10)		# \
 	cmpwi r11, 0x0			# | check if noContest
 	beq+ loop				# /
-	lbz r11, 0x1f(r12)		# |
+	lbz r11, 0x1f(r10)		# |
 	mulli r11, r11, 0x2ac	# | turn g_GameGlobal->resultInfo->playerResultInfo[winningPlayer].characterKind so that can have per character results screen
-	add r12, r12, r11		# |
-	lbz r16, 0x24(r12)		# |
+	add r10, r10, r11		# | 
+getCharacterKind:
+	lbz r16, 0x24(r10)		# |
 	addi r16, r16, 0x1		# /
 loop:	
 	# r29 - Most accurate choice, defaulting to the start
@@ -824,6 +840,21 @@ If No Song Titles Are Found, Obtain Them From The TLST File [DukeItOut, Kapedani
 #################################################################################
 .alias tlstHeaderSize = 0xC		# Data block size for the header
 .alias tlstSongSize = 0x10		# Data block size for each available song
+
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+
 # 
 op b -0x158 @ $800DE81C # Go to below
 op li r5, -2 @ $800DE6D4
@@ -862,7 +893,7 @@ foundSong:
 
 	add r6, r6, r9
 	add r5, r12, r6
-	bla 0x0b9230		# MuMsg::printf
+	%call(0x800b9230) #bla 0x0b9230		# MuMsg::printf
 
 	li r3, 1				# Force it to assume it is successful
 	b %end%
@@ -1021,7 +1052,7 @@ forceSkip:
 }
 	
 .include source/Netplay/Net-MyMusic.asm		# Integrated heavily into the above!
-.include source/Netplay/Net-Random.asm		# Custom random code to load expansion and non-striked slots, properly
+.include source/Netplay/Net-Random.asm			# Custom random code to load expansion and non-striked slots, properly
 
 #####################################################################################################
 [Legacy TE] Hold Y on Smashville to Guarantee a Concert V2 (requires ASL Helper and SFSN) [DukeItOut]
@@ -1078,7 +1109,9 @@ SSSRES:Stage Selection Screen Roster Expansion System (RSBE.Ver) v1.3 [JOJI, Duk
 # 1.3: Compatibility with new random
 #################################################################################################
 .alias g_muSelectStageFileTask		= 0x806BB388
-.alias STAGELIST_TYPE				= 0x806AEE1A
+.alias STAGELIST_TYPE				= 0x8042C842 #0x806AEE1A
+.alias STAGE_PAGES					= 0x8042C524
+.alias STAGE_PAGES_IDS				= 0x8042C525
 
 .alias MaxPages = 3			# Amount of normal expansion stage pages
 .alias BackFrame = 4		# Frame that the last page will use to indicate the next is page 1
@@ -1198,18 +1231,18 @@ HOOK @ $806b5934	# muSelectStageTask::buttonProc
 }
 HOOK @ $806B2310		# Updates the page number texture icon
 {
-	lis r12, 0x8049		# \ Page Number as is observed by the new SSS system
-	ori r12, r12, 0x6000#
-
 	# lwz r3, 0x228(r29)	# Page Number as is observed by Brawl
 	cmpwi r29, 2			# Is it the Brawl custom stage page?
 	beq- LastPage
 
 	li r4, 2			# Max amount of normal pages in Brawl
 	lbz r5, 0x0(r12)	# Active Page
-	lbz r3, 0x2(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 3 (if any)
-	lbz r3, 0x3(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 4 (if any)
-	lbz r3, 0x4(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 5 (if any)
+
+	%lbd(r5, 0x80496000)	# Page Number as is observed by the new SSS system
+	%lwi(r12, STAGE_PAGES)
+	lbz r3, 0x50(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 3 (if any)
+	lbz r3, 0x78(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 4 (if any)
+	lbz r3, 0xA0(r12); cmpwi r3, 0; beq- notAny; addi r4, r4, 1 # Amount of stages on page 5 (if any)
 notAny:	
 	addi r0, r5, 1
 	cmpw r0, r4			# If this isn't relevant due to being less than the latest normal page
@@ -1248,19 +1281,11 @@ HOOK @ $806B0AB8	# muSelectStageTask::__ct
 
 HOOK @ $806B5910	# muSelectStage::buttonProc
 {
-  lis r22, 0x806C
-  lis r16, 0x8049			# \
-  ori r16, r16, 0x6000		# | Load page number
-  lbz r17, 0(r16)			# /
-  lbz r0, -0x6D64(r22)	# Get num pages from page 1 (default)
-  cmpwi r17, 0x1
-  blt- %end%
-  beq- page_2
-page_extra:
-  lbzx r0, r16, r17			# Load byte value from 80496002-80496004 for amount of stages on this page if page 3 or higher
-  b %end%
-page_2:
-  lbz r0, -0x6D5C(r22)	# Get num pages from page 2
+    lis r12, 0x8049					# \
+  	lbz r11, 0x6000(r12)			# / Get the page button value number
+  	mulli r11, r11, 40  	# \
+	%lwi(r12, STAGE_PAGES)	# | get number of stages in pages
+	lbzx r0, r11, r12		# /
 }
 
 HOOK @ $806b1f7c	# muSelectStage::dispPage
@@ -1277,30 +1302,47 @@ HOOK @ $806b1f7c	# muSelectStage::dispPage
 notHazardOff:
 	stb r12, 0x45(r26)	
 notBuilderStagelist:
-  	lis r9, 0x806C
-	lis r12, 0x8049			# \
-  	ori r12, r12, 0x6000		# | Load page number
-  	lbz r11, 0(r12)			# /
-	lbz r10, -0x6D64(r9)	# Get num pages from page 1 (default)
-  	cmpwi r11, 0x1  
-	blt- setStageCount
-	beq- page_2
-page_extra:
-  	lbzx r10, r12, r11			# Load byte value from 80496002-80496004 for amount of stages on this page if page 3 or higher
-  	b setStageCount
-page_2:
-	lbz r10, -0x6D5C(r9)	# Get num pages from page 2
+  	lis r12, 0x8049					# \
+  	lbz r11, 0x6000(r12)			# / Get the page button value number
+  	mulli r11, r11, 40  	# \
+	%lwi(r12, STAGE_PAGES)	# | get number of stages in pages
+	lbzx r10, r11, r12		# /
 setStageCount:
   	stb r10, 0x230(r26)			
 }
 
-HOOK @ $806B8F60
+CODE @ $806b8f38		# MuStageTblAcces_GetNumStageInPage
 {
-  lis r3, 0x8049				# \
-  lbz r7, 0x6000(r3)			# / Get the page button value number
-  mulli r7, r7, 4				#
-  ori r8, r3, 0x5D04			# Pointer table to separate stage tables in memory
-  lwzx r3, r7, r8				# 80496014 = Page 3? 8049603C = Page 4? 80496064 = Page 5?
+	%lwi(r8, STAGE_PAGES)
+	mulli r3, r3, 40
+	lbzx r3, r8, r3
+	blr
+}
+
+CODE @ $806b8f50	# MuStageTblAcces_GetStageKind
+{
+	%lwi(r8, STAGE_PAGES_IDS)
+	mulli r3, r3, 40
+	add r3, r3, r8
+	lbzx r3, r3, r4
+	blr
+}
+HOOK @ $806b20c8	# muSelectStageTask::dispPage
+{
+	lis r3, 0x8049				# \
+  	lbz r3, 0x6000(r3)			# / Get the page button value number
+}
+HOOK @ $806b5c2c	# muSelectStageTask::dispPage
+{
+	lis r3, 0x8049				# \
+  	lbz r3, 0x6000(r3)			# / Get the page button value number
+	cmplwi r4, 255	# Original operation
+}
+HOOK @ $806b6b80	# muSelectStageTask::dispPreview
+{
+	lis r3, 0x8049				# \
+  	lbz r3, 0x6000(r3)			# / Get the page button value number
+	cmplwi r4, 255	# Original operation
 }
 
 op li r0, 4 @ $806B50B0
@@ -1319,39 +1361,7 @@ HOOK @ $806E3D2C
 }
 byte 0x58 @ $8070294D	# "X"
 
-############################
-Crush anywhere anytime [Eon] 
-############################
-op nop @ $8083b1ac 
-
-#####################################################################################
-Crush effect in ef_StgBattleField outside of SSE v2 [DukeItOut, Kapedani]
-#
-#Requires a special ef_StgBattleField pac file to be included in the stage to show up
-#Requires "Crush anywhere anytime [Eon]" to function
-#####################################################################################
-.alias g_GameGlobal                 = 0x805a00E0
-
-.macro lwd(<reg>, <addr>)
-{
-    .alias  temp_Lo = <addr> & 0xFFFF
-    .alias  temp_Hi_ = <addr> / 0x10000
-    .alias  temp_r = temp_Lo / 0x8000
-    .alias  temp_Hi = temp_Hi_ + temp_r
-    lis     <reg>, temp_Hi
-    lwz     <reg>, temp_Lo(<reg>)
-}
-
-HOOK @ $8087C838	# ftStatusUniqProcessDead::initStatus
-{
-	ori r4, r3, 18		# Get SSE effect
-	%lwd(r12, g_GameGlobal)
-	lwz r12, 0x8(r12)	# \
-	lhz r12, 0x1a(r12)	# | check g_GameGlobal->globalModeMelee->meleeInitData.stageKind == Stage_Subspace
-	cmpwi r12, 0x3d		# /
-	beq+ %END% 	# Branch if in SSE
-	lis r4, 0x32; ori r4, r4, 1		# First effect ID in ef_StgBattlefield 
-}
+.include Source/Project+/Gimmick.asm
 
 ############################################################################
 Stage Builder Can Not Save to Wii NAND [DukeItOut]
@@ -1401,8 +1411,6 @@ HOOK @ $8009D0C0
 ######################################################################################
 Custom Stage Select Screen V2 [Spunit, Phantom Wings, SOJ, Yohan1044, DukeItOut, JOJI]
 ######################################################################################
-op mr r0, r4				@ $806B8F5C # Access stage location in table
-op lbzx r3, r3, r0			@ $806B8F64	# Entry variable is a byte, rather than a half
 op rlwinm r0, r3, 1, 0, 30	@ $800AF618	# Access stage to load
 op addi r4, r4, 2			@ $800AF68C	# Table entry size
 op rlwinm r3, r3, 1, 0, 30	@ $800AF6AC	# \ Relates to loading the stage frame icon
@@ -1419,18 +1427,16 @@ CODE @ $800B91C8
 	ble- cr2, 0x14		
 }
 
-op lis r4, 0x8049 		@ $800AF58C
-op lwz r4, 0x5D00(r4)	@ $800AF594
-op lis r4, 0x8049		@ $800AF614
-op lwz r4, 0x5D00(r4)	@ $800AF61C
-op lis r4, 0x8049		@ $800AF66C
-op lwz r4, 0x5D00(r4)	@ $800AF674
-op lis r4, 0x8049		@ $800AF6A0
-op lwz r4, 0x5D00(r4)	@ $800AF6A8
-op lis r4, 0x8049		@ $800AF6D8
-op lwz r4, 0x5D00(r4)	@ $800AF6E0
-
-.include Source/Project+/StageTable.asm
+op lis r4, 0x8042 		@ $800AF58C
+op ori r4, r4, 0xC5EC	@ $800AF594
+op lis r4, 0x8042		@ $800AF614
+op ori r4, r4, 0xC5EC	@ $800AF61C
+op lis r4, 0x8042		@ $800AF66C
+op ori r4, r4, 0xC5EC	@ $800AF674
+op lis r4, 0x8042		@ $800AF6A0
+op ori r4, r4, 0xC5EC	@ $800AF6A8
+op lis r4, 0x8042		@ $800AF6D8
+op ori r4, r4, 0xC5EC	@ $800AF6E0
 
 ###########################################################
 SSS Stage Lists and Alt Stage Display [DukeItOut, Kapedani]
@@ -1454,17 +1460,17 @@ SSS Stage Lists and Alt Stage Display [DukeItOut, Kapedani]
 .alias __memfill                    			= 0x8000443c
 
 .alias PAGE_INDEX						= 0x8049601E
-.alias STAGELIST_STAGEKIND				= 0x806AEE19
-.alias STAGELIST_TYPE					= 0x806AEE1A
-.alias STAGELIST_FOLDER_NAME			= 0x806AEE1E
+.alias STAGELIST_STAGEKIND				= 0x8042C841
+.alias STAGELIST_TYPE					= 0x8042C842
+.alias STAGELIST_FOLDER_NAME			= 0x8042C846
 .alias STAGELIST_FILE_NAME				= 0x80423674
 .alias _pf               				= 0x80507b70
 .alias MOD_FOLDER        				= 0x80406920
 .alias STAGE_FOLDER 					= 0x8053EFE4
 .alias ASL_BUTTON						= 0x800B9EA0
-.alias STAGE_STRIKE_TABLE				= 0x806AEDFA
-.alias RSS_HAZARD_DATA					= 0x806AEDBE
-.alias RSS_EXDATA_BONUS					= 0x806AEE18
+.alias STAGE_STRIKE_TABLE				= 0x8042C822
+.alias RSS_HAZARD_DATA					= 0x8042C506
+.alias RSS_EXDATA_BONUS					= 0x8042C840
 .alias CURRENT_PAGE						= 0x80496000
 .alias MUSIC_SELECT_STEP				= 0x80002810
 
@@ -1579,7 +1585,7 @@ end:
 	lwz	r3, 0x40(r26)	# Original operation
 }
 
-string "%s%s%s%sstagelist/%02X_%s/" @ $806AEE1E 
+string "%s%s%s%sstagelist/%02X_%s/" @ $8042C846  
 
 HOOK @ $806b6b38	# muSelectStageTask::dispPreview
 {
@@ -1783,6 +1789,7 @@ dontLoadStageBuilderStages:
 	blt- loc_notCustom
 	li r3, 0x29
 loc_notCustom:
+	%lbd (r3, CURRENT_PAGE)
 	lwz r4, 0x22c(r4)
 	lbzx r4, r4, r11
 	%call (MuStageTblAcces_GetStageKind)
@@ -2050,8 +2057,94 @@ isNotBuilderStagelist:
 	stw r11, 0x258(r10)	# /
 }
 
+#####################################################################################
+Stage Builder Files Supports Having JPEG and RGBA8 TEX0 Images [Squidgy, Kapedani]
+# Allows for HD Textures since can't guarantee same JPEG decoding in game and outside
+#####################################################################################
+.alias memcpy 									= 0x80004338
+
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro call(<addr>)
+{
+  %lwi(r12, <addr>)
+  mtctr r12
+  bctrl    
+}
+.macro branch(<addr>)
+{
+    %lwi(r12, <addr>)
+    mtctr r12
+    bctr
+}
+
+HOOK @ $806b8a6c	# muSelectStageFileTask::copyFileData
+{
+	lwz	r6, 0x10(r29) # Original operation
+	lwz r12,0x0(r4)		# Get first four bytes
+	%lwi(r11, 0x54455830)	# "TEX0"
+	cmpw r12, r11   # \ check if TEX0
+	bne+ %end%		# /
+	mr r3, r6			# \
+	addi r4, r4, 0x40	# | copy RGBA8
+	mr r5, r7			# |
+	%call(memcpy)		# /
+	%branch(0x806b8a74)
+}
+
+###################################################################################
+Stage Builder Files Supports Having UTF16 or UTF8 Encoded Names [Squidgy, Kapedani]
+# Allows for double the stage name length
+###################################################################################
+.macro lwi(<reg>, <val>)
+{
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
+}
+.macro branch(<addr>)
+{
+    %lwi(r12, <addr>)
+    mtctr r12
+    bctr
+}
+
+op stb r3, 0xC(r29) @ $806b8a94	# Copy whole preview type byte from summary
+
+op andi. r12, r0, 0x1 @ $806b2bf4 # use only first bit to determine preview pic setting
+HOOK @ $806b2a98	# muSelectStageTask::dispEditLineData
+{
+	mr r4, r3	# Original operation
+	lbz r12, 0xC(r4)		# \
+	andi. r12, r12, 0x80	# | check if should use utf8 encoding
+	beq+ %end%				# /
+	lwz	r3, 0x6064(r25)	# \
+	addi r5, r4, 0x20	# |
+	addi r4, r26, 22	# | skip to printf
+	%branch(0x806b2ab4)	# /
+}
+
+op andi. r12, r0, 0x1 @ $806b6e40 #  use only first bit to determine preview pic setting
+HOOK @ $806b6db8	# muSelectStageTask::dispEditPreview
+{
+	mr r4, r3	# Original operation
+	lbz r12, 0xC(r4)		# \
+	andi. r12, r12, 0x80	# | check if should use utf8 encoding
+	beq+ %end%				# /
+	lwz	r3, 0x6064(r27)	# \
+	addi r5, r4, 0x20	# | skip to printf
+	%branch(0x806b6dd0)	# /
+}
+
+
 ## TODO: Classic/All Star Mode ASL from certain range (use all L-alts?)
 ## TODO: Also investigate random substage handling with replays
-## TODO: Song id in results based on costume id?
+## TODO: Song id in results based on costume id? also consider set sublevel based on costume?
 ## TODO: Investigate same song id playing during endless friendlies?
 ## TODO: Fix Replays always saying Home Run Contest?

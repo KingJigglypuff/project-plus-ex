@@ -89,18 +89,25 @@ updateInputHistory:
   lis r9, 0x8062;  ori r9, r9, 0x13D4
   add r9, r9, r25
 
+calcChangedInputs:
   #go into input list found at 
   lwz r8, 0x40(r9)
+  mulli r6, r8, 0x4
+  lwzx r10, r9, r6 #current held inputs
+
+
   subi r8, r8, 1
   cmpwi r8, 0x0;  bge 0x8
   li r8, 0xF
-  mulli r8, r8, 0x4
-  lwzx r7, r9, r8 #getPrevFrame in queue
+  mulli r6, r8, 0x4
+  lwzx r7, r9, r6 #previous held inputs
   
-  lwz r8, 0x48(r30) #current calced prevFrame
-  andc r10, r7, r8
+  lwz r8, 0x48(r30) #inputs that were blanked since last frame
 
-
+  andc r10, r10, r7 #changed inputs since prev frame
+  andc r8, r7, r8 #this is all inputs that are new to this frame
+  or r10, r8, r10
+  
   lwz r8, 0x40(r9)
   li r25, 3 			        #number of frames to retroactively change (caps at 16 coz only 16 frames are remembered)
 DecrementInputCounter: 	  #defines how many frames are available to Zsync, 1 makes it match vanilla

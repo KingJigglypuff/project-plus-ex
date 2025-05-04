@@ -840,31 +840,40 @@ fsOkay:
   stb r0, 4(r27)
 }
 
-##########################################################################
-No Autosweetspot Ledges v1.3&K [spunit262, Dantarion, Magus, DukeItOut]
-#
+#####################################################################################
+No Autosweetspot Ledges v1.4 [spunit262, Dantarion, Magus, DukeItOut, KingJigglypuff]
+#####################################################################################
 # v1.2: Cleaned up code
 # v1.3: Made an exception for Knuckles' wall climb so it could grab ledges
-##########################################################################
+# v1.4: Added exception for Sceptile's wall climb
+#####################################################################################
 HOOK @ $807812B0
 {
     cmpwi r4, 0xA; bne+ normal
 
-    lwz r12, 0x28(r1)		#
-	cmplwi r12, 0x100		# \ Sometimes input buffer goes through here.
-	blt+ normal				# / It's not doing what we expect so this makes it skip that!
-	
+    lwz r12, 0x28(r1)        #
+    cmplwi r12, 0x100        # \ Sometimes input buffer goes through here.
+    blt+ normal              # / It's not doing what we expect so this makes it skip that!
+  
     lwz r11, 0x110(r12)    # Get the instance ID
     lwz r12, 0x3C(r1)
+    lwz r7, 0x7C(r12)      # \
+    lhz r7, 0x3A(r7)       # / Get the action
     cmpwi r11, 0x2D        # Is it Knuckles?
-    bne+ notEchidna
-
-    lwz r11, 0x7C(r12)
-    lhz r7, 0x3A(r11)
+    beq- Echidna
+    cmpwi r11, 0x62         # Is it Sceptile?
+    bne- notGecko          # /
+Gecko:
+    cmpwi r7, 0x11D        # \
+    blt+ notWallClimb      # | Is Sceptile climbing a wall?
+    cmpwi r7, 0x120        # | Let it grab the ledge!
+    bgt+ notWallClimb      # |
+    b normal               # /
+Echidna:
     cmpwi r7, 0x117        # Is Knuckles climbing a wall?
-    beq normal             # Let them grab the ledge!
-
-notEchidna:
+    beq normal             # Let him grab the ledge!
+    
+notGecko:
 notWallClimb:    
       lwz r11, 0x18(r12)
       lfs f0, 0x10(r11)
@@ -1230,23 +1239,36 @@ op fmr	f0,f2 	@ $8079463C
 ######################################################################
 Traction 2x on Non-Dash Character Momentum > Max Walking Speed [Magus]
 ######################################################################
-* C2794D3C 00000010
-* 3C808100 60840000
-* 7C1A2000 41800060
-* 3C808170 60840000
-* 7C1A2000 41810050
-* 809A004C 7C04F000
-* 40820044 809A001C
-* 808400D0 C0040024
-* FC201A10 FC000840
-* 4082002C C0240020
-* C01E0008 FC000210
-* FC000840 40810018
-* C01E0008 EC23182A
-* EC00082A C03E000C
-* 48000010 C01E0008
-* C03E000C EC00182A
-* 60000000 00000000
+HOOK @ $80794D3C
+{ 
+  lwz r12, 0x8(r31)			# \
+  lwz r12, 0x3C(r12)		# |
+  lwz r12, 0xA4(r12)		# |
+  mtctr r12					# |
+  bctrl						# |
+  cmpwi r3, 0; bne+ normal	# /	
+  
+  lwz r4, 0x4C(r26)				# \ Check of unknown current application.
+  cmpw r4, r30;  bne- normal	# / Please document reasoning. Related to knockback on the ground.
+  lwz r4, 0x1C(r26)	# Get to the character properties.
+  lwz r4, 0xD0(r4)	# Attributes Table
+  lfs f0, 0x24(r4)	# Ground Friction 
+  
+  fabs f1, f3;  fcmpo cr0, f0, f1;  bne- normal # Compare absolute friction with ground friction attribute
+  lfs f1, 0x20(r4)	# Max Walk Speed
+  lfs f0, 0x08(r30)	# X Movement Speed  
+  fabs f0, f0;  fcmpo cr0, f0, f1;  ble- normal # Compare absolute X Speed with max walk speed
+  lfs f0, 0x08(r30)	# X Movement Speed (again!)
+  fadds f1, f3, f3	# 2x directional friction placed into f1
+  fadds f0, f0, f1	# Original operation modified. Apply ground friction!
+  lfs f1, 0x0C(r30)	# Y Movement Speed
+  b %END%
+
+normal:
+  lfs f0, 0x08(r30)	# X Movement Speed
+  lfs f1, 0x0C(r30)	# Y Movement Speed
+  fadds f0, f0, f3	# Original operation, apply ground friction!! 
+} 
 
 ################################################################
 Dash Exit into Wait, Dash, and Taunt Keep Full Velocity [Magus]
@@ -1570,12 +1592,13 @@ _end:
 }
 
 ###############################################################################################################
-[Project+] Customizable Attacker Hitlag Modifier [DukeItOut]
+[Project+] Customizable Attacker Hitlag Modifier 1.1 [DukeItOut]
 #
 # Place value 48495421 into RA-Basic[10] to eliminate hitlag for the attacker
 # Place value 48495478 into RA-Basic[10] to make the scalar in RA-Basic[12] be an additional multiplier
 # 	for the attacker's hitlag
 # Place value 6869743A into RA-Basic[10] to make the value in RA-Basic[12] be the attacker's hitlag
+#	If this is negative, instead subtracts that frame amount from the existing lag.
 ###############################################################################################################
 HOOK @ $8083FFBC
 {
@@ -1585,24 +1608,29 @@ HOOK @ $8083FFBC
 	lwz r6, 0xC(r6)			# / 
 	lwz r5, 40(r6)			# We want RA-Basic[10] 	(10*4 = 40)
 	lis r12, 0x4849			# \ "HIT!" (48495421)
-	ori r12, r12, 0x5421		# /
+	ori r12, r12, 0x5421	# /
 	cmpw r5, r12			# If that's what the ASCII in RA-Basic[10] says . . . .
 	beq- NoHitlag			# Then there will be no hitlag!
 	lis r12, 0x4849			# \ "HITx" (48495478)
-	ori r12, r12, 0x5478		# /
+	ori r12, r12, 0x5478	# /
 	cmpw r5, r12
 	beq- MultiplyHitlag
 	lis r12, 0x6869			# \ "hit:" (6869743A)
-	ori r12, r12, 0x743A		# /
+	ori r12, r12, 0x743A	# /
 	cmpw r5, r12
 	bne+ %END%
 SetHitlag:
-	lwz r4, 48(r6)			# Access RA-Basic[12] (12*4 = 48)
+	lwz r5, 48(r6)			# Access RA-Basic[12] (12*4 = 48)
+	cmpwi r5, 0
+	bge+ setFrames
+	add r5, r4, r5			# Frames of hitlag + RA-Basic[12] if RA-Basic[12] < 0, else hitlag = RA-Basic[12]
+setFrames:
+	mr r4, r5
 	b ModifiedHitlag
 MultiplyHitlag:
 	lwz r5, 48(r6)			# \ Access RA-Basic[12] (12*4 = 48)
 	mullw r4, r4, r5		# / and multiply the current hitlag by it
-	li r5, 0			# \
+	li r5, 0				# \
 	ori r5, r5, 60000		# | Scalars are really just ints * 60000			
 	divw r4, r4, r5			# / Convert back into an int!
 ModifiedHitlag:
@@ -1925,9 +1953,10 @@ op b 0x60 @ $80741744 # makes it so you can't "rehit" an opponent if they change
 .include Source/ProjectM/Grab.asm
 .include Source/ProjectM/Knockback.asm
 .include Source/ProjectM/Ledge.asm
+.include Source/ProjectM/Reflect.asm
+
 .include Source/ProjectM/Modifier/Hitlag.asm
 .include Source/ProjectM/Modifier/Physics.asm
-.include Source/ProjectM/Modifier/Reflect.asm
 .include Source/ProjectM/Modifier/ThrowRelease.asm
 .include Source/ProjectM/Modifier/VariableSet.asm
 
@@ -1945,67 +1974,7 @@ Timer Always Displays 6th Digit [ds22]
 ######################################
 op nop @ $800DE17C
 
-##########################################################################################################
-Individual Stock Icons (info.pac) V2.6 PMEx + 50CC [ds22, wiiztec, DukeItOut, PyotrLuzhin, KingJigglypuff]
-##########################################################################################################
-* C20E2168 0000002C
-* 818100E8 3D609018
-* 896BF37F 2C0B0002
-* 4082007C 392000A5
-* 3D408058 614A8000
-* 897F0002 1D6B00A0
-* 7D4A5A14 896A009E
-* 80BF0020 2C050006
-* 41810020 2C050000
-* 40820030 3CA08128
-* 60A5AE64 80A50000
-* 2C050006 4081001C
-* 7D8A58AE 2C0C00CC
-* 4082000C 39600003
-* 48000008 396B0003
-* 7D8A58AE 2C0C00CC
-* 40820014 2C0B0000
-* 4182000C 39600000
-* 4BFFFFE8 3FA0817D
-* 38C0007D 3BBD5AC0
-* 7CC903A6 88DD0002
-* 7C0C3000 41820020
-* 88DD0003 7C0C3000
-* 41820014 3BBD0010
-* 4200FFE4 3FA0817D
-* 3BBD5AC0 7D876378
-* 899D0000 2C0C0042
-* 40A20008 39800025
-* 88C100ED 2C0900A5
-* 4082002C 7CCA582E
-* 54C6801E 54C6463E
-* 396B0003 996A009E
-* 2C1B0004 40820010
-* 892A009C 39290003
-* 992A009E 1D8C0032
-* 2C07002D 40A20008
-* 39802328 7D8C3214
-* 38EC0001 2C1B0000
-* 4082000C 7C882378
-* 7FFCFB78 3D8080C2
-* A18C4314 3BA05F65
-* 7C0CE800 4182000C
-* 6D1E8000 48000008
-* 6CFE8000 83BC008C
-* 60000000 00000000
-* 040E215C 60000000
-* 040E2160 60000000
-* C203D8B4 00000005
-* 2C09000B 40820018
-* 3C600006 38631C00
-* 3C800002 38847180
-* 7C641A14 881B001C
-* 60000000 00000000
-* 044218EC 00095F00
-* 0442190C 00180000
-* 04494990 00095F00
-* 044949EC 80C23A60
-* 044949F0 00180000
+.include Source/LegacyTE/50CC.asm
 
 ###################################################################
 KO Star Count Is Number of Match Wins v1.4 [standardtoaster, Eon]
@@ -2152,119 +2121,7 @@ HOOK @ $807A3E20
 	lwz r30, 0x10(r2)
 }
 
-#################################################################
-[Legacy TE] Transforming Characters Switch Stocks [PyotrLuzhin]
-#################################################################
-* C20E2090 00000013
-* 38E00000 81810094
-* 7C0802A6 90020000
-* 9421FF80 BC610010
-* 3F608098 637B8E8C
-* 7C0CD800 4082005C
-* 3F609018 8B7BF37F
-* 2C1B0002 4082000C
-* 3B600001 48000008
-* 3B600005 6F5A8000
-* 93820004 93420008
-* 7FBCEB78 807C008C
-* C8220004 EC21E028
-* 3D80800B 618C7900
-* 7D8903A6 4E800421
-* 3B9C0004 3B7BFFFF
-* 2C1B0000 41A1FFD8
-* 80020000 B8610010
-* 80210000 7C0803A6
-* 60000000 00000000
-
-#####################################################################
-[Legacy TE] Team Glow CSS Toggle [PyotrLuzhin, Fracture, Yohan1044]
-#####################################################################
-* C26895F4 00000004
-* 807B01F4 886305C8
-* 2C030000 4182000C
-* 38600000 987B01C4
-* 7F63DB78 00000000
-* C268A498 0000000B
-* 3D809019 888CA0E4
-* 2C00001F 40820024
-* 2C0400CC 4182001C
-* 2C040000 40810020
-* 38800000 38A00001
-* 38000020 48000018
-* 38800001 38A00000
-* 4800000C 38800000
-* 38A00000 988CA0E4
-* 98ACA0E5 5404D97E
-* 60000000 00000000
-* C2689B90 00000003
-* 881805C8 2C000000
-* 4182000C 3D809019
-* 880CA0E4 00000000
-* C269A2E0 00000003
-* 8B6805C8 2C1B0000
-* 4182000C 3D809019
-* 8B6CA0E4 00000000
-* C269A3F0 00000003
-* 8B6805C8 2C1B0000
-* 4182000C 3D809019
-* 8B6CA0E4 00000000
-* C26974D0 00000003
-* 2C1B0000 41820010
-* 3D809019 898CA0E4
-* 2C0C0000 00000000
-* C2684968 00000003
-* 881A05C8 2C000000
-* 4182000C 3D809019
-* 880CA0E4 00000000
-* C26D5C28 00000003
-* 3D809019 898CA0E5
-* 2C0C0001 41820008
-* 981C000A 00000000
-* C281F4B8 00000011
-* 39610058 3D809019
-* 898CA0E5 2C0C0001
-* 40820070 7C0802A6
-* 90020000 9421FF80
-* BC610010 80DF0028
-* 88FF000A 2C0700FF
-* 40820008 38E00000
-* 1CE70008 7CFF3A14
-* 80670034 38A00010
-* 38800088 80C60014 #the 88 in this line is the base gfx id, it adds 1 or 2 for the other teams
-* 7C843214 80630060
-* 806300D8 80630088
-* 81830000 818C0054
-* 7D8903A6 4E800421
-* 80020000 B8610010
-* 80210000 7C0803A6
-* 60000000 00000000
-* C268EEF4 00000005
-* FC20F890 3D809019
-* 898CA0E5 2C0C0001
-* 40820010 3D8040C0
-* 91820000 C0220000
-* 60000000 00000000
-* C268A494 00000003
-* 889F05CB 899F05C8
-* 7C846278 989F05CB
-* 7FE3FB78 00000000
-* C26846E0 00000004
-* 888305CB 3CA0805A
-* 80A500E0 80A50010
-* 98850030 9421FF10
-* 60000000 00000000
-* C2684480 00000004
-* 3C80805A 808400E0
-* 80840010 88840030
-* 988305CB 9421FFD0
-* 60000000 00000000
-* C2686C04 00000006
-* 3C60805A 806300E0
-* 80630010 88830030
-* 88A30033 3C609018
-* 6063A0E4 98830001
-* 7C842A78 98830000
-* 889D05C8 00000000
+.include Source/Project+/Teams.asm
 
 ####################################################################################
 [Legacy TE] CSS keeps character choice for inactive ports between matches [Fracture]
@@ -2527,20 +2384,32 @@ op fmr f0, f3 @ $8010c888
 ###############################################
 Franklin Badge SFX Modifier V2 [Magus, ds22]
 ###############################################
-* C2840824 00000004
-* 2C05001A 41800014
-* 2C05001D 4181000C
-* 38801F86 48000008
-* 3880000B 00000000
+HOOK @ $80840824
+{
+  cmpwi r5, 0x1A;  blt- FranklinBadgeSFX	# \ Check if shielding
+  cmpwi r5, 0x1D;  bgt- FranklinBadgeSFX	# /
+  
+  li r4, 0x1F86		# Power Shield SFX
+  b %END%
+
+FranklinBadgeSFX:
+  li r4, 0xB		# Franklin Badge SFX
+
+}
 
 ##################################
 Team Coloured Shields V2 [ds22]
 ##################################
-* C281DEEC 00000003
-* 2C170002 4182000C
-* 7EE4BB78 48000008
-* 38800003 00000000
-* 0481DEF4 7EE4BB78
+HOOK @ $8081DEEC
+{
+  cmpwi r23, 0x2;  beq- loc_0x10
+  mr r4, r23
+  b %END%
+
+loc_0x10:
+  li r4, 0x3	# use 3 instead of 2!
+}
+op mr r4, r23 @ $8081DEF4
 
 #########################################################
 Team Colour Shade Check Fix (BrawlEx) [ds22, Sammi Husky]
@@ -2580,11 +2449,12 @@ SFX Survival -> Choose Your Character [Standardtoaster]
 op li r4, 0x2046 @ $80683998
 op li r4, 0x2046 @ $8068E590
 
-############################################################################
-No Audience SFX on Stage Selection v2 [Standardtoaster, DukeItOut, Kapedani]
-############################################################################
+#############################################################################################
+No Audience SFX on Stage Selection v2.5 [Standardtoaster, DukeItOut, Kapedani, ilikepizza107]
+#############################################################################################
 op NOP @ $806b46d0
 op NOP @ $806b53b8
+op NOP @ $806b5520
 
 ###################################################################
 No Swoosh SFX on Character Selection v2 [standardtoaster, Kapedani]
@@ -2630,6 +2500,37 @@ op li r0, -1 @ $8004FA64
 Locked Stage Music Fix [Magus]
 ##############################
 op li r0, 0xFFF @ $8004FAE4
+
+##############################################################
+Distance Player Icons Are Enforced Is More Lenient [DukeItOut]
+##############################################################
+#
+# Affects the distance that player icons are mandatory to be
+# less aggressive and more like older titles.
+#
+# 80.0 is retained in teams since the indicators are more
+# important there with everything going on.
+#
+# Elsewhere, it is at 145.0, improving visual clarity in 1v1s
+# by making more of the character visible during battle.
+#
+# Melee-like situations that force the indicators on, such as
+# during knockback, still apply as usual.
+#
+# This code has no effect on player tags.
+##############################################################
+HOOK @ $80960388
+{
+    lis r3, 0x805A
+    lwz r3, 0xE0(r3)
+    lwz r3, 0x10(r3)
+    lbz r3, 0x33(r3);    cmpwi r3, 1;    beq- teams     # check if in teams
+    lis r3, 0x4311        # 145.0
+    stw r3, 0x110(r31)
+    b %END%
+teams:
+    stfs f1, 0x110(r31)    # Original operation. Sets distance needed to see player indicators.
+}
 
 
 .include Source/Project+/CSE.asm
@@ -2814,15 +2715,18 @@ word[24] 0x1D, 0x1E, 0x1F, 0x1C, 0x1D, -1, -1, -1, |
 ############################
 Aura Sphere Cancel [ds22]
 ############################
-* C2AA658C 00000007
-* 2C1A001A 41820030
-* 2C1A001F 41820028
-* 2C1A0020 41820020
-* 2C1A0021 41820018
-* 2C1A0118 41820010
-* 2C1A011E 41820008
-* 40820004 00000000
-* 04AA6590 40820040
+HOOK @ $80AA658C
+{
+  cmpwi r26, 0x1A;  beq- %END%
+  cmpwi r26, 0x1F;  beq- %END%
+  cmpwi r26, 0x20;  beq- %END%
+  cmpwi r26, 0x21;  beq- %END%
+  cmpwi r26, 0x118; beq- %END%
+  cmpwi r26, 0x11E;  
+  # beq- loc_0x34 ?????????
+  # bne- loc_0x34 ?????????
+}
+op bne- 0x40 @ $80AA6590
 
 #######################################################################
 [Project+] Aura Sphere Only Pulsates Horizontally v1.2 [DukeItOut, Eon]
@@ -2944,6 +2848,32 @@ HOOK @ $808A1058
   li r3, 0x0;  b %END%
 loc_0x10:
   li r3, 0x1
+}
+
+#########################################
+Sleep doesn't pierce armour in air [Eon] 
+#########################################
+HOOK @ $8085CDD0
+{
+    stw r4, 0xC(r1)
+    lwz r3, 0xD8(r4)
+}
+HOOK @ $8085CDF0 
+{
+    lwz r3, 0xC(r1)
+    lwz r3, 0xD8(r3)
+    lwz r3, 0x14(r3)
+    lwz r12, 0(r3)
+    lwz r12, 0x14(r12)
+    mtctr r12 
+    bctrl 
+    cmpwi r3, 2 #if situation = in air, noReaction = true
+    beq true
+false:
+    li r3, 0
+    b %end%
+true:
+    li r3, 1
 }
 
 ##############################################################
@@ -3109,6 +3039,7 @@ op b 0x38	@ $808A087C
 .include Source/Project+/Debug/modifiedDebug.asm
 .include Source/Project+/CStick.asm		# Don't move this to BOOST, it will cause aerial drift for some reason
 .include Source/Project+/Items.asm
+.include Source/Project+/Co-OpSave.asm
 .include Source/Community/ItemEx.asm
 .include Source/Community/Syringe.asm		# Move out of Extras when more fully tested
 

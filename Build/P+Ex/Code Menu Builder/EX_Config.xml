@@ -26,17 +26,18 @@
         <lineColor lineKind="0" colorHex="0xRRGGBBAA" />
         -->
         <!--Where "lineKind" corresponds to the type of line whose color you're modifying.-->
-        <!--0: Normal, 1: Selected, 2: Changed, 3: Changed & Selected, 4: Comment, 5: Locked-->
+        <!--0: Normal, 1: Selected, 2: Changed, 3: Changed & Selected-->
+        <!--4: Locked, 5: Locked & Selected, 6: Locked & Changed, 7: Locked & Changed & Selected, 8: Comment-->
     </menuLineColors>
 
     <!--To add characters to the code menu, add entries for them into this block!-->
     <!--Note: the "baseListVersion" field determines the base character list your declarations will be added to!-->
-    <!--0: vBrawl, 1: vBrawl & Playable Sopo/GBowser/WarioMan, 2: Project M, 3: Project+, 4: P+EX 1.0, 5: P+EX 1.2-->
-    <characterList baseListVersion="6">
+    <!--0: vBrawl, 1: vBrawl & Playable Sopo/GBowser/WarioMan, 2: Project M, 3: Project+-->
+    <!--4: P+EX v1.0 (Ridley), 5: P+EX v1.2 (Waluigi), 6: P+EX v1.5 (Alloys), 7: P+EX v1.5 (Alloys + Sceptile)-->
+    <characterList baseListVersion="7">
         <!--Add characters in the following format:
         <character name="YOUR_NAME_HERE" slotID="SLOT_ID_HERE"/>
         -->
-		<character name="Sceptile" slotID="0x62"/>
     </characterList>
 
     <!--Use this block to register Addons for inclusion in the menu!-->
@@ -56,6 +57,7 @@
             <!--Add rosters in the following format:
             <roster name="YOUR_NAME_HERE" filename="FILENAME_HERE"/>
             -->
+			<roster name="Project+" filename="CSSRosterPPlus.dat"/>
         </rosterChanger>
 
         <!--To declare new themes, add new entries into this block!-->

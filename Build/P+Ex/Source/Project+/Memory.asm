@@ -10,6 +10,10 @@
 #
 # 0x020 = Port ID
 # 0x024 = Sub  ID
+#
+# 0x030 = Owner of last hitbox to damage
+# 0x034 = Type of damager
+# 0x038 = Type ID (if an article)
 ####################################################################
 LA Variables Expansion and Additional Info System [Magus, DukeItOut]
 ####################################################################
@@ -23,7 +27,7 @@ LA Variables Expansion and Additional Info System [Magus, DukeItOut]
 }
 HOOK @ $80585540
 {
-  cmpwi r26, 0x2329;  bne+ loc_0x34
+  cmpwi r26, 0x2329;  bne+ loc_0x34 # Identifier of the function calling this as multiple do
   mr r30, r12			# Will be overwritten, later
   %Address(LA_region)	# Area to use as freespace for LA variables
   lhz r7, -0x86(r30)	# Get the port ID
@@ -101,28 +105,31 @@ HOOK @ $808152E4
 }
 
 #########################################################################################################################################
-TopN Y Used as SCD Bottom in Air for 10 Frames v3.3 (Memory leak fix, requires above Additional Info System code) v1.1 [Magus, DukeItOut]
+TopN Y Used as SCD Bottom in Air for 10 Frames (Memory leak fix, requires above Additional Info System code) v3.5 [Magus, DukeItOut]
 #
-# v1.1: Fixes an error where the [Boss Battles/Subspace] Ridley fight would trigger a false positive and crash the game.
+# v3.4: Fixes an error where the [Boss Battles/Subspace] Ridley fight would trigger a false positive and crash the game.
+# v3.5: Checks more intuitively that this is a fighter to avoid more false positives
 #########################################################################################################################################
 HOOK @ $8073A2A4
 {
-  lis r8, 0x8120	# \ Used as an address validity check
-  lis r9, 0x9380	# /
-  lwz r10, 0x98(r27)# \
-  lwz r7, 0x70(r10) # |
+  mr r9, r3			# preserve rhombus info
+  lwz r10, 0x98(r27)
+  lwz r12, 0x08(r10)
+  lwz r12, 0x3C(r12)
+  lwz r12, 0xA4(r12)
+  mtctr r12
+  bctrl				# Get the object type
+  cmpwi r3, 0		# Is this a fighter?
+  mr r3, r9			# restore rhombus pointer, it's definitely needed regardless
+  
+  bne- notValid		# Then don't modify the diamond!
+					# The timer checking for how long the individual is airborne is custom for characters!
+					# Other objects won't have it.
+  
+  lwz r7, 0x70(r10) # \
   lwz r7, 0x20(r7)	# | Access LA-Basic address. If the above system is in place, the address to access the AIS memory will be 0x2D0 off
-					  cmplw r7, r8;  	 blt+ notValid # \
-					  cmplw r7, r9;  	 bge+ notValid # / Don't account for it if it is unassigned!
   lwz r7, 0x0C(r7)	# /
-  lwz r7, 0x2D0(r7);  cmplw r7, r8;  	 blt+ notValid # \
-					  cmplw r7, r9;  	 bge+ notValid # / Don't account for it if it is unassigned!
-
-
-  lwz r12, 0x0(r7)		# \ Look for the "P+" tag that indicates this is AIS memory 
-  cmpwi r12, 0x502B		# | Bosses don't have this!!!
-  bne- notValid			# /
-
+  lwz r7, 0x2D0(r7);  # AIS access
 
   lwz r12, 0x14(r7)		# Access AIS variable for frames grounded
   lwz r9, 0x10(r7)		# Access AIS variable for frames airborne

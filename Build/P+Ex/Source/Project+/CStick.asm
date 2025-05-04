@@ -1,22 +1,28 @@
-###################################################################################
-C-stick Smash Fixes + functional tilt stick (reverse ftilt included) [camelot, Eon]
-###################################################################################
+########################################################################################
+C-stick Smash Fixes + functional tilt stick (reverse ftilt included) v1.2 [camelot, Eon]
+########################################################################################
+#v1.1 fixed smashstick still being able to dtilt with crawl characters
+#v1.2 fixed smashstick being able to do specific angles to get ftilts
+
+#special edit of Metaknights 0x25 override required to match this code as he enters rapidjab instead of jab1 when you jab
+
 #original moved address were 
 #.alias C_Stick_Off  = 0x80546C38
 #.alias C_Stick_Off2 = 0x80546C88
 
 .alias C_Stick_Off  = 0x805410A0
 .alias C_Stick_Off2 = 0x80541120
-.alias C_Stick_Off3 = 0x80541190
+.alias C_Stick_Off3 = 0x80541220
+.alias C_Stick_Off4 = 0x805412D0
 #utilt to usmash (up + smashstick up != utilt)
 CODE @ $805410A0
 {
 	#If: Requirement Value Button Press Occurs: F (cstick used to initate move) 
 	word 6; word 0x30
 	word 0; word 0xF
-	#Change Action: Requirement: Action=30, Requirement=Character Exists?
+	#Change Action: Requirement: Action=30, Requirement=True
 	word 0; word 0x30
-	word 6; word 0
+	word 6; word 0xF
 	#And: Comparison Compare: IC-Basic[1018] >= IC-Basic[3158]
 	word 6; word 7 			#Compare
 	word 5; IC_Basic 1018 	#Control Stick Y Axis
@@ -37,32 +43,56 @@ CODE @ $80FB29CC
 	word 0x00070100; word C_Stick_Off+0x40
 }
 #dtilt to dsmash (down + smashstick down != dtilt)
+#dtilt to fsmash (down + smashstick downforward during crawl != dtilt)
 CODE @ $80541120
 {
-	#Change Action: Requirement: Action=2D, Requirement=Character Exists?
+	word 2; word C_Stick_Off2+0x80
+	
+	#Change Action: Requirement: Action=2D, Requirement=True
 	word 0; word 0x2D
-	word 6; word 0
-	#And: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160]
+	word 6; word 0xF
+	#If: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160]
 	word 6; word 7 			#Compare
 	word 5; IC_Basic 1018 	#Control Stick Y Axis
 	word 0; word 1 			#<=
 	word 5; IC_Basic 3160 	#Dsmash Sensitivity
+	#If: Fsmashshortcut ICBasic[3122], ICBasic [23031]
+	word 6; word 0x271D
+	word 5; IC_Basic 3122
+	word 5; IC_Basic 23031
+	
 
-	word 2; word C_Stick_Off2+0x38
+    #If: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160]
+	word 6; word 7 			#Compare
+	word 5; IC_Basic 1018 	#Control Stick X Axis
+	word 0; word 1 			#<=
+	word 1; scalar 0.0	 	#Dsmash Sensitivity
+
+	#Change Action: Requirement: Action=2D, Requirement=Character Exists?
+	word 0; word 0x2A
+	word 6; word 0xF
 
 	word 0x02010200; word 0x80FABAF4 		#Change Action: Requirement: Action=E, Requirement=In Air
 	word 0x000A0200; word C_Stick_Off 		#If: Requirement Value Button Press Occurs: F
-	word 0x000B0400; word C_Stick_Off2+0x10	#And: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160]
-	word 0x02010200; word C_Stick_Off2 		#Change Action: Requirement: Action=2D, Requirement=Character Exists?
+	word 0x000A0400; word C_Stick_Off2+0x18	#   If: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160]     #if dsmash
+	word 0x02010200; word C_Stick_Off2+0x8  #      Change Action: Requirement: Action=2D, Requirement=True
+	word 0x000D0400; word C_Stick_Off2+0x38	#   ElIf: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160] #fsmash
+	word 0x000A0200; word C_Stick_Off2+0x50 #       if fsmash backwards then
+	word 0x05000000; word 0 				#          Reverse Direction
+	word 0x000F0000; word 0                 #       endif 
+	word 0x02010200; word C_Stick_Off2+0x70 #       Change Action: Requirement: Action=2A, Requirement=True
+	word 0x000F0000; word 0 				#   endif
 	word 0x000F0000; word 0 				#endif
+
 	word 0x00080000; word 0 				#return
 }
 CODE @ $80FC2498
 {
-	word 0x00070100; word C_Stick_Off2+0x30
+	word 0x00070100; word C_Stick_Off2
 }
 #jab to reverse ftilt (tilt stick backwards != jab forwards)
-CODE @ $80541190
+#jab to dsmash/usmash
+CODE @ $80541220
 {
 	#Change Action: Requirement: Action=27, Requirement=Character Exists?
 	word 0; word 0x27
@@ -75,19 +105,44 @@ CODE @ $80541190
 
 	word 2; word C_Stick_Off3+0x38 
 
+
 	word 0x02010200; word 0x80FABAF4 		#Change Action: Requirement: Action=E, Requirement=In Air
 	word 0x000A0200; word C_Stick_Off 		#If: Requirement Value Button Press Occurs: F
-	word 0x000B0400; word C_Stick_Off3+0x10	#And: Comparison Compare: IC-Basic[1012] >= IC-Basic[3151]
-	word 0x05000000; word 0 				#Reverse Direction
-	word 0x02010200; word C_Stick_Off3 		#Change Action: Requirement: Action=27, Requirement=Character Exists?
-	word 0x000F0000; word 0 				#endif
+	word 0x000A0400; word C_Stick_Off2+0x18	#	If: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160] #dsmash
+	word 0x02010200; word C_Stick_Off2+0x8  #		Change Action: Requirement: Action=2D, Requirement=True
+	word 0x000D0400; word C_Stick_Off+0x20	#   ElIf: Comparison Compare: IC-Basic[1018] >= IC-Basic[3158]    #usmash
+	word 0x02010200; word C_Stick_Off+0x10  #      Change Action: Requirement: Action=30, Requirement=True
+	word 0x000D0400; word C_Stick_Off3+0x10	#	ElIf: Comparison Compare: IC-Basic[1012] >= IC-Basic[3151]
+	word 0x05000000; word 0 				#		Reverse Direction
+	word 0x02010200; word C_Stick_Off3 		#		Change Action: Requirement: Action=27, Requirement=Character Exists?
+	word 0x000F0000; word 0 				#	endif
+	word 0x000F0000; word 0					#endif
+	
 	word 0x00080000; word 0 				#return
 }
 CODE @ $80FB203C
 {
 	word 0x00070100; word C_Stick_Off3+0x30
 }
-
+#Ftilt to Dsmash/usmash
+CODE @ $805412D0
+{
+	word 2; word C_Stick_Off4+0x8
+	
+	word 0x000A0200; word C_Stick_Off 		#If: Requirement Value Button Press Occurs: F
+	word 0x000A0400; word C_Stick_Off2+0x18	#   If: Comparison Compare: IC-Basic[1018] <= IC-Basic[3160] #dsmash
+	word 0x02010200; word C_Stick_Off2+0x8  #	   Change Action: Requirement: Action=2D, Requirement=True
+	word 0x000D0400; word C_Stick_Off+0x20	#   ElIf: Comparison Compare: IC-Basic[1018] >= IC-Basic[3158]     #if usmash
+	word 0x02010200; word C_Stick_Off+0x10  #      Change Action: Requirement: Action=2D, Requirement=True
+	word 0x000F0000; word 0 				#	endif
+	word 0x000F0000; word 0					#endif
+	word 0x07020000; word 0			 		#Clear controller, original instruction
+	word 0x00080000; word 0
+}
+CODE @ $80FB2844
+{
+	word 0x00070100; word C_Stick_Off4
+}
 ###############################################################################
 [Project+] C-Stick Debug Mode and Slow Mode fix v4.3 [Fracture, DukeItOut, Eon]
 ###############################################################################

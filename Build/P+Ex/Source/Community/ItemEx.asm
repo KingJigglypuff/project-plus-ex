@@ -1,6 +1,6 @@
 
 #################################################
-ItemEx Clone Engine v2.51 [Sammi Husky, Kapedani]
+ItemEx Clone Engine v2.52 [Sammi Husky, Kapedani]
 #################################################
 # Stages can override items
 # Character specific items
@@ -41,6 +41,7 @@ ItemEx Clone Engine v2.51 [Sammi Husky, Kapedani]
 .alias MuMsg__setMsgData                    = 0x800b8c7c
 .alias g_ftManager                          = 0x80B87C28
 .alias ftManager__getFighter                = 0x80814f20
+.alias ftInfo__getNamePtr                   = 0x808588d8
 .alias g_ftEntryManager                     = 0x80B87c48
 .alias ftEntryManager__getEntryIdFromTaskId = 0x80823f90
 .alias ftEntryManager__getEntity            = 0x80823b24
@@ -64,7 +65,6 @@ ItemEx Clone Engine v2.51 [Sammi Husky, Kapedani]
 .alias 076_SOUND_HEAP_LEVEL_ADDR    = 0x80B51918
 .alias ITM_FT_PARAM_ARCHIVES        = 0x80B5191C
 .alias FIGHTER_STR                  = 0x80B08850
-.alias BRAWLEX_FIGHTER_NAMES        = 0x817CD820
 .alias ITM_OVERRIDE_SETTINGS        = 0x80B51939
 .alias PKM_OVERRIDE_SETTINGS        = 0x80B518D8
 .alias DEFAULT_PKM_VARIETY_AMOUNT   = 5
@@ -686,15 +686,8 @@ skipBrres:
 op b 0xB0 @ $809af154   # Skip to formulate ItmParam
 
 .macro buildFighterItemPath()
-{
-    %lwi (r6, FIGHTER_STR)   # "Fighter"
-    andi. r12, r19, 0xFF    # Get ftKind from fourth parameter
-    %lwi (r11, BRAWLEX_FIGHTER_NAMES)  # Internal BrawlEX internal fighter names
-    mulli r12, r12, 0x10    # Offsets are 0x10 apart
-    add r7, r11, r12        # r7 now contains a pointer to the character filename when using P+EX
-    addi r8, r31, 0x1A44    # "item"
-    mr r9, r21              # "Itm" or "Pkm" or "Asf" or "Wpn"
-    mr r10, r7              # Fighter name again
+{   
+    
 }
 CODE @ $809af148
 {
@@ -709,24 +702,42 @@ HOOK @ $809af158
     stw r12, 0xc(r1)        # / "Brres"
     stw r14, 0x14(r1)       # ".pac"
 formulateBrresPath:
+    li r3, 0x0
+    andi. r4, r19, 0xFF    # Get ftKind from fourth parameter
+    %call(ftInfo__getNamePtr)
+    %lwi (r6, FIGHTER_STR)   # "Fighter"
+    mr r7, r3
+    addi r8, r31, 0x1A44    # "item"
+    mr r9, r21              # "Itm" or "Pkm" or "Asf" or "Wpn"
+    mr r10, r7              # Fighter name again
+
     addi r3, r1, 532
     li r4, 0xff
     addi r5, r31, 6807      # "/%s/%s/%s/%s%s%02d%s%02d.%s"
-    %buildFighterItemPath()
     rlwinm r12,r19,24,24,31 # \
     stw r12, 0x10(r1)       # / Costume id from fourth parameter
     crclr 6,6
     %call (snprintf)
 brresItemPathObtained:
+    li r3, 0x0
+    andi. r4, r19, 0xFF    # Get ftKind from fourth parameter
+    %call(ftInfo__getNamePtr)
+    stw r3, 0x14(r1)
+
     stw r14, 0x10(r1)       # ".pac"
     li r22, 276             # Formulate param path
     addi r5, r31, 6783      # "/%s/%s/%s/%s%s%02d%s.%s"
     addi r12, r31, 6919     # \
     stw r12, 0xc(r1)        # / "Param"
 formulateParamPath:
+    %lwi (r6, FIGHTER_STR)   # "Fighter"
+    lwz r7, 0x14(r1)
+    addi r8, r31, 0x1A44    # "item"
+    mr r9, r21              # "Itm" or "Pkm" or "Asf" or "Wpn"
+    mr r10, r7              # Fighter name again
+
     li r4, 0xff
     add r3, r1, r22
-    %buildFighterItemPath()
     crclr 6,6
     %call (snprintf)
     cmpwi r22, 0x24
@@ -3229,8 +3240,9 @@ word[12] 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, | # Stage Item switch
         0xFFE7FFFF, 0xFFFFFFFF, 0x7FFF7FFF, 0x7FFFFFDF, | # Classic Item switch
         0xFFE7BFFF, 0xfffffe17, 0x7FFF7FFF, 0x7Ff9f7df, | # All Star Item Switch
 @ $8042c4b8
-word[4] 0xFFE7BFFF, 0xfcebf016, 0x7FFF7FFF, 0x7ef9f7df, | # Multi Man Item Switch
-@ $8042d098
+word[8] 0xFFE7FFFF, 0xFFFFFFFF, 0x7FFF7FFF, 0x7FFFFFDF, | # Target Smash
+        0xFFE7BFFF, 0xfcebf016, 0x7FFF7FFF, 0x7ef9f7df, | # Multi Man Item Switch
+@ $8042d088
 
 op b 0x1c @ $800559ac  # Always use gmGetItemSwitchData_NormalStage[0] in gmGetItemSwitchData_NormalStage
 CODE @ $806ee9bc    # sqEvent::setupEvent
@@ -3244,6 +3256,18 @@ CODE @ $806ee9bc    # sqEvent::setupEvent
     lwz r0, 0x34(r18)   # |
     stw r0, 0x3c(r27)   # /
 } 
+HOOK @ $806efe08    # sqTargetBreak::setupTargetBreak
+{
+    %lwi(r12, 0x8042d088)   # \
+    lwz r11, 0x0(r12)       # |
+    stw r11, 0x30(r29)      # |
+    lwz r11, 0x4(r12)       # |
+    stw r11, 0x34(r29)      # | Use gmItSwitchData_Challenger[13] for target smash
+    lwz r11, 0x8(r12)       # |
+    stw r11, 0x38(r29)      # |
+    lwz r11, 0xC(r12)       # |
+    stw r11, 0x3C(r29)      # /
+}
 op subi	r4, r4, 0x3b48 @ $80055c5c   # \ Use gmGetItemSwitchData_NormalStage[1] for gmGetItemSwitchData_Simple
 op li r0, 0x1 @ $80055ccc            # /
 CODE @ $80055de4
@@ -3316,9 +3340,11 @@ CODE @ $809622d8    # stOperatorInfoTraining::processBegin
 #     fcmpo cr0,f1,f0   # Original operation
 #     fcmpo cr0,f1,f1
 # }
+## TODO: Null check of ItmParam so use global instead (in the future params will be in the item psa file, tho having a common ItmParam shared among fighter items could be useful for common scripts)
 ## TODO: Disable coin if not in coin mode from item switch? then can have it in crate drop 
-## TODO: Have clone/customizer item id in ItmParam instead of it being determined based on variant id? Accessible with itValueAccesser::getConstantIntCore. Could also use for common item brres and param id
-## TODO: Limit rolling crates to 10 otherwise it crashes
+## TODO: Have clone/customizer item id in ItmParam instead of it being determined based on variant id? Accessible with itValueAccesser::getConstantIntCore. Could also use for common item brres and param id. Slowly could turn every hardcoded id check into flags from param (including stuff like itCustomizer getKineticFlags)
+## TODO: Have an ItmParam be random drop chance from hit?
+## TODO: Limit rolling crates to 10 otherwise it crashes with collision
 ## TODO: Handle extra options for replays
 ## TODO: For completion sake patch any functions that call gmGetItemSwitchData including net relatedfunctions
 
@@ -3606,22 +3632,30 @@ Passive Aggressive Mode [Kapedani]
   bctrl    
 }
 
-.macro checkDisableFighterCollisionCategory(<reg>)
+.macro checkDisableFighterCollisionRoutine()
 {
+	stwu, r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0x8(r1)
+	mr r31, r3
+	
     %lwd (r11, g_GameGlobal)    # \
     lwz r11, 0x8(r11)           # |
     lbz r11, 0x31(r11)          # | Check if Passive Agressive mode is on
     andi. r11, r11, 0x10        # |
-    beq+ end                    # /
-    lwz <reg>, 0x28(<reg>)  # \
-    lwz r3, 0x8(<reg>)      # |
+    beq+ hitFighters            # /
+### Passive Aggressive Mode ###	
+    lwz r31, 0x28(r31)  	# \
+    lwz r3, 0x8(r31)     	# |
     lwz r12, 0x3c(r3)       # | attackModule->moduleAccesser->stageObject->soGetKind()
     lwz r12, 0xA4(r12)      # |
     mtctr r12               # |
     bctrl                   # /
     cmpwi r3, 0x2       # \ Check if soKind is a weapon
     bne+ notWeapon      # /
-    lwz r3, 0x8(<reg>)  # \
+### Checking Article Info ###	
+    lwz r3, 0x8(r31)  	# \
     lwz r12, 0x3c(r3)   # | 
     lwz r12, 0x1e8(r12) # | moduleAccesser->weapon->getFounderTaskId()
     mtctr r12           # |
@@ -3635,9 +3669,9 @@ Passive Aggressive Mode [Kapedani]
     lwz r4, 0x28(r3)    # task->taskId
     b checkEmitter
 founderNotFound:   
-    lwz r3, 0xd8(<reg>) # \
+    lwz r3, 0xd8(r31) 	# \
     lwz r3, 0x18(r3)    # |
-    lwz r12, 0x0(r3)   # | moduleAccesser->moduleEnumeration->teamModule->getTeamOwnerId()
+    lwz r12, 0x0(r3)   	# | moduleAccesser->moduleEnumeration->teamModule->getTeamOwnerId()
     lwz r12, 0x28(r12)  # |
     mtctr r12           # |
     bctrl               # /
@@ -3646,32 +3680,34 @@ founderNotFound:
 notWeapon:
     cmpwi r3, 0x4       # \ Check if soKind is a item
     bne+ notItem        # /
-    lwz r3, 0x8(<reg>)  # moduleAccesser->stageObject
+### Checking Item Info ###
+    lwz r3, 0x8(r31)  # moduleAccesser->stageObject
 isItem:
-    mr <reg>, r3
+    mr r31, r3
     %call (BaseItem__getCreaterItem)
     cmpwi r3, 0x0 
     bne+ isItem
-    lwz r12, 0x8c0(<reg>)   # baseItem->itKind
-    cmpwi r12, 0x15 # \ check if Dragoon set
-    beq- end        # /
-    lwz r4, 0x8C8(<reg>) # baseItem->emitterTaskId
+    lwz r12, 0x8c0(r31)   # baseItem->itKind
+    cmpwi r12, 0x15 	# \ check if Dragoon set
+    beq- hitFighters	# /
+    lwz r4, 0x8C8(r31) # baseItem->emitterTaskId
 checkEmitter:
     %lwd (r3, g_ftEntryManager)                     # \
     li r5, 0                                        # |
     %call (ftEntryManager__getEntryIdFromTaskId)    # | Check if emitterTaskId belongs to a fighter
     cmpwi r3, 0                                     # |
-    blt+ end                                        # /
+    blt+ hitFighters                                # /
     mr r4, r3                       # \
     %lwd (r3, g_ftManager)          # |
     li r5, -1                       # | moduleAccesser = g_ftManager->getFighter(entryId, -1)
     %call (ftManager__getFighter)   # |
-    lwz <reg>, 0x60(r3)             # /
+    lwz r31, 0x60(r3)             # /
     b checkBoss
 notItem:
     cmpwi r3, 0x0       # \ Check if soKind is a fighter
-    bne+ end            # / 
-    lwz r3, 0xD8(<reg>) # \
+    bne+ hitFighters    # / 
+### Checking Fighter Info ###
+    lwz r3, 0xD8(r31) # \
     lwz r3, 0x70(r3)    # |
     lwz r12, 0x0(r3)    # | moduleAccesser->moduleEnumeration->statusModule->getStatusKind()
     lwz r12, 0x48(r12)  # |
@@ -3680,9 +3716,9 @@ notItem:
     cmpwi r3, 158           # \
     blt+ checkBoss          # | Check if status is affiliated with item melee attacks
     cmpwi r3, 163           # |
-    ble+ end                # /
+    ble+ hitFighters        # /
 checkBoss:
-    lwz r10, 0x8(<reg>)
+    lwz r10, 0x8(r31)
     lwz r11, 0x10c(r10) # fighter->entryId
     %lwd (r12, g_ftEntryManager)    # \
     rlwinm r11, r11, 0, 24, 31      # |
@@ -3697,10 +3733,10 @@ checkBoss:
 JapaneseCheck:		# Look for "ボス"
 	lis r5, 0x30DC		# \ r5 = "ボス"
 	ori r5, r5, 0x30B9	# /
-	lwz r4, 0xA4(r12);	cmpw r4, r5;	beq- end
-	lwz r4, 0xA6(r12);	cmpw r4, r5;	beq- end
-	lwz r4, 0xA8(r12);	cmpw r4, r5;	beq- end
-	lwz r4, 0xAA(r12);	cmpw r4, r5;	beq- end
+	lwz r4, 0xA4(r12);	cmpw r4, r5;	beq- hitFighters
+	lwz r4, 0xA6(r12);	cmpw r4, r5;	beq- hitFighters
+	lwz r4, 0xA8(r12);	cmpw r4, r5;	beq- hitFighters
+	lwz r4, 0xAA(r12);	cmpw r4, r5;	beq- hitFighters
 BOSScheck:
 	lis r5, 0xFF22		# \ r5 = "BO"
 	ori r5, r5, 0xFF2F	# /
@@ -3708,10 +3744,10 @@ BOSScheck:
 	ori r6, r6, 0xFF33 	# /
 B_0a:
 	lwz r4, 0xA4(r12); cmpw r4, r5; bne+ B_1a
-	lwz r4, 0xA8(r12); cmpw r4, r6; beq- end
+	lwz r4, 0xA8(r12); cmpw r4, r6; beq- hitFighters
 B_1a:
 	lwz r4, 0xA6(r12); cmpw r4, r5; bne boss_Check
-	lwz r4, 0xAA(r12); cmpw r4, r6; beq- end
+	lwz r4, 0xAA(r12); cmpw r4, r6; beq- hitFighters
 boss_Check:		
 	lis r5, 0xFF42		# \ r5 = "bo"
 	ori r5, r5, 0xFF4F	# /
@@ -3719,10 +3755,10 @@ boss_Check:
 	ori r6, r6, 0xFF53 	# /
 B_0b:
 	lwz r4, 0xA4(r12); cmpw r4, r5; bne+ B_1b
-	lwz r4, 0xA8(r12); cmpw r4, r6; beq- end
+	lwz r4, 0xA8(r12); cmpw r4, r6; beq- hitFighters
 B_1b:
 	lwz r4, 0xA6(r12); cmpw r4, r5; bne notBoss
-	lwz r4, 0xAA(r12); cmpw r4, r6; beq- end
+	lwz r4, 0xAA(r12); cmpw r4, r6; beq- hitFighters
 boss_Check2:	
 	lis r5, 0xFF22		# \ r5 = "Bo"
 	ori r5, r5, 0xFF4F	# /
@@ -3730,13 +3766,13 @@ boss_Check2:
 	ori r6, r6, 0xFF53 	# /
 B_0c:
 	lwz r4, 0xA4(r12); cmpw r4, r5; bne+ B_1c
-	lwz r4, 0xA8(r12); cmpw r4, r6; beq- end
+	lwz r4, 0xA8(r12); cmpw r4, r6; beq- hitFighters
 B_1c:
 	lwz r4, 0xA6(r12); cmpw r4, r5; bne notBoss
-	lwz r4, 0xAA(r12); cmpw r4, r6; beq- end	
+	lwz r4, 0xAA(r12); cmpw r4, r6; beq- hitFighters	
 notBoss:
 
-    lwz r3, 0x8(<reg>)  # \
+    lwz r3, 0x8(r31)  	# \
     lwz r12, 0x3c(r3)   # | 
     lwz r12, 0xA8(r12)  # | moduleAccesser->stageObject->soGetSubKind()
     mtctr r12           # |
@@ -3748,30 +3784,30 @@ notBoss:
 warioMan:
     lis r4, 0x1200      # \
     addi r4, r4, 0x3d   # |
-    lwz r3, 0xd8(<reg>) # |
+    lwz r3, 0xd8(r31) 	# |
     lwz r3, 0x64(r3)    # | moduleAccessor->moduleEnumeration->workManageModule->isFlag(0x1200003d)
     lwz r12, 0x0(r3)    # |
     lwz r12, 0x4c(r12)  # |
     mtctr r12           # |
     bctrl               # /
     cmpwi r3, 0x1           # \
-    beq+ end                # | check if flag is on (i.e. is it during WarioMan transformation)
+    beq+ hitFighters    	# | check if flag is on (i.e. is it during WarioMan transformation)
     b normalFinalSmash      # /
 gKoopa:
     lis r4, 0x1000      # \
     addi r4, r4, 0x40   # |
-    lwz r3, 0xd8(<reg>) # |
+    lwz r3, 0xd8(r31) 	# |
     lwz r3, 0x64(r3)    # | moduleAccessor->moduleEnumeration->workManageModule->getInt(0x10000040)
     lwz r12, 0x0(r3)    # |
     lwz r12, 0x18(r12)  # |
     mtctr r12           # |
     bctrl               # /
     cmpwi r3, 0x2           # \
-    bgt+ end                # / check if int > 0x2 (i.e. is it during Giga Bowser transformation)
+    bgt+ hitFighters        # / check if int > 0x2 (i.e. is it during Giga Bowser transformation)
 normalFinalSmash:
     lis r4, 0x1200      # \
     addi r4, r4, 0x6    # |
-    lwz r3, 0xd8(<reg>) # |
+    lwz r3, 0xd8(r31) 	# |
     lwz r3, 0x64(r3)    # | moduleAccessor->moduleEnumeration->workManageModule->isFlag(0x12000006)
     lwz r12, 0x0(r3)    # |
     lwz r12, 0x4c(r12)  # |
@@ -3781,21 +3817,48 @@ normalFinalSmash:
     bne+ dontHitFighters    # /
     lis r4, 0x1200      # \
     addi r4, r4, 0x8    # |
-    lwz r3, 0xd8(<reg>) # |
-    lwz r3, 0x64(r3)    # | moduleAccessor->moduleEnumeration->workManageModule->isFlag(0x1200x1200000600008)
+    lwz r3, 0xd8(r31) 	# |
+    lwz r3, 0x64(r3)    # | moduleAccessor->moduleEnumeration->workManageModule->isFlag(0x12000008)
     lwz r12, 0x0(r3)    # |
     lwz r12, 0x4c(r12)  # |
     mtctr r12           # |
     bctrl               # /
-    cmpwi r3, 0x0       # \ Check if fighter used final smash
-    beq+ end            # /
+    cmpwi r3, 0x0        # \ Check if fighter used final smash
+    bne+ dontHitFighters # /
+hitFighters:
+	li r3, 0
+	b end
+dontHitFighters:
+	li r3, 1			# Merit Disabling!
+end:
+	lwz r0, 0x14(r1)
+	mtlr r0
+	lwz r31, 0x8(r1)
+	addi r1, r1, 0x10
+	blr
+}
+
+.macro checkDisableFighterCollisionCategory(<reg>)
+{
+	mr r3, <reg>
+	bla 0x758F60		# custom function below!
+	cmpwi r3, 1
+	bne- end
+}
+HOOK @ $80758F60
+{
+	%checkDisableFighterCollisionRoutine()
+}
+
+HOOK @ $80758F5C
+{
+	addi r1, r1, 0x20		# Original operation
+	blr						# Making room for a function pointer to the above.
 }
 
 HOOK @ $80745d00    # soCollisionAttackModule::update
 {
-    mr r28, r31   # Store r31 (attackModule)
-    %checkDisableFighterCollisionCategory(r31)
-dontHitFighters:
+    %checkDisableFighterCollisionCategory(r31) # attackModule
     addi r3, r29, 0x44      # \
     lwz r12, 0x44(r29)      # |
     li r4, 1                # |
@@ -3806,33 +3869,27 @@ dontHitFighters:
     andi. r0,r0,0xfdbc      # | clTarget->categoryMask.isCollisionCategory0,1,6,9 = false
     sth r0, 0x6(r3)         # /
 end:
-    mr r31, r28         # Restore r31
     lwz	r6, 0x28(r31)   # Original operation
 }
 
 HOOK @ $80756288    # soCollisionCatchModuleImpl::set
 {
     mr r30, r27   # Store r27 (catchModule)
-    %checkDisableFighterCollisionCategory(r27)
-dontHitFighters:
+    %checkDisableFighterCollisionCategory(r27) # catchModule
     lhz r6, 0x12(r29)       # \
     andi. r6,r6,0xdbcf      # | Change category mask to not hit fighter,stage or enemies
     sth r6, 0x12(r29)       # /
 end:
-    mr r27, r30     # Restore r27
     mr r4, r28      # Original operation
 }
 
 HOOK @ $80758d94    # soCollisionSearchhModuleImpl::set
 {
-    mr r30, r31   # Store r31 (searchModule)
-    %checkDisableFighterCollisionCategory(r31)
-dontHitFighters:
+    %checkDisableFighterCollisionCategory(r31) # searchModule
     lhz r6, 0x12(r27)       # \
     andi. r6,r6,0x6f3f      # | Change category mask to not hit fighter,stage or enemies
     sth r6, 0x12(r27)       # /
 end:
-    mr r31, r30 # Restore r31
     mr r4, r26  # Original operation
 }
 

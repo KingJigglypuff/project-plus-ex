@@ -35,26 +35,35 @@ finish:
 }
 op NOP @ $80A15820	# NOP's original stw r5, 0x14(r1) since the same value is also used for the model and animation
 
-#############################################################
-[Project+] Yoshi's eggshell particles are Colored [DukeItOut]
-#############################################################
+#################################################################
+[Project+] Yoshi's eggshell particles are Colored 1.1 [DukeItOut]
+#################################################################
 # Use in conjunction with the above code, the code adding 
 # support for additional efect animations and a module 
 # modified to use these new features
-#############################################################
+#
+# 1.1: Fixed oversight regarding Kirby and the effect his
+# 	Egg Lay copy ability will spawn.
+#################################################################
 HOOK @ $80892AF8
 {
 	lwz r3, 0xD8(r29)	# Original operation
 	lwz r4, 0x44(r18)	# Parent (Yoshi)
+	lwz r12, 0x08(r4)	# \ Character instance ID
+	lwz r12, 0x110(r12) # /
 	lwz r4, 0x70(r4)
 	lwz r4, 0x20(r4)	# LA
 	lwz r4, 0x0C(r4)	# Basic
-	lwz r4, 0xD8(r4)	# 54 (Color)
+	lwz r0, 0xD8(r4)	# 54 (Color)
 	
 	lwz r5, 0x64(r3)
 	lwz r5, 0x24(r5)	# RA
 	lwz r5, 0x0C(r5)	# Basic
-	stw r4, 0x40(r5)	# 16 (store Yoshi color)
+	stw r0, 0x40(r5)	# 16 (store Yoshi color)
+	stw r12, 0x44(r5)	# 17 (character who is eating)
+	cmpwi r12, 5; bne+ %END% # Check if Kirby
+	lwz r0, 0x120(r4) # LA-Basic 72 (Kirby Copy Instance ID)
+	stw r0, 0x40(r5)	# 16 (Kirby copy ability if 17 is 5)
 }
 HOOK @ $80A15CE0
 {
@@ -63,7 +72,11 @@ HOOK @ $80A15CE0
 	lwz r3, 0x70(r3)		#
 	lwz r3, 0x24(r3)		# RA
 	lwz r3, 0x0C(r3)		# Basic
-	lwz r8, 0x40(r3)		# 16: Costume ID of the Yoshi that made this egg.
+	lwz r8, 0x40(r3)		# 16: Costume ID of the Yoshi that made this egg (if Yoshi)
+	stw r8, 0x14(r1)
+	lwz r7, 0x44(r3)		# 17: Character ID of who spawned the egg
+	stw r7, 0x18(r1)		# The stack here won't be used until later in the function, safe!
+	cmpwi r7, 5; beq- skip	# Check if Kirby
     lis r12, 0x8006
     ori r12, r12, 0x06A8
     mtctr r12 
@@ -73,9 +86,18 @@ HOOK @ $80A15CE0
 	li r7, 0
 	li r9, 128			# Custom identifier
     bctrl				# Set the animation indexes of this effect!	
-
+skip:
 	lwz r5, 0x10(r1)
 	lis r3, 0x80AE		# Original operation.
+}
+HOOK @ $80A15CFC
+{
+	addi r4, r4, 3		# Original operation. Sets effect to 00050003
+	lwz r7, 0x18(r1)
+	cmpwi r7, 4; beq+ %END% # Skip if Yoshi! The above is right!
+	
+	lis r4, 0x109		# \
+	ori r4, r4, 1		# / ef_KbYoshi has it in a different slot!
 }
 
 #########################################################

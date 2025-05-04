@@ -1184,7 +1184,25 @@ HOOK @ $806dea1c
     bctr
 }
 
-##############################################
-CSS Selections Preserved in Training [Squidgy]
-##############################################
-op b 0x24 @ $806f14d8
+###################################################################
+Only Reset Team Setting Upon Entering Training [Squidgy, Kapedani]
+###################################################################
+.alias g_GameGlobal                         = 0x805a00E0
+
+.macro lwd(<reg>, <addr>)
+{
+    .alias  temp_Lo = <addr> & 0xFFFF
+    .alias  temp_Hi_ = <addr> / 0x10000
+    .alias  temp_r = temp_Lo / 0x8000
+    .alias  temp_Hi = temp_Hi_ + temp_r
+    lis     <reg>, temp_Hi
+    lwz     <reg>, temp_Lo(<reg>)
+}
+
+CODE @ $806f14d0  # sqTraining::start
+{
+    %lwd(r12, g_GameGlobal)
+    lwz r12, 0x10(r12)
+    li r11, 0x0
+    stb r11, 0x33(r12)
+}

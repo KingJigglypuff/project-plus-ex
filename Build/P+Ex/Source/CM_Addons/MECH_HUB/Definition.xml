@@ -1,0 +1,85 @@
+<addon name="Mechanics Hub v1.0.0 [QuickLava]" shortName="MECH_HUB" makeINDEXFile="true">
+	<codeMenuPage shortName="_SPECIAL">
+		<codeMenuSubmenu name="Bonus Mechanic Settings" shortName="PAGE_000"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_000">
+		<codeMenuComment text="Bonus Mechanic Settings: "/>
+		<codeMenuSubmenu name="Player 1 Mechanic Settings" shortName="PAGE_001"/>
+		<codeMenuSubmenu name="Player 2 Mechanic Settings" shortName="PAGE_002"/>
+		<codeMenuSubmenu name="Player 3 Mechanic Settings" shortName="PAGE_003"/>
+		<codeMenuSubmenu name="Player 4 Mechanic Settings" shortName="PAGE_004"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_001">
+		<codeMenuComment text="Player 1 Mechanic Settings: "/>
+		<codeMenuComment text="Active Mechanics: "/>
+		<codeMenuSelection name="Active Mechanic" shortName="LINE_001">
+			<defaultOption index="0" />
+			<option value="None" />
+			<option value="Airdodge Cancels" />
+			<option value="Slime Cancels" />
+			<option value="Rocket Burst" />
+		</codeMenuSelection>
+		<codeMenuComment text="Passive Mechanics: "/>
+		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_005">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_009">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_013">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_002">
+		<codeMenuComment text="Player 2 Mechanic Settings: "/>
+		<codeMenuComment text="Active Mechanics: "/>
+		<codeMenuSelectionMirror name="Active Mechanic" shortName="LINE_002" mirrorSourceShortName="LINE_001">
+			<defaultOption index="0" />
+		</codeMenuSelectionMirror>
+		<codeMenuComment text="Passive Mechanics: "/>
+		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_006">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_010">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_014">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_003">
+		<codeMenuComment text="Player 3 Mechanic Settings: "/>
+		<codeMenuComment text="Active Mechanics: "/>
+		<codeMenuSelectionMirror name="Active Mechanic" shortName="LINE_003" mirrorSourceShortName="LINE_001">
+			<defaultOption index="0" />
+		</codeMenuSelectionMirror>
+		<codeMenuComment text="Passive Mechanics: "/>
+		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_007">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_011">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_015">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_004">
+		<codeMenuComment text="Player 4 Mechanic Settings: "/>
+		<codeMenuComment text="Active Mechanics: "/>
+		<codeMenuSelectionMirror name="Active Mechanic" shortName="LINE_004" mirrorSourceShortName="LINE_001">
+			<defaultOption index="0" />
+		</codeMenuSelectionMirror>
+		<codeMenuComment text="Passive Mechanics: "/>
+		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_008">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_012">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_016">
+			<defaultValue value="false" />
+		</codeMenuToggle>
+	</codeMenuPage>
+</addon>
+

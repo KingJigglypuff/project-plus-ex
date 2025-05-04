@@ -660,7 +660,7 @@ op  blr  @ $8001eb94
 
 .RESET
 
-.include Source/P+Ex/ReplacementSoundbankEngine.asm
+.include Source/Project+/ReplacementSoundbankEngine.asm
 
 ####################################
 SDHC/SDXC Extension 2.0 [Bero, Jako]

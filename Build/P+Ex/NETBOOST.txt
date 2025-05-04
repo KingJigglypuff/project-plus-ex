@@ -10,6 +10,7 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/Netplay/Net-StageFiles.asm
 .include Source/Project+/CustomRequirements.asm
 .include Source/Project+/Shake.asm
+.include Source/Project+/Slippery.asm
 .include Source/Project+/LedgeGrab.asm
 .include Source/Project+/ScreenKO.asm
 .include Source/Project+/Timeout.asm
@@ -17,37 +18,9 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/Project+/PSA.asm
 .include Source/Project+/AnimatedCSS.asm
 .include Source/Project+/Hurtbox.asm
+.include Source/Project+/Camera.asm
 
 .include Source/ProjectM/IdleAudioFade.asm
-
-###############################################
-Sleep doesn't pierce armour in air [Eon]
-# Formerly in Source/ProjectM/PSA/Misc.asm
-# Moved so the rest of that file could be
-# converted into an inject!
-###############################################
-HOOK @ $8085CDD0
-{
-    stw r4, 0xC(r1)
-    lwz r3, 0xD8(r4)
-}
-HOOK @ $8085CDF0 
-{
-    lwz r3, 0xC(r1)
-    lwz r3, 0xD8(r3)
-    lwz r3, 0x14(r3)
-    lwz r12, 0(r3)
-    lwz r12, 0x14(r12)
-    mtctr r12 
-    bctrl 
-    cmpwi r3, 2 #if situation = in air, noReaction = true
-    beq true
-false:
-    li r3, 0
-    b %end%
-true:
-    li r3, 1
-}
 
 .include Source/ProjectM/SpecialModes/AllStarVs.asm
 .include Source/ProjectM/SpecialModes/BombRain.asm
@@ -61,6 +34,7 @@ true:
 
 .include Source/Project+/EffectCommands.asm
 .include Source/Project+/EffectsEX.asm
+.include Source/Project+/Effects.asm
 .include Source/Project+/Attributes.asm
 .include Source/Project+/PokeTrainer.asm
 
@@ -77,6 +51,7 @@ true:
 .include Source/Project+/VictoryCamera.asm
 .include Source/Project+/ResultsSkip.asm
 .include Source/Project+/Unlocks.asm
+.include Source/Project+/Hitbox.asm
 
 .include Source/LegacyTE/ASLHelper.asm
 .include Source/LegacyTE/UnboundedTeamEngine.asm
@@ -86,14 +61,17 @@ true:
 .include Source/ProjectM/Handicap.asm
 
 .include Source/Community/MusicSelect.asm
+.include Source/Community/PassiveAnim.asm
 .include Source/Community/Subspace.asm
+.include Source/Community/SubspaceSwap.asm
+.include Source/Community/WallAttach.asm
 
 .include Source/Community/PSA/Angle.asm
 .include Source/Community/PSA/IC-Basics.asm
 .include Source/Community/PSA/Maths.asm
+.include Source/Community/PSA/NewCommands.asm
 .include Source/Community/PSA/PointerWizardry.asm
 .include Source/Community/PSA/PSA.asm
-.include Source/Community/PSA/VariableParameter.asm
 
 #.include Source/Project+/TexFlags.asm	# This code is currently having issues interacting with the Code Menu. Included 
 					# to allow an understanding of how it will mechanically work in the future.
@@ -101,7 +79,6 @@ true:
 .include Source/P+Ex/AllStar.asm
 .include Source/P+Ex/CustomEnding.asm
 .include Source/P+Ex/Misc.asm
-.include Source/P+Ex/PassiveAnim.asm
 .include Source/P+Ex/SoundbankFix.asm
 .include Source/Community/lavaInjectLoader.asm
 #.include Source/Community/Character-CostumeSwapper.asm # Disabled by default, as there's no characters in base P+Ex who utilize this function. This code is simply here for people to make use of for their own builds.

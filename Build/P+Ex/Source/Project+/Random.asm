@@ -27,26 +27,23 @@ RSS Page Switch [DukeItOut, Kapedani]
 .alias _pf               			= 0x80507b70
 .alias STAGE_FOLDER 				= 0x8053EFE4
 
-.alias NUM_STAGES_PAGE_1			= 0x806B929C
-.alias NUM_STAGES_PAGE_2 			= 0x806B92A4
-.alias NUM_STAGES_EX_PAGE			= 0x80496000
-.alias NUM_STAGES_EX_PAGE_START		= 0x80496002
-.alias NUM_STAGES 					= 0x800AF673
-.alias RSS_EXDATA					= 0x806AEDA0
-.alias RSS_HAZARD_DATA				= 0x806AEDBE
-.alias RSS_EXDATA_BONUS				= 0x806AEE18
-.alias RSS_EXDATA_PATH_FULL			= 0x806AEDE0
-.alias RSS_EXDATA_PATH				= 0x806AEDE4
-.alias RSS_CURRENT_PRESET			= 0x806AEDF4
-.alias STAGE_SLOTS_PAGES 			= 0x80495D04
-.alias STAGE_SLOTS_COSMETIC			= 0x80495D00
+.alias STAGE_PAGES					= 0x8042C524
+.alias STAGE_PAGES_IDS				= 0x8042C525
+.alias RSS_EXDATA					= 0x8042C4E8
+.alias RSS_HAZARD_DATA				= 0x8042C506
+.alias RSS_EXDATA_BONUS				= 0x8042C840
+.alias RSS_EXDATA_PATH_FULL			= 0x8042C808
+.alias RSS_EXDATA_PATH				= 0x8042C80C
+.alias RSS_CURRENT_PRESET			= 0x8042C81C
+.alias STAGE_SLOTS_COSMETIC			= 0x8042C5EC
 .alias CURRENT_PAGE					= 0x80496000
-.alias PAGE_INDEX					= 0x806AEDF9
-.alias RANDOM_LAST_STAGEKIND		= 0x806AEDF8
-.alias STAGE_STRIKE_TABLE			= 0x806AEDFA
+.alias PAGE_INDEX					= 0x8042C821
+.alias RANDOM_LAST_STAGEKIND		= 0x8042C820
+.alias STAGE_STRIKE_TABLE			= 0x8042C822
 .alias ASL_BUTTON					= 0x800B9EA2
 .alias MUSIC_SELECT_STEP			= 0x80002810
 
+.alias MAX_PAGES 					= 0x5
 .alias DEFAULT_RSS_INDEX			= 0x00	# Index of main .rss to load/save, Netplay - 0xFF
 .alias NUM_PRESETS					= 0x7	# Change for more presets
 
@@ -130,7 +127,7 @@ RSS Page Switch [DukeItOut, Kapedani]
 #op lis r7, 0x0010 @ $806c8750
 #op li r4, 43 @ $806c8748	# load sc_selcharacter2.pac in MenuResource instead of InfoExtraResource
 
-string "%s%s%s%s/%s%02X.rss" @ $806AEDE0 
+string "%s%s%s%s/%s%02X.rss" @ $8042C808  
 
 op cmpwi r25, 41 @ $806a4104	# \ Use same model for all 41 panes
 op b 0x4C @ $806a410c			# / 
@@ -176,8 +173,8 @@ HOOK @ $806acb1c	# muProcStageSwitch::selectProc
 
 	%branch (0x806acd2c)
 notHazardSwitchButton:
-	li r12, 0x0							# \ reset RSS_CURRENT_PRESET
-	%shd(r12, r11, RSS_CURRENT_PRESET)	# /
+	#li r12, 0x0							# \ reset RSS_CURRENT_PRESET
+	#%shd(r12, r11, RSS_CURRENT_PRESET)	# /
 	mr r21, r24
 	cmpwi r24, 0x1f
 	blt+ %end%
@@ -253,16 +250,16 @@ notDefault:						# /
 end:
 	lwz	r29, 0x73C(r22)	# Original operation
 }
-HOOK @ $806ac78c	# muProcStageSwitch::selectProc
-{
-	li r5, 0x0							# \ reset RSS_CURRENT_PRESET when turn page on is set
-	%shd(r5, r11, RSS_CURRENT_PRESET)	# /
-	lwz	r3, 0x66C(r22)			# \
-	li r4, 0					# | update preset name 
-	li r6, 0					# |
-	%call(MuMsg__printIndex)	# /
-	lwz	r3, 0x64C(r22)	# Original operation
-}
+# HOOK @ $806ac78c	# muProcStageSwitch::selectProc
+# {
+# 	li r5, 0x0							# \ reset RSS_CURRENT_PRESET when turn page on is set
+# 	%shd(r5, r11, RSS_CURRENT_PRESET)	# /
+# 	lwz	r3, 0x66C(r22)			# \
+# 	li r4, 0					# | update preset name 
+# 	li r6, 0					# |
+# 	%call(MuMsg__printIndex)	# /
+# 	lwz	r3, 0x64C(r22)	# Original operation
+# }
 
 op b 0x2c @ $806ac83c
 op b 0x444 @ $806ac8e8
@@ -306,18 +303,21 @@ CODE @ $806ac98c # muProcStageSwitch::selectProc
 	mr r3, r22
 	%call (muProcStageSwitch__exit)
 
-	%lbdu(r12, r10, NUM_STAGES_EX_PAGE_START)
-	li r11, 1
+	%lbdu(r12, r10, STAGE_PAGES)
+	li r11, -1
 loc_hasStage:
 	cmpwi r12, 0x0
 	addi r11, r11, 0x1
-	lbzu r12, 0x1(r10)
+	lbzu r12, 0x28(r10)  
 	bne+ loc_hasStage
 	lbz r9, 0x763(r22)
-	addi r9, r9, 0x1 			# \ 
-	cmpw r9, r11 				# | Increment page
-	blt+ dontResetPageNumber	# /
-	li r9, 0x0
+	addi r9, r9, 0x1 			# Increment page
+	cmpwi r9, MAX_PAGES			# \
+	bge+ resetPageNumber		# |
+	cmpw r9, r11 				# | check if in max pages
+	blt+ dontResetPageNumber	# |
+resetPageNumber:				# / 
+	li r9, 0x0					
 dontResetPageNumber:
 	stb r9, 0x763(r22)
 
@@ -359,21 +359,15 @@ HOOK @ $806ab88c	# muProcStageSwitch::init
 {
 	## Set number of Normal stages accessible
 	lbz r12, 0x763(r31)
-	%lbdu (r29, r11, NUM_STAGES_PAGE_1)
-	cmpwi r12, 0x1
-	bne+ notPage2
-	lbz r29, 0x8(r11)
-notPage2:
-	ble+ notExtraPages
-	%lwi (r11, NUM_STAGES_EX_PAGE)
-	lbzx r29, r11, r12
-notExtraPages:
+  	mulli r11, r12, 40  	# \
+	%lwi(r12, STAGE_PAGES)	# | get number of stages in pages
+	lbzx r29, r11, r12		# /
 	stw r29, 0x15C(r1)
 	cmpwi r29, 0x1f
 	ble+ lessThanMaxNormalStages
 	li r29, 0x1f
-lessThanMaxNormalStages:	
- 	stw r29, 0x704(r31)
+lessThanMaxNormalStages:
+	stw r29, 0x704(r31)
 }
 HOOK @ $806ab908	# muProcStageSwitch::init
 {
@@ -406,15 +400,16 @@ notHazardSwitch:
 	%call (muProcMenu__setAnimUpdateRate)	# /
 	
 	## Set animIndex of icon
-	%lwi (r10, STAGE_SLOTS_PAGES)
+	%lwi(r10, STAGE_PAGES_IDS)
 	lbz r12, 0x763(r31)	# \
-	mulli r12, r12, 0x4	# | pages[pageNumber]
-	lwzx r12, r10, r12 	# /
+	mulli r12, r12, 40	# | pages[pageNumber]
+	add r12, r10, r12 	# /
 	lwz	r11, 0x688(r23)	# Original operation
 	lbzx r12, r12, r11	# Get stage slot
 	mulli r12, r12, 0x2	# \ 
-	lwz r10, -0x4(r10)	# | get cosmetic id
-	addi r10, r10, 0x1	# |
+	#lwz r10, -0x4(r10)	# | get cosmetic id
+	#addi r10, r10, 0x1	# |
+	addi r10, r10, 0xC8
 	lbzx r10, r10, r12	# /
 	subi r0, r10, 0x1
 }
@@ -437,61 +432,61 @@ notHazardSwitch:
 	%call (muProcMenu__setAnimUpdateRate)	# /
 
 	## Set animIndex of icon
-	%lwi (r10, STAGE_SLOTS_PAGES)
+	%lwi(r10, STAGE_PAGES_IDS)
 	lbz r12, 0x763(r31)	# \
-	mulli r12, r12, 0x4	# | pages[pageNumber]
-	lwzx r12, r10, r12 	# /
+	mulli r12, r12, 40	# | pages[pageNumber]
+	add r12, r10, r12 	# /
 	lwz	r11, 0x708(r28)	# Original operation
 	addi r11, r11, 0x1f	# 
 	lbzx r12, r12, r11	# Get stage slot
 	mulli r12, r12, 0x2	# \ 
-	lwz r10, -0x4(r10)	# | get cosmetic id
-	addi r10, r10, 0x1	# |
+	addi r10, r10, 0xC8 # | get cosmetic id
 	lbzx r10, r10, r12	# /
 	subi r0, r10, 0x1
 }
 
-CODE @ $806abf04	# muProcStageSwitch::init
+HOOK @ $806abf04	# muProcStageSwitch::init
+{
+	%lhd(r5, RSS_CURRENT_PRESET)
+}
+CODE @ $806abf0C	# muProcStageSwitch::init
 {
 	# print preset name
-	lhz r5, 0xBC(r26)	# RSS_CURRENT_PRESET
-	li r4, 0x0
 	li r6, 0x0
 	bl -0x5F2D58	# MuMsg::printIndex 
 }
 HOOK @ $806acf24	# muProcStageSwitch::setCursor
 {
 	subi r5, r29, 19	
-	%lwi (r10, STAGE_SLOTS_PAGES)
+	%lwi(r10, STAGE_PAGES_IDS)
 	lbz r12, 0x763(r28)	# \
-	mulli r12, r12, 0x4	# | pages[pageNumber]
-	lwzx r12, r10, r12 	# /
+	mulli r12, r12, 40	# | pages[pageNumber]
+	add r12, r10, r12 	# /
 	lbzx r12, r12, r5	# Get stage slot
 	mulli r12, r12, 0x2	# \ 
-	lwz r10, -0x4(r10)	# | get cosmetic id
-	addi r10, r10, 0x1	# |
+	addi r10, r10, 0xC8 # | get cosmetic id
 	lbzx r5, r10, r12	# /
 	addi r5, r5, NUM_PRESETS
 }
 HOOK @ $806acf74	# muProcStageSwitch::setCursor
 {
 	subi r5, r29, 2		
-	%lwi (r10, STAGE_SLOTS_PAGES)
+	%lwi(r10, STAGE_PAGES_IDS)
 	lbz r12, 0x763(r28)	# \
-	mulli r12, r12, 0x4	# | pages[pageNumber]
-	lwzx r12, r10, r12 	# /
+	mulli r12, r12, 40	# | pages[pageNumber]
+	add r12, r10, r12 	# /
 	lbzx r12, r12, r5	# Get stage slot
 	mulli r12, r12, 0x2	# \ 
-	lwz r10, -0x4(r10)	# | get cosmetic id
-	addi r10, r10, 0x1	# |
+	addi r10, r10, 0xC8 # | get cosmetic id
 	lbzx r5, r10, r12	# /
 	addi r5, r5, NUM_PRESETS
 }
 op li r5, NUM_PRESETS @ $806acf08	# custom stages button line index
-CODE @ $806acee4	# muProcStageSwitch::setCursor
+CODE @ $806acedc	# muProcStageSwitch::setCursor
 {
 	# print preset name
-	lhz	r5, -0x120C(r5)	# RSS_CURRENT_PRESET
+	lwz	r3, 0x066C (r3)
+	%lhd(r5, RSS_CURRENT_PRESET)
 	li r4, 0x0
 	li r6, 0x0
 	bl -0x5F3D38	# MuMsg::printIndex
@@ -506,14 +501,13 @@ HOOK @ $806ad070	# muProcStageSwitch::setCursor
 	blt+ notMeleeStages
 	subi r29, r29, 17
 notMeleeStages:
-	%lwi (r10, STAGE_SLOTS_PAGES)
+	%lwi(r10, STAGE_PAGES_IDS)
 	lbz r12, 0x763(r28)	# \
-	mulli r12, r12, 0x4	# | pages[pageNumber]
-	lwzx r12, r10, r12 	# /
+	mulli r12, r12, 40	# | pages[pageNumber]
+	add r12, r10, r12 	# /
 	lbzx r12, r12, r29	# Get stage slot
 	mulli r12, r12, 0x2	# \ 
-	lwz r10, -0x4(r10)	# | get cosmetic id
-	addi r10, r10, 0x1	# |
+	addi r10, r10, 0xC8 # | get cosmetic id
 	lbzx r10, r10, r12	# /
 	addi r29, r10, 0x1
 
@@ -578,6 +572,8 @@ HOOK @ $806cb200	# scStrap::process
 	li r8, DEFAULT_RSS_INDEX		# /
 	li r12, -1			# \ set RANDOM_LAST_STAGEKIND to -1
 	stb r12, 0x14(r4)	# /
+	li r12, 0x0			# \ set RSS_CURRENT_PRESET to 0
+	sth r12, 0x10(r4)	# /
 	%call (sprintf)					
 	
 	addi r3, r1, 0x10
@@ -665,7 +661,7 @@ exit:
 	stw r4, 0xc(r3)					# |
 	addi r4, r1, 0x40				# |
 	stw r4, 0x0(r3)					# |
-	li r4, 60						# |
+	li r4, 772 						# |
 	stw r4, 0x8(r3)					# |
 	li r4, -1						# |
 	stw r4, 0x14(r3)				# |
@@ -769,7 +765,7 @@ selectRandom:
 	li r30, 0x0	# Number of selected stages 
 	li r6, 0x0	# Page number
 	%lwi (r12, RSS_EXDATA)
-	%lwi (r29, STAGE_SLOTS_PAGES)
+	%lwi (r29, STAGE_PAGES_IDS)
 	cmpwi r27, 0x2 
 	beq- addCustomStage 
 nextPage:
@@ -779,30 +775,22 @@ nextPage:
 	slwi r4,r4,16
 	lhz r11, 0x4(r12)
 	or r4, r4, r11
-	lhz r5, 0x5C(r12)
+	lhz r5, 0x33C(r12)
 	slwi r5,r5,16
-	lhz r11, 0x5E(r12)
+	lhz r11, 0x33E(r12)
 	or r5, r5, r11
 	li r3, -1		# \
 	xor r5, r5, r3	# / Invert the strike table
 	and r4, r5, r4
 	li r7, 0x0	# Stage index in current page
-	lwz r11, 0x0(r29)	# Stage slots in current page
-	%lbdu (r8, r9, NUM_STAGES_PAGE_1)
-	cmpwi r6, 0x1
-	bne+ notPage2
-	lbz r8, 0x8(r9)
-notPage2:
-	ble+ notExtraPages
-	%lwi (r9, NUM_STAGES_EX_PAGE)
-	lbzx r8, r9, r6
+	lbz r8, -0x1(r29)		# get number of stages in page
 notExtraPages:
 	cmpwi r8, 0x0
 	ble+ noStagesLeft
 	andi. r0, r4, 0x1
 	srawi r4, r4, 1
 	beq+ notSelected
-	lbzx r3, r11, r7
+	lbzx r3, r29, r7 
 	stb r6, 0x0(r28) 
 	stb r7, 0x1(r28)
 	stb r3, 0x2(r28)
@@ -819,7 +807,7 @@ notSelected:
 	cmpwi r7, 0x1F
 	bne+ notMeleeStagesStart
 	lhz r4, 0x0(r12)
-	lhz r5, 0x5A(r12)
+	lhz r5, 0x33A(r12)
 	li r3, -1		# \
 	xor r5, r5, r3	# / Invert the strike table
 	and r4, r5, r4
@@ -828,9 +816,9 @@ notMeleeStagesStart:
 	b notExtraPages
 noStagesLeft:	
 	addi r12, r12, 0x6
-	addi r29, r29, 0x4
+	addi r29, r29, 40
 	addi r6, r6, 0x1
-	cmpwi r6, 0x5
+	cmpwi r6, MAX_PAGES
 	blt+ nextPage
 	cmpwi r27, 0x0			# \ check if random mode allows repeats
 	bne+ ableToPickRepeat	# /
@@ -838,7 +826,7 @@ noStagesLeft:
 	bne+ ableToPickRepeat	# /
 	addi r30, r30, 1	# set to 1 so repeat can be picked
 ableToPickRepeat:
-	lbz r11, 0x5A(r12)	# \ Get RSS_EXDATA_BONUS to check if custom stages are on
+	lbz r11, 0x33A(r12) # \ Get RSS_EXDATA_BONUS to check if custom stages are on
 	andi. r0, r11, 0x1	# /
 	beq+ noCustomStages	
 addCustomStage:
@@ -916,9 +904,9 @@ notMeleeStages:						# |
 	srawi r8,r8,16					# |
 	sth r8, 0x2(r12)				# /
 notOrdered:
-	lwz r12, -0x18(r29)
 	mulli r5, r4, 0x2 
-	lbzx r6, r12, r5	
+	subi r29, r29, 0x1
+	lbzx r6, r29, r5   	
 	stw r6, 0x8(r26)
 	stw r3, 0x4(r26)	
 	%sbd (r10, r12, CURRENT_PAGE)
@@ -928,7 +916,7 @@ notOrdered:
 normal:
 	stw r10, 0x0(r26)
 	addi r11, r1, 13456
-	b 0x94
+	b 0xB8  
 }
 op nop @ $806b40fc	# \
 op nop @ $806b4eb8 	# |
@@ -1087,11 +1075,11 @@ HOOK @ $806B586C	# muSelectStageTask::buttonProc
 	#mr r4, r12
 	stwu r1, -0x50(r1)
   	stmw r18, 0x18(r1)
-	lis r12, 0x8049
-	lwz r12, 0x6000(r12)
-	stw r12, 0x8(r1)
+	#lis r12, 0x8049
+	#lwz r12, 0x6000(r12)
+	#stw r12, 0x8(r1)
 	%lwi (r26, RSS_EXDATA)
-	addi r25, r26, 0x5A	# STAGE_STRIKE_TABLE
+	addi r25, r26, 0x33A # STAGE_STRIKE_TABLE
 	mr r28, r3
 	# lwz r3, 0xC(r25)
 	# cmpwi r3, 0;	beq+ noSecondBell
@@ -1287,7 +1275,8 @@ storeNormal:
 copyStrikes:	
 doneStrikingSlot:
 notStrikingSlot:
-	
+	lis r3, 0x8049
+	lbz r3, 0x6000(r3)
 	%call (0x806B8F50)	# Obtain the stage slot in this location
 	%call (0x800AF6A0)	# Access the float for this stage number's icon
 	cmpwi r24, 0			# \ Only apply the strike mark if it is requested
@@ -1337,9 +1326,9 @@ clearSplash:
 noStageStrike:	
 finishStageStrike:	
 	lmw r18, 0x18(r1)
-	lwz r3, 0x8(r1)
-	lis r12, 0x8049
-	stw r3, 0x6000(r12)	
+	#lwz r3, 0x8(r1)
+	#lis r12, 0x8049
+	#stw r3, 0x6000(r12)	
   	addi r1, r1, 0x50
 doneStageStrike:
 	lwz r3, 0x13C(r1)				# Retrieve input and floats, again

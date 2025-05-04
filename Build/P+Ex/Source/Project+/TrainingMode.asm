@@ -1,6 +1,6 @@
-###########################################################################
-[Project+] Training Mode Combo Meter Allows for techchasing and grabs [Eon]
-###########################################################################
+########################################################################################
+[Project+] Training Mode Combo Meter Allows for techchasing and grabs v2 [Eon, Kapedani]
+########################################################################################
 HOOK @ $80838980
 {
 	subic. r0, r27, 1
@@ -36,28 +36,33 @@ op nop @ $8083c938
 op nop @ $8083c958
 op nop @ $8083c978
 
-HOOK @ $80840ad4
+HOOK @ $80840ad4 # Fighter::notifyEventOnDamage
 {
-	li r18, 0
-	beq %end%
-	li r18, 1
+	li r12, 0
+	beq end
+	li r12, 1
+end:
+  stb r12, 0x8(r1)
 }
-HOOK @ $80840ae8
+HOOK @ $80840ae8 # Fighter::notifyEventOnDamage
 {
 	bgt %end%
-	li r18, 1
+	li r12, 1
+  stb r12, 0x8(r1)
 }
 
-HOOK @ $80840b1c
+HOOK @ $80840b1c # Fighter::notifyEventOnDamage
 {
-	cmpwi r18, 0
+  lbz r12, 0x8(r1)
+	cmpwi r12, 0
 	mr r4, r27
 	bne %end%
 	addi r4, r27, 1
 }
-HOOK @ $80840b80
+HOOK @ $80840b80 # Fighter::notifyEventOnDamage
 {
-	cmpwi r18, 0
+  lbz r12, 0x8(r1)
+	cmpwi r12, 0
 	mr r4, r27
 	bne %end%
 	addi r4, r27, 1
