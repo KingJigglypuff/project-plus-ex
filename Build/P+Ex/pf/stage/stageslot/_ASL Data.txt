@@ -1,11 +1,12 @@
 ################
-01.asl - 5 entries
+01.asl - 6 entries
 
 Base: Battlefield.param
 R: Battlefield_R.param
 L: Battlefield_L.param
 Z: Battlefield_Z.param
-0x8000: Battlefield_ML_00.param
+0x4000: Battlefield_MR_00.param
+0xC000: Battlefield_MR_00.param
 
 
 ################
@@ -21,12 +22,13 @@ Z: Final_Destination_Z.param
 
 
 ################
-03.asl - 4 entries
+03.asl - 5 entries
 
 Base: Delfino_Secret.param
 R: Delfino_Secret_R.param
 L: Delfino_Secret_L.param
 Z: Delfino_Secret_Z.param
+0x4000: Delfino_Secret_MR_00.param
 
 
 ################
@@ -347,13 +349,14 @@ Z: Onett_Z.param
 
 
 ################
-2D.asl - 5 entries
+2D.asl - 6 entries
 
 Base: Dream_Land.param
 R: Dream_Land_R.param
 L: Dream_Land_L.param
 Z: Dream_Land_Z.param
 0x4000: Dream_Land_MR_00.param
+0xC000: Dream_Land_MR_00.param
 
 
 ################
@@ -396,7 +399,7 @@ Z: Big_Blue_Z.param
 
 
 ################
-32.asl - 6 entries
+32.asl - 7 entries
 
 Base: Planet_Zebes.param
 R: Planet_Zebes_R.param
@@ -404,6 +407,7 @@ L: Planet_Zebes_L.param
 Z: Planet_Zebes_Z.param
 0x8000: Planet_Zebes_ML_00.param
 0x8001: Planet_Zebes_ML_01.param
+0xC000: Planet_Zebes_ML_01.param
 
 
 ################
@@ -613,12 +617,13 @@ Z: Rainbow_Cruise_Z.param
 
 
 ################
-50.asl - 4 entries
+50.asl - 5 entries
 
 Base: Poke_Floats.param
 R: Poke_Floats_R.param
 L: Poke_Floats_L.param
 Z: Poke_Floats_Z.param
+0x8000: Poke_Floats_ML_00.param
 
 
 ################

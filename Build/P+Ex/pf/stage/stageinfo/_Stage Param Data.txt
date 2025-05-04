@@ -13,10 +13,10 @@ Battlefield_L.param
 	Battlefield_Melee.tlst
 
 ################
-Battlefield_ML_00.param
+Battlefield_MR_00.param
 
-	STGBATTLEFIELD_ML_DUEL.pac
-	st_battle_NoShadowRotate.rel
+	STGBATTLEFIELD_MR_BF_DUEL.pac
+	st_final.rel
 	Battlefield_64.tlst
 
 ################
@@ -97,16 +97,29 @@ Big_Blue_Z.param
 Bowser_Castle.param
 
 	STGBOWSERCASTLE.pac
-	st_final.rel
+	st_bowsercastle.rel
 	Bowsers_Castle.tlst
+	SFX / GFX: 0x0201 / 0x0032
 
 ################
 Bowser_Castle_L.param
 
-	STGBOWSERCASTLE_L_THWOMPS.pac
+	[Substages / Normal]
+	- STGBOWSERCASTLE_L_THWOMPS.pac
+
 	st_bowsercastle.rel
 	Bowsers_Castle.tlst
-	SFX / GFX: 0x0053 / 0x0032
+	SFX / GFX: 0x0201 / 0x0032
+
+################
+Bowser_Castle_MR_00.param
+
+	[Substages / Normal]
+	- STGBOWSERCASTLE_MR_BC_DRY.pac
+
+	st_bowsercastle.rel
+	Bowsers_Castle.tlst
+	SFX / GFX: 0x0201 / 0x0032
 
 ################
 Bowser_Castle_R.param
@@ -333,7 +346,7 @@ Cookie_Country_L.param
 Cookie_Country_R.param
 
 	STGCOOKIECOUNTRY_R_FOD_COOKIE.pac
-	st_final.rel
+	st_dxfountain.rel
 	Cookie_Country.tlst
 
 ################
@@ -371,7 +384,7 @@ Corneria_ML_00.param
 Corneria_R.param
 
 	STGCORNERIA_R_FOD_SAURIA.pac
-	st_final.rel
+	st_dxfountain.rel
 	Sauria.tlst
 	SFX / GFX: 0x006D / 0x0061
 
@@ -424,6 +437,14 @@ Delfino_Secret_L.param
 	STGDELFINOSECRET_L_DELFINOPLAZA.pac
 	st_dolpic.rel
 	Delfino_Plaza.tlst
+	SFX / GFX: 0x004D / 0x0034
+
+################
+Delfino_Secret_MR_00.param
+
+	STGDELFINOSECRET_MR_DS_WORLD2-3.pac
+	st_final.rel
+	World_2-3.tlst
 	SFX / GFX: 0x004D / 0x0034
 
 ################
@@ -488,17 +509,17 @@ Distant_Planet_L.param
 ################
 Distant_Planet_R.param
 
-	STGDISTANTPLANET_R_DS_CAVE.pac
-	st_final.rel
+	STGDISTANTPLANET_R_DP_VALLEY.pac
+	st_earth.rel
 	Distant_Planet.tlst
+	SFX / GFX: 0x0060 / 0x004E
 
 ################
 Distant_Planet_Z.param
 
-	STGDISTANTPLANET_Z_GHZ_PLANET.pac
-	st_earth.rel
+	STGDISTANTPLANET_Z_DS_CAVE.pac
+	st_final.rel
 	Distant_Planet.tlst
-	SFX / GFX: 0x0060 / 0x004E
 
 ################
 Draculas_Castle.param
@@ -547,7 +568,7 @@ Dream_Land_L.param
 ################
 Dream_Land_MR_00.param
 
-	STGDREAMLAND_MR_64.pac
+	STGDREAMLAND_MR_DL_64.pac
 	st_dreamland64_ht.rel
 	Dream_Land_64.tlst
 	SFX / GFX: 0x006C / 0x005E
@@ -602,7 +623,7 @@ Event_31.param
 Final_Destination.param
 
 	STGFINALDESTINATION.pac
-	st_final.rel
+	st_final_substage.rel
 	Final_Destination.tlst
 	SFX / GFX: 0xFFFF / 0x0033
 
@@ -633,8 +654,8 @@ Final_Destination_ML_01.param
 ################
 Final_Destination_MR_00.param
 
-	STGFINALDESTINATION_MR_RAINBOW.pac
-	st_final.rel
+	STGFINALDESTINATION.pac
+	st_final_substage.rel
 	Final_Destination.tlst
 	SFX / GFX: 0xFFFF / 0x0033
 
@@ -692,9 +713,9 @@ Flat_Zone_Z.param
 Fountain_of_Dreams.param
 
 	STGFOUNTAINOFDREAMS.pac
-	st_dxfountain_ht.rel
+	st_dxfountain.rel
 	Fountain_of_Dreams.tlst
-	SFX / GFX: 0x006E / 0x0033
+	SFX / GFX: 0x0200 / 0x0033
 
 ################
 Fountain_of_Dreams_L.param
@@ -707,7 +728,7 @@ Fountain_of_Dreams_L.param
 Fountain_of_Dreams_R.param
 
 	STGFOUNTAINOFDREAMS_R_FOD_CAVE.pac
-	st_dxfountain_ht.rel
+	st_dxfountain.rel
 	Fountain_of_Dreams.tlst
 
 ################
@@ -766,9 +787,9 @@ Frigate_Husk.param
 ################
 Frigate_Husk_L.param
 
-	STGFRIGATEHUSK_L_PHENDRANA.pac
-	st_battle.rel
-	Phendrana.tlst
+	STGFRIGATEHUSK_L_ORPHEON.pac
+	st_orpheon.rel
+	Frigate_Orpheon.tlst
 	SFX / GFX: 0x0056 / 0x0032
 
 ################
@@ -782,18 +803,18 @@ Frigate_Husk_ML_00.param
 ################
 Frigate_Husk_R.param
 
-	STGFRIGATEHUSK_R_FH_DROWNED.pac
-	st_final.rel
-	Frigate_Orpheon.tlst
-	SFX / GFX: 0x013D / 0x005E
+	STGFRIGATEHUSK_R_FH_PHENDRANA.pac
+	st_phendrana.rel
+	Phendrana.tlst
+	SFX / GFX: 0x0053 / 0x0032
 
 ################
 Frigate_Husk_Z.param
 
-	STGFRIGATEHUSK_Z_ORPHEON.pac
-	st_orpheon.rel
+	STGFRIGATEHUSK_Z_FH_DROWNED.pac
+	st_final.rel
 	Frigate_Orpheon.tlst
-	SFX / GFX: 0x0056 / 0x0032
+	SFX / GFX: 0x013D / 0x005E
 
 ################
 Golden_Temple.param
@@ -851,7 +872,7 @@ Green_Hill_Zone_ML_00.param
 ################
 Green_Hill_Zone_MR_00.param
 
-	STGGREENHILLZONE_MR_PROJECTM.pac
+	STGGREENHILLZONE_MR_GHZ_PROJECTM.pac
 	st_greenhill_ht.rel
 	Green_Hill_Zone.tlst
 	SFX / GFX: 0x0066 / 0x0054
@@ -933,7 +954,7 @@ Hanenbow_L.param
 ################
 Hanenbow_R.param
 
-	STGHANENBOW_R_FOD_HANENBOW.pac
+	STGHANENBOW_R_YI_HANENBOW.pac
 	st_plankton.rel
 	Electroplankton.tlst
 	SFX / GFX: 0x0068 / 0x0056
@@ -1012,7 +1033,7 @@ Infinite_Glacier_L.param
 Infinite_Glacier_R.param
 
 	STGINFINITEGLACIER_R_FOD_SUMMIT.pac
-	st_final.rel
+	st_dxfountain.rel
 	Infinite_Glacier.tlst
 
 ################
@@ -1089,8 +1110,6 @@ Kongo_Jungle_Z.param
 	st_final.rel
 	Golden_Temple.tlst
 	SFX / GFX: 0x0060 / 0x004E
-	Character overlay enabled: R:41 G:13 B:2 A:255
-	Flags: Flat
 
 ################
 Luigis_Mansion.param
@@ -1211,9 +1230,9 @@ Metal_Cavern.param
 
 	[Substages / RandomVariance]
 	- STGMETALCAVERN_00.pac
-	- STGMETALCAVERN_01.pac
+	- STGMETALCAVERN_00.pac
 
-	st_final.rel
+	st_final_substage.rel
 	Metal_Cavern.tlst
 
 ################
@@ -1236,7 +1255,7 @@ Metal_Cavern_ML_00.param
 ################
 Metal_Cavern_MR_00.param
 
-	STGMETALCAVERN_MR_N64.pac
+	STGMETALCAVERN_MR_MC_N64.pac
 	st_final.rel
 	Metal_Cavern_64.tlst
 
@@ -1251,10 +1270,10 @@ Metal_Cavern_R.param
 Metal_Cavern_Z.param
 
 	[Substages / RandomVariance]
-	- STGMETALCAVERN_Z_00_64_REMAKE.pac
-	- STGMETALCAVERN_Z_01_64_REMAKE.pac
+	- STGMETALCAVERN_Z_64_REMAKE.pac
+	- STGMETALCAVERN_Z_64_REMAKE.pac
 
-	st_final.rel
+	st_final_substage.rel
 	Metal_Cavern.tlst
 
 ################
@@ -1471,8 +1490,8 @@ PictoChat_R.param
 ################
 PictoChat_Z.param
 
-	STGPICTOCHAT_Z_GHZ_PICTOCHAT.pac
-	st_pictsimple.rel
+	STGPICTOCHAT_Z_MEDLEY.pac
+	st_battle.rel
 	PictoChat.tlst
 	SFX / GFX: 0x0067 / 0x0032
 
@@ -1562,7 +1581,7 @@ Pokemon_Stadium_2.param
 ################
 Pokemon_Stadium_2_L.param
 
-	STGPOKEMONSTADIUM_L_ULTRA.pac
+	STGPOKEMONSTADIUM_L_PS2_ULTRA.pac
 	st_stadium_static.rel
 	Pokemon_Stadium_2.tlst
 	SFX / GFX: 0x0059 / 0x0045
@@ -1578,15 +1597,15 @@ Pokemon_Stadium_2_ML_00.param
 ################
 Pokemon_Stadium_2_R.param
 
-	STGPOKEMONSTADIUM_R_RADIANT.pac
-	st_stadium_static.rel
+	STGPOKEMONSTADIUM_R_PS2_RADIANT.pac
+	st_final.rel
 	Pokemon_Stadium_2.tlst
 	SFX / GFX: 0x0059 / 0x0045
 
 ################
 Pokemon_Stadium_2_Z.param
 
-	STGPOKEMONSTADIUM_Z_ABANDONED.pac
+	STGPOKEMONSTADIUM_Z_PS2_ABANDONED.pac
 	st_final.rel
 	Spear_Pillar.tlst
 
@@ -1602,6 +1621,14 @@ Poke_Floats_L.param
 
 	STGPOKEFLOATS_L_PS1.pac
 	st_dxpstadium.rel
+	Pokemon_Stadium.tlst
+	SFX / GFX: 0x006E / 0x005F
+
+################
+Poke_Floats_ML_00.param
+
+	STGPOKEFLOATS_ML_FROZENPS1.pac
+	st_dxpstadium_static.rel
 	Pokemon_Stadium.tlst
 	SFX / GFX: 0x006E / 0x005F
 
@@ -1873,7 +1900,7 @@ Sky_Sanctuary_L.param
 ################
 Sky_Sanctuary_MR_00.param
 
-	STGSKYSANCTUARY_MR_ORIGINAL.pac
+	STGSKYSANCTUARY_MR_SSZ_ORIGINAL.pac
 	st_palutena.rel
 	Sky_Sanctuary.tlst
 
@@ -1993,8 +2020,11 @@ Spear_Pillar.param
 ################
 Spear_Pillar_L.param
 
-	STGSPEARPILLAR_L_FD_ROCKETHIDEOUT.pac
-	st_final.rel
+	[Substages / RandomVariance]
+	- STGSPEARPILLAR_L_FD_ROCKETHIDEOUT.pac
+	- STGSPEARPILLAR_L_FD_ROCKETHIDEOUT.pac
+
+	st_final_substage.rel
 	Rocket_Hideout.tlst
 
 ################
