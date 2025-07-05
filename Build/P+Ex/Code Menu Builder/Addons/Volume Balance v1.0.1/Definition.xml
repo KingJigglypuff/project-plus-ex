@@ -1,4 +1,4 @@
-<addon name="Volume Balance Control v1.0.0 [QuickLava]" shortName="VOLBLNCE" workingMemSize="0x08">
+<addon name="Volume Balance Control v1.0.1 [QuickLava]" shortName="VOLBLNCE">
     <codeMenuPage shortName="_DEBUG">
         <codeMenuFloat name="Volume Ratio" shortName="VALUE">
             <minValue value="0.00"/>
