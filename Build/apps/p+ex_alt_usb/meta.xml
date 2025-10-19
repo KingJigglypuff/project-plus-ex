@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1.0">
+	<name>Project+Ex Alt USB Loader</name>
+	<version>70r78.13</version>
+	<coder>Project+Ex Dev Team</coder>
+	<release_date>202505011800</release_date>
+	<short_description>Project+Ex Alt USB Loader</short_description>
+	<long_description>
+Use this if you have problems with the main Project+Ex Launcher. Report any boot problems to #project-plus-ex-support.
+This is a modified version of CFG USB Loader designed for instantly loading Project+Ex via USB.</long_description>
+	<arguments>
+		<arg>#RSBE01</arg>
+		<arg>intro = 0</arg>
+		<arg>device = usb</arg>
+		<arg>partition = auto</arg>
+		<arg>ios = 249</arg>
+		<arg>private_server = 2</arg>
+		<arg>deflicker = 0</arg>
+		<arg>fix_480p = 1</arg>
+		<arg>video = auto</arg>
+		<arg>video_patch = all</arg>
+		<arg>ocarina = 1</arg>
+		<arg>hooktype = axframe</arg>
+		<arg>codes_path = sd:/p+ex</arg>
+	</arguments>
+	<ahb_access/>
+
+</app>

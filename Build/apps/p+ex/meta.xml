@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1.15">
+	<name>Project+ Launcher</name>
+	<version>1.6</version>
+	<coder>Project+Ex Dev Team</coder>
+	<release_date>20250609</release_date>
+	<short_description>Project+Ex Launcher</short_description>
+	<long_description>
+Project+Ex is an unofficial mod of Project+, featuring the BrawlEx Clone Engine, CSSExpansion Engine, and additional characters (with more to come). Thank you for playing!</long_description>
+	<arguments>
+		<arg>--codespath=sd:/p+ex</arg>
+	</arguments>
+	<ahb_access/>
+</app>
