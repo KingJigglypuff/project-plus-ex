@@ -1,0 +1,26 @@
+######################################################
+# MOVEDEF.GCT
+######################################################
+# Place all PSA command script injections in this GCT!
+# 
+# Do not include new PSA command ASM, this is just for
+# modifications of Fighter.pac!
+######################################################
+
+.include MoveDef/C-Stick.asm
+.include MoveDef/Edge.asm
+.include MoveDef/Effects.asm
+.include MoveDef/Glide.asm
+.include MoveDef/Grabs.asm
+.include MoveDef/Hitstun.asm
+.include MoveDef/Items.asm
+.include MoveDef/MeteorCancel.asm
+.include MoveDef/Misc.asm
+.include MoveDef/Moonwalk.asm
+.include MoveDef/PlatformIgnore.asm
+.include MoveDef/PowerShield.asm
+.include MoveDef/ScrewAttack.asm
+.include MoveDef/SlowTurn.asm
+.include MoveDef/TauntCancel.asm
+.include MoveDef/Tethers.asm
+.include MoveDef/WallCling.asm

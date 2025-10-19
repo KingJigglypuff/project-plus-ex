@@ -196,35 +196,47 @@ PSA Command 1F080200 (spawn item variant) [Sammi Husky]
 * 047C8674 83A3000C
 
 #################################################################
-On hit Action change through Trip Rate [MarioDox, Eon (refactor)]
+On hit Action change through Trip Rate v1.26 [MarioDox, Eon (refactor)]
 #################################################################
-.macro checkTripRate(<TripRateHalf>, <Action>)
-{
-    lis r6, <TripRateHalf>
-    cmpw r5, r6
-    bne 0xC
-    li r3, <Action>
-    b exit
-}
+v1.2: Automatized, trip rate is decimal action ID change
+v1.25: Added anti-lock behavior, can't change action if it's already in it
+v1.26: Anti-lock behavior works properly
+#################################################################
 HOOK @ $8076BD5C
 {
+    stwu r1, -0x10(r1)
+    mflr r0
+    stw r0, 0x14(r1)
     mr r31, r4
     lwz r5, 0x44(r5)
     lwz r5, 0x40(r5)
-    lwz r5, 0x6C(r5)    
-    %checkTripRate(0x4040, 0x4B)    //3 = floor cripple
-    %checkTripRate(0x4080, 0xBD)    //4 = death
-    %checkTripRate(0x40a0, 0xFF)    //5 = freeze in place
-    %checkTripRate(0x40c0, 0x46)    //6 = speen knockback
-    %checkTripRate(0x40d0, 0x40)    //7 = grab release (horizontal)
-    %checkTripRate(0x40f0, 0x41)    //8 = grab release (vertical)
-	%checkTripRate(0x4330, 0xB0)    //176 = Aerial Screw Attack Jump
-    b %end%
+    lfs f1, 0x6C(r5)
+    fctiw f1,f1
+    stfd f1,0x08(r1)
+    lwz r5,0x0C(r1)
+    cmpwi r5, 0x15     # \ No need forcing these actions,
+    ble+ end         # / saves some room for extra effects.
+    cmpwi r5, 0x112     # \ And Don't access Specials!
+    bge+ end        # /
+    lwz r12, -0x4(r3)     # \ return from moduleAccesser
+    lwz r12, 0x60(r12)  # | 
+    lwz r12, 0x7C(r12)  # | 
+    lwz r12, 0x38(r12)     # / Access action
+    cmpw r5, r12
+    beq- end
+    mr r3, r5
 exit:
+    lwz r0, 0x14(r1)
+    mtlr r0
+    addi r1, r1, 0x10
     lis r12, 0x8076
     ori r12, r12, 0xBDAC
     mtctr r12 
     bctr
+end:
+    lwz r0, 0x14(r1)
+    mtlr r0
+    addi r1, r1, 0x10
 }
 
 #######################################################################

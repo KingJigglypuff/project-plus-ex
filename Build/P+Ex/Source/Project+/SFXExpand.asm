@@ -142,7 +142,7 @@ Table_Skip:
 	.RESET
 
 ###########################################################################################################################################################
-[Project+] SoundBank Expansion System (RSBE.Ver) v2.4 [codes, DukeItOut, JOJI]
+[Project+] SoundBank Expansion System (RSBE.Ver) v2.5 [codes, DukeItOut, JOJI]
 # v1.1 - Kirbycide Fix + Voice clips volume fix + CSS Hiccup Fix
 # v1.2 - Fixes Mr. Resetti's brsar conflicts
 # v2.0 - Removed Sound Resource table occupation and made dynamic to better support resource size changes
@@ -151,6 +151,7 @@ Table_Skip:
 # v2.2 - Made pointers even more flexible to account for potential Sound Resource changes
 # v2.3 - Added a safety to prevent crashing when attempting to load a custom soundbank that failed to be found.
 # v2.4 - Fixed issue where sounds could be paired with the wrong soundbanks if not played the moment they are called.
+# v2.5 - Increased stability of sample check to avoid introduced error where the wrong bank was accessed sometimes.
 #
 # 90432134 references -> Sound Resource + 0x298934-to-0x29897F
 # 901A3090 references -> Written to CodeFlag+0x4
@@ -324,11 +325,11 @@ HOOK @ $801C8374
   
     lis r15, 0x8053;  ori r15, r15, 0xED00
   
-  subi r14, r28, 0x80	# 909ebbe0 -> 909EBB60
+  lwz r14, 0x1C(r25)
   
   li r12, 11	# \ Loop 11 times!
   mtctr r12		# /
-  lwz r12, -0x4(r15)	# Pointer to a table of 11 pointers
+  lwz r12, -0x4(r15)	# Pointer to a table of 11 pointers. Typically at 90DE5CF4.
   
   li r19, 0
   
@@ -339,7 +340,7 @@ HOOK @ $801C8374
   addi r19, r19, 4
   bdnz+ loopPass 
  endLoop:
-  mulli r19, r19, 2	# 4 apart -> 8 apart
+  mulli r19, r19, 3	# 4 apart -> 12 apart
   
   lwz r14, 0x18(r31) 		#
   lwz r14, 0x04(r14)		#
@@ -352,6 +353,7 @@ HOOK @ $801C8374
   stw r19, 0x00(r15)
   lwz r19, 0x60(r14)
   stw r19, 0x04(r15)
+  stw r26, 0x08(r15)	# Soundbank ID
   
   lwz r15, 0x8(r1)
   lwz r14, 0xC(r1)
@@ -363,6 +365,20 @@ HOOK @ $801C8374
 loc_0x34:
   cmpwi r3, 0x0			# Original operation
 }
+### Soundbank Unloading
+HOOK @ $80073CC4
+{
+	rlwinm r12, r4, 24, 24, 31 # Filter for bottom half to get allocation index
+	mulli r12, r12, 12	# 0xC bytes of separation
+	lis r11, 0x8053;  ori r11, r11, 0xED00
+	add r12, r11, r12
+	li r0, 0			# \
+	stw r0, 0x0(r12)	# | Clear it for this section!
+	stw r0, 0x4(r12)	# |
+	stw r0, 0x8(r12)	# /
+	
+	lwz r3, 0x2D0(r3)	# Original operation
+}
 ### Soundbank address info
 HOOK @ $801C7AB4
 {
@@ -372,32 +388,21 @@ HOOK @ $801C7AB4
 	stwu r1, -0x10(r1)
 	stw r4, 0x8(r1)
 	stw r5, 0xC(r1)
-
-  # lwz r28, 0x10(r1)
-  # lwz r28, 0x1C(r28)
-  # lwz r28, 0x94(r28)
-  # lwz r28, 0x490(r28)		# Pointer to mostly unused FRMH sound heap. Commented out as it actually was used by Pokemon Trainer 
-  # addi r28, r28, 0x60		# Start at offset 0x60
-  
-  lwz r28, 0x2C(r1)	# 1C + 10
-  subi r28, r28, 0x80 
   
   lis r3, 0x8053;  ori r3, r3, 0xED00
   
   li r12, 11	# \ Loop 11 times!
   mtctr r12		# /
-  lwz r12, -0x4(r3)	# Pointer to a table of 11 pointers
   
-  li r5, 0
-  
+  li r5, 8		# 3rd word for each 0xC set of values
  loopPass:  
-  lwzx r4, r12, r5
-  cmpw r4, r28		# Check if in the same allocation
-  ble endLoop		# The checks are in order from highest address to lowest!
-  addi r5, r5, 4
+  lwzx r4, r3, r5
+  cmpw r4, r29		# Check if in the same allocation
+  beq- endLoop		# The checks are in order from highest address to lowest!
+  addi r5, r5, 12
   bdnz+ loopPass 
  endLoop:
-  mulli r5, r5, 2	# 4 apart -> 8 apart 
+  subi r5, r5, 8	# Acccess address of first member of size-0xC struct design
   add r12, r3, r5
 
 	lwz r4, 0x8(r1)

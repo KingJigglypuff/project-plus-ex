@@ -27,7 +27,7 @@ HOOK @ $808E53B4
 checkHitstun:
 	lwz r12, 0x90(r26)		# \
 	lwz r12, 0xC4(r12)		# |
-	mtctr r12				# | Get the creator of this projectile
+	mtctr r12				# | Get the creator of this projectile	
 	bctrl					# |
 	mr r4, r3				# / 
 	li r5, 0				# r5 will be a pointer to write to if non-zero!
@@ -94,7 +94,7 @@ finish:
 HOOK @ $807724F4
 {
 	stb r0, 0x1C(r3)		# Original operation
-	lwz r3, 0x3C(r27)
+	lwz r3, 0x3C(r31)
 	lwz r3, 0xA4(r3)
 	mtctr r3
 	bctrl
@@ -140,4 +140,91 @@ HOOK @ $80AB4194
 	ori r12, r12, 0xEEC8	# | Deactivate the exact same as the arrow this projectile
 	mtctr r12				# | was based on code-wise.
 	bctr 					# /
+}
+
+###############################################################
+Hitstop Cancels Maintain The Hitframe On Transition [DukeItOut]
+###############################################################
+# Due to oddities in the animation engine of Brawl, 
+# if a character is able to buffer an option during hitstop,
+# they will be stuck in the first frame of the NEXT subaction
+# if animation blending is not explicitly defined in the 
+# subaction's header. (Typically set to 0)
+#
+# This exploits this property by forcing blending on such a
+# cancel option.
+#
+# For some reason, Yoshi's armored rising aerials ignore this
+# fix even when modifying the area in memory where they do the
+# above to do the same thing though it still applies fine to 
+# air dodges.
+###############################################################
+.alias HitstopBlendFrameCount = 5 # For attacks
+.alias HitstopBlendFrameCountB = 1 # For defensive actions
+HOOK @ $80724344
+{
+	stwu r1, -0x10(r1)
+	
+	lwz r3, 0x8(r26)	# \
+	lwz r3, 0x3C(r3)	# | This code must only modify
+	lwz r3, 0xA4(r3)	# | characters!
+	mtctr r3			# |
+	bctrl				# |
+	cmpwi r3, 0			# |
+	bne+ normal			# /
+	
+	lwz r3, 0x50(r26)	# \ Frames of hitlag left.
+	lwz r3, 0x10(r3)	# /
+	cmpwi r3, 0			# \ Don't modify if not in hitlag!
+	beq+ normal			# /
+	
+	lwz r3, 0x7C(r26)
+	lwz r4, 0x38(r3)	# Current action [entering]
+	
+	cmpwi r4, 0x0D; blt- runCancel		# Dashes, Runs, Jumps
+	cmpwi r4, 0x1E; blt- normal			# \ Grounded Dodges
+	cmpwi r4, 0x21; beq- dodge			# / and Air Dodge
+	cmpwi r4, 0x24; blt+ normal			# \ Grounded Normals
+	cmpwi r4, 0x34; ble+ normalAttack	# / Aerials and Standing Grab
+	cmpwi r4, 0x7F; beq- normalAttack	# Tether Aerial
+	cmpwi r4, 0x112; blt+ normal 		# Specials
+normalAttack:
+	li r5, HitstopBlendFrameCount
+	b continue
+runCancel:	
+dodge:
+	li r5, HitstopBlendFrameCountB 
+continue:
+	stb r5, 0x8(r1)
+	addi r3, r24, 0x34
+	lwz r4, 0x348(r1)	# Subaction (0x338 + 0x10)
+	li r5, 1
+	bla 0x72B9F8		# Get subaction info
+	lbz r4, 0(r3)		# Transition frame count
+	lbz r5, 8(r1)
+	cmpw r4, r5		# \ If it already does this to this extent,
+	bge- normal		# / don't bother modifying!
+	stw r3, 0x8(r1)
+	stb r4, 0xC(r1)
+	stb r5, 0(r3)		# Force to blend in this context
+	
+	mr r3, r24			# Restore r3
+	addi r4, r1, 0x348	# Restore r4 0x338 + 0x10
+	
+	lwz r12, 0(r24)		# \ Original operation
+	lwz r12, 0x80(r12)	# |
+	mtctr r12			# |
+	bctrl				# /
+	
+	lwz r3, 0x8(r1)		# \
+	lbz r4, 0xC(r1)		# | Restore transition frames for subaction
+	stb r4, 0(r3)		# / 
+	addi r1, r1, 0x10
+	ba 0x724354			# Return
+	
+normal:
+	addi r1, r1, 0x10
+	mr r3, r24			# Restore r3
+	addi r4, r1, 0x338	# Restore r4
+	lwz r12, 0(r24)		# Original operation
 }

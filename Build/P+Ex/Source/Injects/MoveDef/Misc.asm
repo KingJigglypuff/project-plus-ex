@@ -952,3 +952,32 @@ Footstool with Only Taunt + Fail Window v1.3 [Magus, ds22]
 * 04FB6240 00000050
 * 04FB61D4 000A0100
 * 04FB6188 80000051
+
+##################################
+Team Colour Shade Modifier [ds22]
+##################################
+* 06F9FF64 0000000C	# Note: This is in Fighter.pac
+* 00000080 80808080
+* FFFFFF80 00000000
+
+###################################
+No Autosweetspot Ledges v2.0 [Eon]
+#
+# converted to PSA
+###################################
+.alias PSA_Off = 0x80546EE8
+CODE @ $80546EE8
+{
+    word 2; word PSA_Off+0x28
+    word 6; word 7      #if compare
+    word 5; IC_Basic 23 #vertical character velocity
+    word 0; word 0      #<
+    word 1; scalar 0    #0
+    word 0x02040400; word PSA_Off+0x8
+    word 0x02040400; word 0x80FAA3DC
+    word 0; word 0
+}
+CODE @ $80FC1458
+{
+    word 0x00070100; word PSA_Off
+}

@@ -840,53 +840,6 @@ fsOkay:
   stb r0, 4(r27)
 }
 
-#####################################################################################
-No Autosweetspot Ledges v1.4 [spunit262, Dantarion, Magus, DukeItOut, KingJigglypuff]
-#####################################################################################
-# v1.2: Cleaned up code
-# v1.3: Made an exception for Knuckles' wall climb so it could grab ledges
-# v1.4: Added exception for Sceptile's wall climb
-#####################################################################################
-HOOK @ $807812B0
-{
-    cmpwi r4, 0xA; bne+ normal
-
-    lwz r12, 0x28(r1)        #
-    cmplwi r12, 0x100        # \ Sometimes input buffer goes through here.
-    blt+ normal              # / It's not doing what we expect so this makes it skip that!
-  
-    lwz r11, 0x110(r12)    # Get the instance ID
-    lwz r12, 0x3C(r1)
-    lwz r7, 0x7C(r12)      # \
-    lhz r7, 0x3A(r7)       # / Get the action
-    cmpwi r11, 0x2D        # Is it Knuckles?
-    beq- Echidna
-    cmpwi r11, 0x62         # Is it Sceptile?
-    bne- notGecko          # /
-Gecko:
-    cmpwi r7, 0x11D        # \
-    blt+ notWallClimb      # | Is Sceptile climbing a wall?
-    cmpwi r7, 0x120        # | Let it grab the ledge!
-    bgt+ notWallClimb      # |
-    b normal               # /
-Echidna:
-    cmpwi r7, 0x117        # Is Knuckles climbing a wall?
-    beq normal             # Let him grab the ledge!
-    
-notGecko:
-notWallClimb:    
-      lwz r11, 0x18(r12)
-      lfs f0, 0x10(r11)
-      lfs f1, 0x1C(r11);   fcmpo cr0, f0, f1; bge+ noSweetspot
-      fsubs f0, f1, f0
-      lfs f1, -0x6A04(r2); fcmpo cr0, f0, f1; bge+ normal
-noSweetspot:
-      li r0, 0x0
-normal:
-      rlwinm. r0, r0, 25, 31, 31
-}
-
-
 ####################################################
 No Air Dodge in tumble [spunit262, Phantom Wings]
 ####################################################
@@ -1509,34 +1462,36 @@ notTooFast:
   stfs f2, 0x190(r1)		# original operation
 }
 
-##################################################
-[Project+] Disable Screen-KOs in teams [ds22, Eon]
-##################################################
+###############################################################
+[Project+] Disable Screen-KOs in teams v1.1 [ds22, Eon, mawwwk]
+###############################################################
 HOOK @ $8087C310
 {
-  lis r15, 0x80b8
-  lwz r15, 0x7C28(r15)
-  lwz r15, 0x6E(r15)
-  andi. r15, r15, 0x8
-  beq normalCheck
-  #if items enabled = casuals, dont enable
-  lis r15, 0x805A
-  lwz r15, 0xE0(r15)
-  lwz r15, 0x08(r15)
-  lbz r15, 0x16(r15)
-  cmpwi r15, 0
-  bne normalCheck
-
-  lis r15, 0x9018
-  addi r15, r15, 0xB73
-  lbz r15, 0(r15)
-  cmpwi r15, 0x1;  beq- forceStarKO
-normalCheck:
-  cmpw r3, r26;  b %END%
+  lis r15, 0x9018       # \ Check if teams enabled
+  lbz r15, 0xB73(r15)   # | 
+  cmpwi r15, 1          # |
+  blt end               # /
+  
+  lis r15, 0x805A       # \ If any items enabled,
+  lwz r15, 0xE0(r15)    # | leave screen KOs enabled
+  lwz r15, 0x08(r15)    # |
+  lbz r15, 0x16(r15)    # |
+  cmpwi r15, 0          # |
+  bne end               # /
+  
+  lis r15, 0x80B8       # \ ?? Unknown check
+  lwz r15, 0x7C28(r15)  # | 
+  lwz r15, 0x6E(r15)    # | 
+  andi. r15, r15, 0x8   # | 
+  beq end               # /
 
 forceStarKO:
-  li r15, 0x0
-  cmpwi r15, 0x1
+  li r15, 0
+  cmpwi r15, 1
+  b %END%
+
+end:
+  cmpw r3, r26          # Original op
 }
 
 ######################################
@@ -2656,21 +2611,31 @@ Pokemon Trainer Infinite Stamina [Phantom Wings, spunit262]
 #############################################################
 op nop @ $80A8BDAC
 
-############################################################
-PT Pokemon Have Final Smashes & FS Characters Don't [ds22]
-############################################################
+####################################################################
+PT Pokemon Have Final Smashes & FS Characters Don't v1.1 [ds22, Eon]
+####################################################################
+#minor edit to remove random change in register use and tidy up a little
+
+#set pointers for 4 chars functions
 * 04B060DC 8081DF8C
 * 04B060E4 8081DF8C
 * 04B060EC 8081DF8C
 * 04B06114 8081DF84
+
 * 0481DF14 809D0008
 * 0481DF18 3804FFFD
-* 0481DF84 380000EC
-* 04AD8BB4 17171717
-* C281DF6C 00000003
-* 3800005C 2C04002D
-* 40A20008 3800007C
-* 60000000 00000000
+op li r0, 236 @ $8081DF84
+
+word 0x17171717 @ $80AD8BB4
+
+HOOK @ $8081DF6C
+{
+  li r0, 92
+  lwz r3, 0x8(r29)
+  cmpwi r3, 45
+  bne %end%
+  li r0, 124
+}
 
 #######################################################
 Independent Pokemon Engine HTP, Classic & MMS [ds22]

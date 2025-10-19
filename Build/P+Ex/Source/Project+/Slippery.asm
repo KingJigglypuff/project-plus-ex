@@ -165,13 +165,15 @@ HOOK @ $80870738 # Related to altering dash speeds on slick surfaces.
 						# (no official terrain value should apply between 
 						#  0.4 and 1.0, but just in case)
 	
-	fmuls f3, f3, f1	# Dash Speed * Friction Coefficient
+	fmuls f3, f3, f2	# Dash Speed * Friction Coefficient
 	stfs f3, 0x08(r6)	# Multiply by friction on ice and slick surfaces!
 	
-	lwz r3, 0x14(r31)	# \
+	/*
+	lwz	r3, 0x14(r31)	# \
 	lfs f0, 0x4C(r3)	# | Also provide the inverse as a playspeed!
-	fdivs f0, f0, f2	# |
+	fdivs f0, f0, f2	# | Disabled because it doesn't feel great for dashdancing, but may still want to tweak later.
 	stfs f0, 0x4C(r3)	# /
+	*/
 finish:	
 	lwz r0, 0x24(r1)	# Original operation
 }

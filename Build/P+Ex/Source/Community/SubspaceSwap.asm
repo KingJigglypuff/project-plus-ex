@@ -1,5 +1,6 @@
 ###############################################
-Code Menu can swap characters in SSE [MarioDox]
+Code Menu can swap characters in SSE v2 [MarioDox]
+# instead of spawning you through the normal fighterChange, force rebirth to respawn you properly in SSE
 ###############################################
 HOOK @ $806cf93c            #start/[scMelee]
 {
@@ -20,7 +21,7 @@ end:
     mr r22,r24
 }
 
-# additional fix to avoid fighterChange to intercept death and rebirths
+# fighterChange in SSE causes rebirth
 HOOK @ $80950e90            #processBegin/[stOperatorFighterChange]
 {
     lbz r0,0x6B(r3)            # original op
@@ -32,29 +33,26 @@ HOOK @ $80950e90            #processBegin/[stOperatorFighterChange]
     lis r3,0x7371            # sq
     ori r3,r3,0x4164        # Ad(venture)
     cmpw r3,r4
-    beq- fix
+    beq- forceRebirth
     lwz r4,0xC(r12)            # get Scene name, but offset to get further parts of the string
     ori r3,r3,0x5369        # Single(Si)mple
     bne- %END%
-fix:
-    li r4,0x0
-loopStart:
+forceRebirth:
     lis r12,0x8002            # \ getInstance/[gfSceneManager]
     ori r12,r12,0xd018        # |
     mtctr r12            # |
     bctrl                # /
     lwz r12,0x4(r3)            # gfSceneManager->currentScene
-    addi r7,r4,0x6c            # \ gfSceneManager->stOperatorFighterRebirths[index]
+    mulli r3,r28,0x4        # \ (fighterChange's currently affected idx)
+    addi r7,r3,0x6c            # | scMelee->stOperatorFighterRebirths[index]
     lwzx r12,r12,r7            # /
     cmpwi r12,0x0            # invalid
     beq- %END%
-    lbz r12,0x40(r12)        # stOperatorFighterRebirth->stOperator->state
-    cmpwi r12,0x0            # 0 = no rebirth process is occurring
-    bne- sseFix
-    addi r4,r4,0x4
-    cmpwi r4,0x1C            # 0x7 * 4 = 0x1C
-    blt- loopStart
-    b %END%
-sseFix:
+    lbz r3,0x40(r12)        # stOperatorFighterRebirth->stOperator->state
+    cmpwi r3,0x0            # 0 = no rebirth process is occurring
+    bne- skip
+    li r3,0x5            # 5 = rebirth is happening
+    stb r3,0x40(r12)
+skip:
     li r0,-1
 }

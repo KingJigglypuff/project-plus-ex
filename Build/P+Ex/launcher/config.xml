@@ -11,7 +11,7 @@
         <useNetwork>true</useNetwork>
         <useSoundEffects>true</useSoundEffects>
         <useMusic>true</useMusic>
-        <minima>true</minima>
+        <autoBoot>true</autoBoot>
       </global>
       <wii />
       <dolphin>

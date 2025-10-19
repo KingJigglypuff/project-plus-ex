@@ -299,4 +299,15 @@ uint32_t 0x74000 	@ $8053EF0C # (59B00 = 0.35MB) 0x74000 = 0.45MB
 uint32_t 0x143800   @ $804218AC # Reduced network size slightly (1.4MB -> 1.26MB)
 # 0.04MB leftover, but I may use that later for the item resource or otherwise
 op li r3, 51 @ $800F1C00 # The heap to set the picture up in!
+HOOK @ $800F1C0C
+{
+	cmpwi r3, 0; bne+ allocated	# If this is non-zero, usable memory was found in OverlayStage!
+	li r3, 52			# OverlayMenu
+	lis r4, 1			# \ Memory to allocate for frame buffer.
+	ori r4, r4, 0x9008	# /
+	bla 0x249E4			# Try to allocate again!
+allocated:
+	stw r3, 0x88(r21)	# Original operation, store allocation.
+}
 # We're using OverlayStage because it in battle is never full!
+# However, it's full in Subspace, so use OverlayMenu in there, instead!

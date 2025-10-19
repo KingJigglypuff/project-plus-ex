@@ -8,6 +8,12 @@
 		<codeMenuSubmenu name="Player 2 Mechanic Settings" shortName="PAGE_002"/>
 		<codeMenuSubmenu name="Player 3 Mechanic Settings" shortName="PAGE_003"/>
 		<codeMenuSubmenu name="Player 4 Mechanic Settings" shortName="PAGE_004"/>
+		<codeMenuComment text=""/>
+		<codeMenuComment text="RivalsMode Mechanic Settings: "/>
+		<codeMenuSubmenu name="Player 1 RivalsMode Settings" shortName="PAGE_R01"/>
+		<codeMenuSubmenu name="Player 2 RivalsMode Settings" shortName="PAGE_R02"/>
+		<codeMenuSubmenu name="Player 3 RivalsMode Settings" shortName="PAGE_R03"/>
+		<codeMenuSubmenu name="Player 4 RivalsMode Settings" shortName="PAGE_R04"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_001">
 		<codeMenuComment text="Player 1 Mechanic Settings: "/>
@@ -20,15 +26,24 @@
 			<option value="Rocket Burst" />
 		</codeMenuSelection>
 		<codeMenuComment text="Passive Mechanics: "/>
-		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_005">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_009">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_013">
-			<defaultValue value="false" />
-		</codeMenuToggle>
+		<codeMenuToggle name="Magic Series" shortName="LINE_005"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_009"/>
+		<codeMenuToggle name="Focus Attacks" shortName="LINE_013"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_R01">
+		<codeMenuComment text="Player 1 RivalsMode Mechanic Settings: "/>
+		<codeMenuToggle name="Parries" shortName="LINE_057"/>
+		<codeMenuToggle name="Hitfalling" shortName="LINE_061"/>
+		<codeMenuToggle name="Baby Dashes" shortName="LINE_029"/>
+		<codeMenuToggle name="Tilt Cancels" shortName="LINE_045"/>
+		<codeMenuToggle name="Actionable Airdodges" shortName="LINE_025"/>
+		<codeMenuToggle name="Wavedash out of Jumpsquat" shortName="LINE_017"/>
+		<codeMenuToggle name="Full-Horizontal Wavedashes" shortName="LINE_021"/>
+		<codeMenuToggle name="Button Walljumps" shortName="LINE_033"/>
+		<codeMenuToggle name="Walljump from Special Fall" shortName="LINE_037"/>
+		<codeMenuToggle name="Same-Direction Walljump Restriction" shortName="LINE_041"/>
+		<codeMenuToggle name="Non-Shrinking Shields" shortName="LINE_049"/>
+		<codeMenuToggle name="Reduced Shieldbreak Stun" shortName="LINE_053"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_002">
 		<codeMenuComment text="Player 2 Mechanic Settings: "/>
@@ -37,15 +52,24 @@
 			<defaultOption index="0" />
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
-		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_006">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_010">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_014">
-			<defaultValue value="false" />
-		</codeMenuToggle>
+		<codeMenuToggle name="Magic Series" shortName="LINE_006"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_010"/>
+		<codeMenuToggle name="Focus Attacks" shortName="LINE_014"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_R02">
+		<codeMenuComment text="Player 2 RivalsMode Mechanic Settings: "/>
+		<codeMenuToggle name="Parries" shortName="LINE_058"/>
+		<codeMenuToggle name="Hitfalling" shortName="LINE_062"/>
+		<codeMenuToggle name="Baby Dashes" shortName="LINE_030"/>
+		<codeMenuToggle name="Tilt Cancels" shortName="LINE_046"/>
+		<codeMenuToggle name="Actionable Airdodges" shortName="LINE_026"/>
+		<codeMenuToggle name="Wavedash out of Jumpsquat" shortName="LINE_018"/>
+		<codeMenuToggle name="Full-Horizontal Wavedashes" shortName="LINE_022"/>
+		<codeMenuToggle name="Button Walljumps" shortName="LINE_034"/>
+		<codeMenuToggle name="Walljump from Special Fall" shortName="LINE_038"/>
+		<codeMenuToggle name="Same-Direction Walljump Restriction" shortName="LINE_042"/>
+		<codeMenuToggle name="Non-Shrinking Shields" shortName="LINE_050"/>
+		<codeMenuToggle name="Reduced Shieldbreak Stun" shortName="LINE_054"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_003">
 		<codeMenuComment text="Player 3 Mechanic Settings: "/>
@@ -54,15 +78,24 @@
 			<defaultOption index="0" />
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
-		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_007">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_011">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_015">
-			<defaultValue value="false" />
-		</codeMenuToggle>
+		<codeMenuToggle name="Magic Series" shortName="LINE_007"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_011"/>
+		<codeMenuToggle name="Focus Attacks" shortName="LINE_015"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_R03">
+		<codeMenuComment text="Player 3 RivalsMode Mechanic Settings: "/>
+		<codeMenuToggle name="Parries" shortName="LINE_059"/>
+		<codeMenuToggle name="Hitfalling" shortName="LINE_063"/>
+		<codeMenuToggle name="Baby Dashes" shortName="LINE_031"/>
+		<codeMenuToggle name="Tilt Cancels" shortName="LINE_047"/>
+		<codeMenuToggle name="Actionable Airdodges" shortName="LINE_027"/>
+		<codeMenuToggle name="Wavedash out of Jumpsquat" shortName="LINE_019"/>
+		<codeMenuToggle name="Full-Horizontal Wavedashes" shortName="LINE_023"/>
+		<codeMenuToggle name="Button Walljumps" shortName="LINE_035"/>
+		<codeMenuToggle name="Walljump from Special Fall" shortName="LINE_039"/>
+		<codeMenuToggle name="Same-Direction Walljump Restriction" shortName="LINE_043"/>
+		<codeMenuToggle name="Non-Shrinking Shields" shortName="LINE_051"/>
+		<codeMenuToggle name="Reduced Shieldbreak Stun" shortName="LINE_055"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_004">
 		<codeMenuComment text="Player 4 Mechanic Settings: "/>
@@ -71,15 +104,24 @@
 			<defaultOption index="0" />
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
-		<codeMenuToggle name="Magic Series Enabled" shortName="LINE_008">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Final Smash Meter Enabled" shortName="LINE_012">
-			<defaultValue value="false" />
-		</codeMenuToggle>
-		<codeMenuToggle name="Focus Attacks Enabled" shortName="LINE_016">
-			<defaultValue value="false" />
-		</codeMenuToggle>
+		<codeMenuToggle name="Magic Series" shortName="LINE_008"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_012"/>
+		<codeMenuToggle name="Focus Attacks" shortName="LINE_016"/>
+	</codeMenuPage>
+	<codeMenuPage shortName="PAGE_R04">
+		<codeMenuComment text="Player 4 RivalsMode Mechanic Settings: "/>
+		<codeMenuToggle name="Parries" shortName="LINE_060"/>
+		<codeMenuToggle name="Hitfalling" shortName="LINE_064"/>
+		<codeMenuToggle name="Baby Dashes" shortName="LINE_032"/>
+		<codeMenuToggle name="Tilt Cancels" shortName="LINE_048"/>
+		<codeMenuToggle name="Actionable Airdodges" shortName="LINE_028"/>
+		<codeMenuToggle name="Wavedash out of Jumpsquat" shortName="LINE_020"/>
+		<codeMenuToggle name="Full-Horizontal Wavedashes" shortName="LINE_024"/>
+		<codeMenuToggle name="Button Walljumps" shortName="LINE_036"/>
+		<codeMenuToggle name="Walljump from Special Fall" shortName="LINE_040"/>
+		<codeMenuToggle name="Same-Direction Walljump Restriction" shortName="LINE_044"/>
+		<codeMenuToggle name="Non-Shrinking Shields" shortName="LINE_052"/>
+		<codeMenuToggle name="Reduced Shieldbreak Stun" shortName="LINE_056"/>
 	</codeMenuPage>
 </addon>
 

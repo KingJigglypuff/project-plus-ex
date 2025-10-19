@@ -10,6 +10,11 @@ Falco can use his own final smash files [DukeItOut]
 op b 0x58 @ $8084D5B8
 op b 0x5C @ $8084D450
 
+#############################################################
+Individual Costume Entry Works for All Costume IDs [Kapedani]
+#############################################################
+op nop @ $8084d828
+
 ###################################################################
 Individual Costume Final Smash Works for All Costume IDs [Kapedani]
 ###################################################################
@@ -130,8 +135,6 @@ HOOK @ $80769ecc #notifyEventCollsionHit2nd/[soDamageModuleImpl]
     li r0, 0
     stw r0, 0x1C(r27)    # Reset to 0 to avoid problems
 }
-
-.include Source/P+Ex/SlotEx.asm
 
 ####################################################################################
 Additional Item Search Target Modes [Kapedani]                                     #

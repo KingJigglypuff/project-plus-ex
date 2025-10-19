@@ -1047,23 +1047,6 @@ forceSkip:
 .include source/Project+/MyMusic.asm		# Integrated heavily into the above!
 .include source/Project+/Random.asm			# Custom random code to load expansion and non-striked slots, properly
 
-#####################################################################################################
-[Legacy TE] Hold Y on Smashville to Guarantee a Concert V2 (requires ASL Helper and SFSN) [DukeItOut]
-#####################################################################################################
-HOOK @ $8010FBC4
-{
-  lbz r0, 0(r31)
-  lis r5, 0x800B			# \ Access player input via ASL Helper
-  ori r5, r5, 0x9EA0		# |
-  lhz r12, 2(r5)			# /
-  andi. r12, r12, 0x800		# If holding Y (800)
-  beq- noConcert			# Attempt the code. (Only Smashville reads here.)
-  lis r12, 0x8010			# \
-  ori r12, r12, 0xFCA8		# | Go straight to triggering the concert mode substage ID 5
-  mtctr r12					# |
-  bctr 						# /
-noConcert:
-}
 ##########################################################
 KK Concert Music Only Triggers Via TLST File [DukeItOut]
 # 

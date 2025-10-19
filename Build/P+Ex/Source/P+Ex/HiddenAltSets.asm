@@ -522,5 +522,48 @@ stringEtcName:
 }
 op NOP @ $8084D2A4              # Prevent overwriting r4 after the above HOOK so we keep the desired formatting string!
 
+############################################################################################
+Game and Watch Costume Code [Sammi Husky, Desi] (TE numbering (00-19/20-29/30+) by MarioDox)
+############################################################################################
+HOOK @ $8084D0A4
+{
+#Checks if the character is Mr.Game and Watch. if it isn't, end the code.
+cmpwi r31, 0x12
+bne- end
 
+#Stack Frame
+stw r7, 0x2F0 (r1)
 
+#Load Filename's CostumeID and Check if 00 (Prevents editing of Dark/Special Costumes)
+lhz r7, -0x5(r6)
+cmpwi r7, 0x3030
+bne- restore
+
+#Costumes 20-29 use 01 File
+#If the CostumeID is less than 20, the Filename is not changed. Otherwise, Filename is 01.
+cmpwi r23, 20
+blt- 0x8
+li r7, 0x3031
+
+#If the CostumeID is less than 30, the Filename is not changed. Otherwise, Filename is 02.
+cmpwi r23, 30
+blt- 0x8
+li r7, 0x3032
+
+#Costumes 40 & higher use 03 File
+#If the CostumeID is less than 40, the Filename is not changed. Otherwise, Filename is 03.
+cmpwi r23, 40
+blt- 0x8
+li r7, 0x3033
+
+#Store Filename
+sth r7, -0x5(r6)
+
+restore:
+lwz r7, 0x2F0 (r1)
+
+end:
+li r4, 3
+
+#CostumeID 00-19 will load 00, 20-29 will load 01, 30-39 will load 02, 40+ will load 03.
+}

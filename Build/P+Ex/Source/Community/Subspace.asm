@@ -541,3 +541,9 @@ HOOK @ $81169fa0
     li r12, 0x70            # \ Change filename back to figdisp.pac
     stb r12, -0x4131(r31)   # /
 }
+
+###########################################
+Subspace Extra Slots Sticker Fix [MarioDox]
+###########################################
+# fixes weird sticker effects being applied on slots higher than sonic's
+op b 0xD0 @ $8015b3e4

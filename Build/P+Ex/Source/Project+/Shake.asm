@@ -11,6 +11,9 @@ HOOK @ $808386F4
 
 	cmpwi r12, 0x46; blt+ finish		# If action 46-4C (tumble)
 	cmpwi r12, 0x4C; ble forceShakeStop	# then cease shaking!
+	
+	cmpwi r12, 0x54; blt+ finish		# If action 54-55 (missed tech)
+	cmpwi r12, 0x55; ble forceShakeStop # then cease shaking!
 
 	cmpwi r12, 0x60; blt finish			# If action 60-64 (teching)
 	cmpwi r12, 0x64; bgt finish			# then cease shaking!

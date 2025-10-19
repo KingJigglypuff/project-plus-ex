@@ -9,27 +9,27 @@ To create or update an injection .GCT, simply compile the corresponding .ASM fil
 Each subfolder within the "pf/injects/" folder represents an "Inject Group": a group of injects that are all applied after some event happens in-game. Currently, the only subfolder is the "pf/injects/fighter/" folder, whose contents are applied a single time immediately after the game finishes loading and resolving the common Fighter.pac file. This makes it most appropriate for Fighter.pac injects, though technically other unrelated injects may be placed in this group as well. 
 
 ### The Fighter.pac Inject Group
-Many .asm files previously compiled and linked in to either RSBE01.GCT or BOOST.GCT have been converted into inject .GCTs to save space in the main .GCTs. These can be found in the "pf/injects/fighter/" folder, and include the following:
+Many .asm files previously compiled and linked in to either RSBE01.GCT or BOOST.GCT have been converted into inject .GCTs to  save space in the main .GCTs. These can be found in the "pf/injects/" folder (subfolders are supported if necessary), and include the following:
 
-| Injection .GCT ("injects/fighter/") | Original Source File                     |
+| Injection .GCT ("/injects/")        | Original Source File                     |
 |-------------------------------------|------------------------------------------|
-| "Constants.GCT"                     | "Source/ProjectM/Constants.asm"          |
-| "Effects.GCT"                       | "Source/ProjectM/PSA/Effects.asm"        |
-| "Misc.GCT"                          | "Source/ProjectM/PSA/Misc.asm" ***\****  |
-| "Tethers.GCT"                       | "Source/ProjectM/PSA/Tethers.asm"        |
-| "TauntCancel.GCT"                   | "Source/ProjectM/PSA/TauntCancel.asm"    |
-| "PowerShield.GCT"                   | "Source/ProjectM/PSA/PowerShield.asm"    |
-| "Items.GCT"                         | "Source/ProjectM/PSA/Items.asm"          |
-| "Hitstun.GCT"                       | "Source/ProjectM/PSA/Hitstun.asm"        |
-| "C-Stick.GCT"                       | "Source/ProjectM/PSA/C-Stick.asm"        |
-| "MeteorCancel.GCT"                  | "Source/ProjectM/PSA/MeteorCancel.asm"   |
-| "WallCling.GCT"                     | "Source/ProjectM/PSA/WallCling.asm"      |
-| "Glide.GCT"                         | "Source/ProjectM/PSA/Glide.asm"          |
-| "Grabs.GCT"                         | "Source/ProjectM/PSA/Grabs.asm"          |
-| "SlowTurn.GCT"                      | "Source/ProjectM/PSA/SlowTurn.asm"       |
-| "Edge.GCT"                          | "Source/ProjectM/PSA/Edge.asm"           |
-| "Moonwalk.GCT"                      | "Source/Project+/Moonwalk.asm"           |
-| "PlatformIgnore.GCT"                | "Source/P+Ex/PlatformIgnore.asm"         |
+| "DEFINE.GCT"                        | "Source/ProjectM/Constants.asm"          |
+| "MDEF.GCT"                          | "Source/Project+/Moonwalk.asm"           |
+|                                     | "Source/P+Ex/PlatformIgnore.asm"         |
+|                                     | "Source/ProjectM/PSA/Effects.asm"        |
+|                                     | "Source/ProjectM/PSA/Misc.asm" ***\****  |
+|                                     | "Source/ProjectM/PSA/Tethers.asm"        |
+|                                     | "Source/ProjectM/PSA/TauntCancel.asm"    |
+|                                     | "Source/ProjectM/PSA/PowerShield.asm"    |
+|                                     | "Source/ProjectM/PSA/Items.asm"          |
+|                                     | "Source/ProjectM/PSA/Hitstun.asm"        |
+|                                     | "Source/ProjectM/PSA/C-Stick.asm"        |
+|                                     | "Source/ProjectM/PSA/MeteorCancel.asm"   |
+|                                     | "Source/ProjectM/PSA/WallCling.asm"      |
+|                                     | "Source/ProjectM/PSA/Glide.asm"          |
+|                                     | "Source/ProjectM/PSA/Grabs.asm"          |
+|                                     | "Source/ProjectM/PSA/SlowTurn.asm"       |
+|                                     | "Source/ProjectM/PSA/Edge.asm"           |
 
 ***\**** *Note: This file contained a single non-Fighter.pac Injection code which was moved to a different .ASM, while the rest of the code was converted to an inject.*
 

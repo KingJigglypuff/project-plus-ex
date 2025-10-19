@@ -1,14 +1,17 @@
-#########################################################################
-[lavaInjectLoader] Inject Load Bootstrap v1.0.0 [QuickLava]
+######################################################################################
+[lavaInjectLoader] Inject Load Bootstrap v1.0.1 [QuickLava]
 # Provides an entrypoint for the injection GCTs loaded in at runtime!
 # Inspired by the Multi-GCT approach, hijacks the codehandler's r15 value
 # to force it to run over each new GCT as it loads in, then branch back!
-#########################################################################
+# v1.0.1 - Properly validates the inject GCT's location, to avoid crashes on hackless.
+######################################################################################
 PULSE
 {
   lwz r12, 0x17F4(r31)           # Load current inject GCT's location.
-  cmplwi r12, 0x00               # Check if loaded address was zero...
-  beq+ exit                      # ... and exit if it was.
+  andis. r0, r12, 0xEC00        # |\ Validate Address: Specifically, checks if address is within
+  rlwinm r0, r0, 16, 16, 31     # || 0x80000000 - 0x84000000
+  cmplwi r0, 0x8000             # || 0x90000000 - 0x94000000
+  bne- exit                     # |/ ... and exit if it isn't.
   mr r15, r12                    # Otherwise, put that new address into r15 to force execution over to it...
   li r4, 0x08                    # ... and set r4 to 0x8, so we hop over the incoming GCT's header.
   li r12, 0x00                   # \

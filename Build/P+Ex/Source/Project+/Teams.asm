@@ -341,9 +341,6 @@ CPU Level 0 is Controlled by Team Member [Kapedani]
 HOOK @ $80684c24  # muSelCharTask::setToGlobal
 {
   lwz r28, 0xE0(r3)  # Original operation
-  lbz r12, 0x33(r14)  # \
-  cmpwi r12, 0x0      # | check if team mode
-  beq+ end            # /
 teamDouble:
   lwz r4, 0x10(r28)
   addi r29, r4, 0xb8
@@ -373,6 +370,9 @@ notHuman:
   addi r18, r18, 0x1
   cmpwi r18, 0x7
   blt+ humanTrackLoop
+  lbz r12, 0x33(r14)  # \
+  cmpwi r12, 0x0      # | check if team mode
+  beq+ end            # /
   mr r17, r29
   li r18, 0x0 
 cpuTrackLoop:
@@ -500,3 +500,5 @@ HOOK @ $80693a70  # muSelCharPlayerArea::initDisp
   extsb r4, r4
   stw	r4, 0x01D4(r30) # Original operation
 }
+
+

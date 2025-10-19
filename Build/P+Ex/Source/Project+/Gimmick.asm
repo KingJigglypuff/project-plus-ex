@@ -305,6 +305,7 @@ Added option for true warps [Kapedani]
 .alias soCollisionAttackPart__initPos      = 0x8074361c
 .alias soCollisionCatchPart__initPos       = 0x80755a9c
 .alias soCollisionSearchPart__initPos      = 0x807585bc
+.alias grCollStatus__cleanInfo             = 0x80133cd4
 
 .macro lwi(<reg>, <val>)
 {
@@ -347,18 +348,67 @@ HOOK @ $808472b0    # Fighter::warp
     lwz r12, 0x2C(r12)  # |
     mtctr r12           # |
     bctrl               # /
+    lwz r3, 0xd8(r31)   # \
+    lwz r3, 0x14(r3)    # |
+    lwz r12, 0x0(r3)    # | moduleAccesser->moduleEnumeration->situationModule->getKind()
+    lwz r12, 0x14(r12)  # |
+    mtctr r12           # |
+    bctrl               # /
+    cmpwi r3, 0x1       # \ check if cliff (do warp by changing action)
+    beq+ %end%          # /
+    cmpwi r3, 0x0       # \ check if on ground
+    bne+ notGround      # /
+    li r4, 0x0          # \
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | moduleAccesser->moduleEnumeration->groundModule->getCollStatus(0)
+    lwz r12, 0x8(r3)    # | 
+    lwz r12, 0xD0(r12) # |
+    mtctr r12           # |
+    bctrl               # /
+    %call(grCollStatus__cleanInfo)
+    li r4, 0x0          # \
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | moduleAccesser->moduleEnumeration->groundModule->attachGround(0x0)
+    lwz r12, 0x8(r3)    # | 
+    lwz r12, 0x1c8(r12) # |
+    mtctr r12           # |
+    bctrl               # /
+notGround:
     lwz r3, 0x8(r31)    # \
     lwz r12, 0x3C(r3)   # |
     lwz r12, 0xB4(r12)  # | moduleAccesser->stageObject->updateNodeSRT()
     mtctr r12           # |
     bctrl               # /
-    # li r4, 0x1          # \
-    # lwz r3, 0xd8(r31)   # |
-    # lwz r3, 0x10(r3)    # | 
-    # lwz r12, 0x8(r3)    # | moduleAccesser->moduleEnumeration->groundModule->update(1)
-    # lwz r12, 0x34(r12)  # |
-    # mtctr r12           # |
-    # bctrl               # /
+    // Set shape and update to reset rhombus to new position
+    li r4, 0x1          # \
+    li r5, 0x0          # |
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | 
+    lwz r12, 0x8(r3)    # | moduleAccesser->moduleEnumeration->groundModule->setShapeKind(Shape_Rhombus, 0)
+    lwz r12, 0x1B8(r12) # |
+    mtctr r12           # |
+    bctrl               # /
+    li r4, 0x1          # \
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | 
+    lwz r12, 0x8(r3)    # | moduleAccesser->moduleEnumeration->groundModule->update(1)
+    lwz r12, 0x34(r12)  # |
+    mtctr r12           # |
+    bctrl               # /
+    li r4, 0x1          # \
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | 
+    lwz r12, 0x8(r3)    # | moduleAccesser->moduleEnumeration->groundModule->update(1)
+    lwz r12, 0x34(r12)  # |
+    mtctr r12           # |
+    bctrl               # /
+    li r4, 0x0          # \
+    lwz r3, 0xd8(r31)   # |
+    lwz r3, 0x10(r3)    # | 
+    lwz r12, 0x8(r3)    # | moduleAccesser->moduleEnumeration->groundModule->initRhombus(0)
+    lwz r12, 0x17C(r12) # |
+    mtctr r12           # |
+    bctrl               # /
     ## Update collision modules to reset hitbox interpolation
     li r4, -1          # \ 
     lwz r3, 0xd8(r31)   # |

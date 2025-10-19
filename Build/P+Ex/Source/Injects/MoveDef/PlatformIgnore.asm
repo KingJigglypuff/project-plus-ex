@@ -74,7 +74,7 @@ CODE @ $8054A790
 	word 0; word 9									#Value: 9
 	word 2; word PSA_Offset3+0x20					#Pointer: 0x80546EEC
 	#Sub Routine
-	word 2; word PSA_Offset2+0x70					#Pointer: 0x80546CD8
+	word 2; word PSA_Offset2+0x78					#Pointer: 0x80546CD8
 	#Sub Routine
 	word 2; word 0x80FB00C4
 	
@@ -113,7 +113,7 @@ CODE @ $8054A840
 	#Sub Routine
 	word 2; word 0x8054C108
 	#Sub Routine
-	word 2; word 0x8054A710
+	word 2; word 0x8054A718
 	
 	
 	word 0x00070100; word PSA_Offset5+0x10			#(Sub Routine) Param Offset: 0x80546EDC

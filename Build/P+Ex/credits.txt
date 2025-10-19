@@ -444,12 +444,12 @@ Pose by davidvkimball, model polish by tryptech, rendered by CSProject Backroom
 06 - G&W Console by Ca$inoWolf
 07 - Orange G&W by Legacy TE development team
 08 - Olive G&W by Legacy TE development team
-09 - Magenta G&W by Legacy TE development team
-10 - Brown G&W by Legacy TE development team
-13 - Grey G&W by PMDT
-14 - Pink G&W by PMDT
+09 - Brown G&W by Legacy TE development team
+10 - Grey G&W by PMDT
+11 - Pink G&W by PMDT
 14 - Purple G&W by PMDT
 15 - Teal G&W by Ca$inoWolf, MetalLegacy
+20 - 23 - Judge Game & Watch by Layell and MarioDox
 AltZ - Rainbow G&W by Cynapse
 R-alt black & white costume implemented by Ca$inoWolf
 
@@ -924,13 +924,15 @@ Base - Metal Cavern Symmetrical by P+DT, DukeItOut, Ryztiq, substage edits by ma
 L    - Mario Bros with stamina wraparound fixes by MarioDox
 R    - Mushroomy Cavern by Motobug, davidvkimball, Scout, Wyld with credit to Skeleton, LlamaJuice, jlclpepe, and PMDT
 Z    - Metal Cavern 64 HD by the PMDT, DukeItOut, Ryztiq; substage edits by Layell, mawwwk
+R+Start - Metal Cavern 64 Symmetrical by P+DT, DukeItOut, Ryztiq with credit to PMDT
+L+Start - Metal Cavern 64 by PMDT
 
 BOWSER'S CASTLE
-Base - Revamp by ART+: Yorch, Fireball, Kirbeast, Motobug, tyleto, GRAND AZEL, nnebf, and PMDT for original stage
-L - Thwomp v2 by ART+: Yorch, Kirbeast, tyleto, GRAND AZEL, mawwwk, and PMDT for original stage
+Base - Revamp by ART+: Yorch, Fireball, Kirbeast, Motobug, tyleto, GRAND AZEL, nnebf, mawwwk, Link Tahuterasu Spirit and PMDT for original stage
+L - Thwomp v2 by ART+: Yorch, Kirbeast, tyleto, GRAND AZEL, mawwwk, Link Tahuterasu Spirit, and PMDT for original stage
 R - NES Bowser's Castle by WorseDoughnut, davidvkimball, Dranakar with credit to Xenozoa425, Mewtwo2000, GotHunch, LlamaJuice for some of the stage's assets, optimizations by Layell, layout update by Yorch and GRAND AZEL
-Z - World Bowser Legal v3 by Yorch, Nezha the Scout, soopercool101, Snoe with credit to Nick, Pyro, ThatTrueStruggle, Carter, Electropolitan, Soopercool, Sub, FancyEX, UberGruvin, Car, DemKnuckles, Dapperman, Peardian, 
-		LegacyTE for their Base stage, Legacy XP, PMDT
+Z - World Bowser Legal v3 by Yorch, Nezha the Scout, soopercool101, Snoe with credit to Nick, Pyro, ThatTrueStruggle, Carter, Electropolitan, Soopercool, Sub, FancyEX, UberGruvin, Car, DemKnuckles, Dapperman, Peardian, LegacyTE for their Base stage, Legacy XP, PMDT
+R+Start - Dry Bowsers Castleby ART+: Yorch, Fireball, Kirbeast, Motobug, tyleto, GRAND AZEL, nnebf, mawwwk, Link Tahuterasu Spirit and PMDT for original stage
 
 KONGO JUNGLE
 Base - Ryztiq, DukeItOut with credit to MarioDox, soopercool101 for hazards and EdwguardFlows and PMDT; remake by Yorch
@@ -940,7 +942,7 @@ Z    - Sunset Shore V2 [DKC:R] by Kuro, Ryztiq, soopercool101, Dranakar with cre
 
 RUMBLE FALLS 
 L - 75M Jungle by davidvkimball, soopercool101, DukeItOut, Yohan1044, MarioDox with credit to Mewtwo2000 and the PMDT for the original stage. 
-R - Rumble Ware by MarioDox with credit to mnnaz05, Dranakar, Nezha the Scout, Ryztiq, davidvkimball, Puzzled, PMDT, optimizations by Layell
+R - Rumble Falls Castle by Motobug, with credit to MarioDox, mnnaz05, Dranakar, Nezha the Scout, Ryztiq, davidvkimball, Puzzled, PMDT, optimizations by Layell
 Z - Construction Site by MarioDox with credit to davidvkimball, optimizations by Layell
 
 TEMPLE OF TIME
@@ -1139,9 +1141,9 @@ R - Yoshi's Island (Melee) Zone by Puzzled, Ryztiq, Dranakar with credit to Duke
 Z - Cheese Bridge by Peardian, Kapadani, and GRAND AZEL
 
 BELL TOWER
-Base - Bell Tower by LenSho
+Base - Bell Tower by LenSho, fixes by MarioFan63
 L    - Whirl Island by Dranakar, Yohan1044, WorseDoughnut, davidvkimball, with credit to Lensho
-R    - Ho-Oh Stadium 2 by Yohan1044 with credit to Scout, davidvkimball, LazyRed, Mewtwo2000, mawwwk and LenSho for the original stage [right platform shader fix by Kirbeast] optimizations by Layell
+R    - Ho-Oh Stadium 2 by Yohan1044 with credit to Scout, davidvkimball, LazyRed, Mewtwo2000, mawwwk and LenSho for the original stage [right platform shader fix by Kirbeast] optimizations by Layell, fixes by MarioFan63
 Z    - Sprout Tower by Puffy, mawwwk with credit to LenSho, Skeleton
 
 CLOCK TOWN
@@ -1166,10 +1168,8 @@ Z     - Jungle Hijynx (back section) by DukeItOut, H!perLink, WorseDoughnut
 OIL DRUM ALLEY
 Base  - Oil Drum Alley by Nezha the Scout, BustedSoda with credit to Mattress87, Tonberry2k, MarioDox, SooperCool, Umbravivens, Peardian, Russmars2, FancyEX, mawwwk
 L     - The Flying Krock by DukeItOut, davidvkimball, Yohan1044, Scout, mawwwk with credit to Peardian for the models, thecoolguyXJ9 for the import, and BullockDS for the K. Rool Heads, optimizations by Layell
-R     - Fear Factory WW by Mariodox, Nezha the Scout, BustedSoda with credit to BustedSoda, Malistaticy, MarioDox, SooperCool, Russmars2, Mattress87, 
-			Tonberry2k, TheUltimateKoopa, Umbravivens, Peardian, mawwwk, Legacy Team
-Z     - Fear Factory RF	by Nezha the Scout, BustedSoda with credit to BustedSoda, Malistaticy, MarioDox, SooperCool, Russmars2, Mattress87, 
-			Tonberry2k, TheUltimateKoopa, Umbravivens, Peardian, mawwwk, Legacy Team
+R     - Fear Factory WW by Mariodox, Nezha the Scout, BustedSoda with credit to BustedSoda, Malistaticy, MarioDox, SooperCool, Russmars2, Mattress87, Tonberry2k, TheUltimateKoopa, Umbravivens, Peardian, mawwwk, Legacy Team
+Z     - Fear Factory RF	by Nezha the Scout, BustedSoda with credit to BustedSoda, Malistaticy, MarioDox, SooperCool, Russmars2, Mattress87, Tonberry2k, TheUltimateKoopa, Umbravivens, Peardian, mawwwk, Legacy Team
 
 COOKIE COUNTRY
 Base  - Cookie Country v3 by Nezha the Scout, Angelglory, Codex-9, soopercool101
@@ -1197,9 +1197,8 @@ Z    - Sky Sanctuary Husk by Yorch, nnebf, and GRAND AZEL
 
 DEAD LINE
 Base - Dead Line v2 by Nezha the Scout with credit to Segtendo, DukeitOut, Pyro, N!ck, Snoe
-L    - Chemical Plant Zone Revamp v1.1 (for Project M) by Puzzled, KTH, Nezha the Scout with credit to PegasusKnt, Mewtwo2000, LegacyWolf, TheBen, 
-		TheUltimateKoopa, and the Smash 2 Team
-R    - Dead Line Zone v2 by Nezha the Scout with credit to Segtendo, DukeitOut, Pyro, N!ck, Snoe
+L    - Chemical Plant Zone Revamp v1.2 by Puzzled, KTH, TheBen, Mewtwo2000, LegacyWolf, PegasusKnt, Nezha and the Smash 2 Team, link to accounts and entry: https://gamebanana.com/mods/149154
+R    - Chemical Plant Zone Revamp v1.2 Dead Line 1:1 by Puzzled, KTH, TheBen, Mewtwo2000, LegacyWolf, PegasusKnt, Nezha and the Smash 2 Team, DukeItOut, Pyro, N!ck, Snoe, link to accounts and entry: https://gamebanana.com/mods/149154
 Z    - Space Colony ARK: Crazy Gadget (SSZ 1:1) by Crashknight0 with credit to DSX8, MarioDox, GrandAzelf, davidvkimball, WorseDoughnut, Yohan1044, soopercool101, mawwwk, Mewtwo2000, Ryztiq, Hope4NeWDaY, PMDT
 
 DRACULA'S CASTLE
@@ -1227,7 +1226,7 @@ Z - Treasure Town (Variant B) by Frof
 L+Start - Frozen Pokemon Stadium by soopercool101 with credit to PMDT
 
 PIRATE SHIP
-L - Ganon's Tower by LegacyWolf with credit to NotZac, RARWRzilla22, mawwwk, Cynapse and Kurukato, Modding Workshop, Smash3c, Smash3, Brawl Vault Vigilantes and KCMM's Discord, brstms: fireluigi12, genandnic, GalaxyManX9, Muggshotter
+L - Ganon's Tower by Nezha, DSX8, LegacyWolf with credit to NotZac, RARWRzilla22, mawwwk, Cynapse and Kurukato, Modding Workshop, Smash3c, Smash3, Brawl Vault Vigilantes and KCMM's Discord
 R - Ancient Castle [Yoshi's Island '23 1:1] by Electropolitan with credit to iwantgames, DukeItOut, Mewtwo2000, Akeno/Archer, Super Smash Bros., Legend of Jesse, Bluebreon, xxWutzMercyxx, and Dranakar. Converted to YI 1:1 by Layell
 Z - Molgera's Castle by WorseDoughnut and mawwwk with credit to Ryztiq, LlamaJuice, Scout, soopercool101
 

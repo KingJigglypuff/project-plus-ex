@@ -1,6 +1,8 @@
-###############################################################
-[P+Ex] SlotsEX Rewrite v1.0.2 [MarioDox, GerraRReal, QuickLava]
-###############################################################
+########################################################################
+[P+Ex] SlotsEX Rewrite v1.0.3 [MarioDox, GerraRReal, QuickLava, Squidgy]
+# v1.0.3 - Update muCharKind when SlotEx fighter is chosen with
+# Melee Random
+########################################################################
 .BA<- Table
 .GOTO->Table_Skip
 Table:
@@ -74,7 +76,7 @@ Table_Skip:
 
 # Adjusts a read from the PT ID Array to use our table, while also freeing up the rest of the function body
 # for our use in storing stuff. In particular we store the address for our table in the freed space, very useful lol
-HOOK @ $806948C4                # [in "exchangePoke3ToGmCharKind/[muSelCharPlayerArea]/mu_selcha" @ 0x806948C4, Ghidra: $806A0160]
+HOOK @ $806948C4                # [0x00 bytes into symbol "exchangePoke3ToGmCharKind/[muSelCharPlayerArea]/mu_selcha" @ 0x806948C4, Ghidra: $806A0160]
 {
   %lwd(r4, LocalMemoryAddrLoc)       # Get table pointer...
   addi r4, r4, 0x6C                  # ... and point to PT's entry (at offset 0x1B * 4 = 0x6C).
@@ -82,16 +84,16 @@ HOOK @ $806948C4                # [in "exchangePoke3ToGmCharKind/[muSelCharPlaye
   blr                                # ... then return!
 }
 
-# Replaces: op cmpwi cr1, r29, RED	@ $80694a34
-HOOK @ $80694A34                # [in "setPoke3/[muSelCharPlayerArea]/mu_selchar_player_area.o" @ 0x80694A04, Ghidra: $806A02D0]
+# Replaces: op cmpwi cr1, r29, RED	@ $80694A34
+HOOK @ $80694A34                # [0x30 bytes into symbol "setPoke3/[muSelCharPlayerArea]/mu_selchar_player_area.o" @ 0x80694A04, Ghidra: $806A02D0]
 {
   %PTSlotCompareBody(r29, 1)
 }
 op lbzx r29, r11, r4 @ $80694a80     # LBZX the new ID from the character's table entry address, as was set up in the previous hook!
 op b 0x40 @ $80694A3C                # Ensure we actually proceed with applying the ID from the table if a valid entry was detected!
 
-# Replaces: op cmpwi r4, RED	@ $806948f4
-HOOK @ $806948F4                # [in "exchangeCharKindDetail/[muSelCharPlayerArea]/mu_selchar_p" @ 0x806948D4, Ghidra: $806A0190]
+# Replaces: op cmpwi r4, RED	@ $806948F4
+HOOK @ $806948F4                # [0x20 bytes into symbol "exchangeCharKindDetail/[muSelCharPlayerArea]/mu_selchar_p" @ 0x806948D4, Ghidra: $806A0190]
 {
   %PTSlotCompareBody(r4, 0)
 }
@@ -99,8 +101,8 @@ op nop @ $806948E4                   # \
 op nop @ $806948F0                   # / Disable a pair of branches preventing IDs lower than 0xE to be properly checked.
 op lbzx r4, r11, r0 @ $80694928      # LBZX the new ID from the character's table entry address, as was set up in the previous hook!
 
-# Replaces: op cmpwi r28, RED	@ $806965b4
-HOOK @ $806965B4                # [in "sendSystemCharKind/[muSelCharPlayerArea]/mu_selchar_playe" @ 0x80696570, Ghidra: $806A1E50]
+# Replaces: op cmpwi r28, RED	@ $806965B4
+HOOK @ $806965B4                # [0x44 bytes into symbol "sendSystemCharKind/[muSelCharPlayerArea]/mu_selchar_playe" @ 0x80696570, Ghidra: $806A1E50]
 {
   %PTSlotCompareBody(r28, 0)
 }
@@ -110,7 +112,7 @@ op lbzx r28, r11, r0 @ $806965E8     # LBZX the new ID from the character's tabl
 
 # Reset selectedPoke when moving between character slots on the CSS!
 # Ensures selected sub-slot isn't maintained across characters with this system enabled.
-HOOK @ $80697040                # [in "setCharKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80696F60, Ghidra: $806A28DC]
+HOOK @ $80697040                # [0xE0 bytes into symbol "setCharKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80696F60, Ghidra: $806A28DC]
 {
   mr r4, r3                          # Restore Original Instruction
   li r3, 0x00                        # \
@@ -118,7 +120,7 @@ HOOK @ $80697040                # [in "setCharKind/[muSelCharPlayerArea]/mu_selc
 }
 
 # Handles Getting Coll Type!
-HOOK @ $80697B9C                # [in "getCollKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80697B08, Ghidra: $806A3438]
+HOOK @ $80697B9C                # [0x94 bytes into symbol "getCollKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80697B08, Ghidra: $806A3438]
 {
   subic r10, r0, 0x9                 # Subtract 9 from the case ID so that PT's case ID is now 0.
   cmplwi r10, 0x3                    # \
@@ -145,7 +147,7 @@ op cmplw r4, r9     @ $8069810C # \
 op cmplw r3, r10    @ $8069811C # / Case 12: PT 3rd Child Slot
 
 # Handles CSS Return Slot IDs!
-HOOK @ $80693D1C                # [in "initCharKind/[muSelCharPlayerArea]/mu_selchar_player_area" @ 0x80693D18, Ghidra: $8069F5B8]
+HOOK @ $80693D1C                # [0x04 bytes into symbol "initCharKind/[muSelCharPlayerArea]/mu_selchar_player_area" @ 0x80693D18, Ghidra: $8069F5B8]
 {
   subi r12, r4, 0x28
   cmplwi r12, 0x1
@@ -187,7 +189,7 @@ subSlotLoopHead:
 }
 
 # Allow Slots with the same Char ID to use the same Costume if they have different sub-slot IDs.
-HOOK @ $80696FCC                # [in "setCharKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80696F60, Ghidra: $806A2868]
+HOOK @ $80696FCC                # [0x6C bytes into symbol "setCharKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80696F60, Ghidra: $806A2868]
 {
   cmplw r31, r0                    # Restore Original Instruction: Compare our Char ID with Opposing Port's
   bne+ %END%                       # If they're not, we can just skip out of the code.
@@ -195,7 +197,7 @@ HOOK @ $80696FCC                # [in "setCharKind/[muSelCharPlayerArea]/mu_selc
   lwz r12, 0x1F0(r4)               # / Otherwise, instead grab their sub-slot IDs...
   cmplw r11, r12                   # ... and compare with those instead!
 }
-HOOK @ $80698408                # [in "setPlayerKind/[muSelCharPlayerArea]/mu_selchar_player_are" @ 0x80698348, Ghidra: $806A3D44]
+HOOK @ $80698408                # [0xC0 bytes into symbol "setPlayerKind/[muSelCharPlayerArea]/mu_selchar_player_are" @ 0x80698348, Ghidra: $806A3D44]
 {
   cmplw r30, r0                    # Restore Original Instruction: Compare our Char ID with Opposing Port's
   bne+ %END%                       # If they're not, we can just skip out of the code.
@@ -203,7 +205,7 @@ HOOK @ $80698408                # [in "setPlayerKind/[muSelCharPlayerArea]/mu_se
   lwz r12, 0x1F0(r6)               # / Otherwise, instead grab their sub-slot IDs...
   cmplw r11, r12                   # ... and compare with those instead!
 }
-HOOK @ $806984A8                # [in "setPlayerKind/[muSelCharPlayerArea]/mu_selchar_player_are" @ 0x80698348, Ghidra: $806A3CA4]
+HOOK @ $806984A8                # [0x160 bytes into symbol "setPlayerKind/[muSelCharPlayerArea]/mu_selchar_player_are" @ 0x80698348, Ghidra: $806A3CA4]
 {
   cmplw r30, r0                    # Restore Original Instruction: Compare our Char ID with Opposing Port's
   bne+ %END%                       # If they're not, we can just skip out of the code.
@@ -211,7 +213,7 @@ HOOK @ $806984A8                # [in "setPlayerKind/[muSelCharPlayerArea]/mu_se
   lwz r12, 0x1F0(r5)               # / Otherwise, instead grab their sub-slot IDs...
   cmplw r11, r12                   # ... and compare with those instead!
 }
-HOOK @ $8069A2AC                # [in "incCharColorNo/[muSelCharPlayerArea]/mu_selchar_player_ar" @ 0x8069A22C, Ghidra: $806A5B48]
+HOOK @ $8069A2AC                # [0x80 bytes into symbol "incCharColorNo/[muSelCharPlayerArea]/mu_selchar_player_ar" @ 0x8069A22C, Ghidra: $806A5B48]
 {
   cmplw r30, r0                    # Restore Original Instruction: Compare our Char ID with Opposing Port's
   bne+ %END%                       # If they're not, we can just skip out of the code.
@@ -219,7 +221,7 @@ HOOK @ $8069A2AC                # [in "incCharColorNo/[muSelCharPlayerArea]/mu_s
   lwz r12, 0x1F0(r5)               # / Otherwise, instead grab their sub-slot IDs...
   cmplw r11, r12                   # ... and compare with those instead!
 }
-HOOK @ $8069A3BC                # [in "decCharColorNo/[muSelCharPlayerArea]/mu_selchar_player_ar" @ 0x8069A340, Ghidra: $806A5C58]
+HOOK @ $8069A3BC                # [0x7C bytes into symbol "decCharColorNo/[muSelCharPlayerArea]/mu_selchar_player_ar" @ 0x8069A340, Ghidra: $806A5C58]
 {
   cmplw r30, r0                    # Restore Original Instruction: Compare our Char ID with Opposing Port's
   bne+ %END%                       # If they're not, we can just skip out of the code.
@@ -227,7 +229,7 @@ HOOK @ $8069A3BC                # [in "decCharColorNo/[muSelCharPlayerArea]/mu_s
   lwz r12, 0x1F0(r5)               # / Otherwise, instead grab their sub-slot IDs...
   cmplw r11, r12                   # ... and compare with those instead!
 }
-HOOK @ $80684E8C                # [in "changeDuplicateCharColor/[muSelCharTask]/mu_selchar.o" @ 0x80684DCC, Ghidra: $80690728]
+HOOK @ $80684E8C                # [0xC0 bytes into symbol "changeDuplicateCharColor/[muSelCharTask]/mu_selchar.o" @ 0x80684DCC, Ghidra: $80690728]
 {
   cmplw r28, r4                    # Compare our Char ID with Opposing Port's
   bne+ exit                        # If they're not, we can just skip out of the code.
@@ -239,3 +241,45 @@ exit:
   stw r4, 0x00(r6)                 # Restore Original Instruction
 }
 
+# Handle Melee Random Coin Placement for Sub-Slot Characters 
+HOOK @ $8068AE28                # [0x64 bytes into symbol "buttonProcInFaceArea/[muSelCharTask]/mu_selchar.o" @ 0x8068ADC4, Ghidra: $806966C4
+{
+  subi r12, r4, 0x28                 # r4 contains the current muCharKind
+  cmplwi r12, 0x1
+  ble exit
+  
+  %lwd(r11, LocalMemoryAddrLoc)      # Get table pointer...
+  subi r11, r11, 0x4                 # ... and set it up for our loop!
+  li r12, MaxCharCount               # \ Set the count register up to limit the number
+  mtctr r12                          # / of character entries we'll attempt to read in our loop.
+charEntryLoopHead:
+  li r10, 0x0                        # Reset sub-slot index!
+  lbzu r12, 0x4(r11)                 # Load the first byte of the current character entry...
+  cmplwi r12, 0xFF                   # ... and check if it's null!
+  beq+ skipChecks                    # If it is the slot is inactive, skip checking the following bytes!
+  cmplw r12, r4                      # Additionally, compare the loaded ID with the incoming one...
+  beq- skipChecks                    # ... and if they're equal, skip the other checks!
+
+subSlotLoopHead:
+  addi r10, r10, 0x1                 # Increment sub-slot index...
+  lbzx r5, r11, r10                  # ... and load the associated byte from this entry!
+  cmplw r5, r4                       # Compare the loaded byte with the incoming ID...
+  beq- entryMatch                    # ... and if they match, jump to the match label!
+  cmplwi r10, 0x3                    # \
+  blt+ subSlotLoopHead               # / If we didn't match, restart the loop if there are still sub-slots to check!
+  b skipChecks                       # If we failed to find a match altogether, ensure we skip past the match found code.
+
+  entryMatch:                        # \
+  mr r4, r12                         # / If we *did* find a match, then overwrite r4 with the first byte's ID!
+
+  skipChecks:
+  cmplw r12, r4                      # Compare the loaded value with the original ID.
+  bc 0, 2, charEntryLoopHead         # Only repeat loop if there are still entries to check AND the last check failed!
+
+  bne+ exit                          # Re-use the previous check to exit early if we didn't find a match!
+  stw r10, 0x1F0(r28)                 # Otherwise, store the matching sub-slot index in the selectedPoke field.
+  stw r4, 0x1B8(r28)                 # Otherwise, store the found ID in muCharKind
+
+  exit:
+  li r4, 0  # original instruction
+}
