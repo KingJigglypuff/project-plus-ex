@@ -227,21 +227,6 @@ Castle_Siege_R.param
 	Flags: DualLoad
 
 ################
-Castle_Siege_X.param
-
-	[Substages / DualLoad]
-	- STGEMBLEM.pac
-	- STGEMBLEM_00.pac
-	- STGEMBLEM_01.pac
-	- STGEMBLEM_02.pac
-
-	st_castlesiege.rel
-	Castle_Siege_Brawl.tlst
-	SFX / GFX: 0x005E / 0x004A
-	MemoryAllocation: 0x483300 (4731648 bytes)
-	Flags: DualLoad
-
-################
 Castle_Siege_Z.param
 
 	[Substages / DualLoad]
@@ -413,9 +398,9 @@ Dead_Line_L.param
 ################
 Dead_Line_R.param
 
-	STGDEADLINE_R_GHZ_DEADLINE.pac
-	st_greenhill_act2.rel
-	Dead_Line.tlst
+	STGDEADLINE_R_DED_CHEMICALPLANT.pac
+	st_greenhill_ht.rel
+	Chemical_Plant_Zone.tlst
 
 ################
 Dead_Line_Z.param
@@ -1945,57 +1930,84 @@ Smashville_L.param
 	SFX / GFX: 0x0064 / 0x0032
 
 ################
+Smashville_MR_00.param
+
+	STGSMASHVILLE_00_MORNING.pac
+	st_smashville_ht.rel
+	Smashville.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_01.param
+
+	STGSMASHVILLE_01_NOON.pac
+	st_smashville_ht.rel
+	Smashville.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_02.param
+
+	STGSMASHVILLE_02_DUSK.pac
+	st_smashville_ht.rel
+	Smashville.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_03.param
+
+	STGSMASHVILLE_03_NIGHT.pac
+	st_smashville_ht.rel
+	Smashville.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_04.param
+
+	STGSMASHVILLE_04_MIDNIGHT.pac
+	st_smashville_ht.rel
+	Smashville.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_05.param
+
+	STGSMASHVILLE_03_NIGHT.pac
+	st_smashville_ht.rel
+	Smashville_Concert.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_06.param
+
+	STGSMASHVILLE_R_SV_BEACH.pac
+	st_smashville_ht.rel
+	Smashville_Concert.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_07.param
+
+	STGSMASHVILLE_L_SV_SAKURA.pac
+	st_smashville_ht.rel
+	Smashville_Concert.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
+Smashville_MR_08.param
+
+	STGSMASHVILLE_Z_SV_OCEAN.pac
+	st_smashville_ht.rel
+	Smashville_Concert.tlst
+	SFX / GFX: 0x0064 / 0x0032
+
+################
 Smashville_R.param
 
 	STGSMASHVILLE_R_SV_BEACH.pac
 	st_smashville_ht.rel
 	Smashville_Tropical.tlst
 	SFX / GFX: 0x0064 / 0x0032
-
-################
-Smashville_Y.param
-
-	[Substages / Normal]
-	- STGSMASHVILLE_00_MORNING.pac
-	- STGSMASHVILLE_01_NOON.pac
-	- STGSMASHVILLE_02_DUSK.pac
-	- STGSMASHVILLE_03_NIGHT.pac
-	- STGSMASHVILLE_03_NIGHT.pac
-	- STGSMASHVILLE_03_NIGHT.pac
-	- STGSMASHVILLE_04_MIDNIGHT.pac
-	- STGSMASHVILLE_04_MIDNIGHT.pac
-
-	st_smashville_ht.rel
-	Smashville_Concert.tlst
-	SFX / GFX: 0x0064 / 0x0032
-	Flags: OldSubstage
-
-################
-Smashville_YL.param
-
-	STGSMASHVILLE_L_SV_SAKURA.pac
-	st_smashville_ht.rel
-	Smashville_Concert.tlst
-	SFX / GFX: 0x0064 / 0x0032
-	Flags: OldSubstage
-
-################
-Smashville_YR.param
-
-	STGSMASHVILLE_R_SV_BEACH.pac
-	st_smashville_ht.rel
-	Smashville_Concert.tlst
-	SFX / GFX: 0x0064 / 0x0032
-	Flags: OldSubstage
-
-################
-Smashville_YZ.param
-
-	STGSMASHVILLE_Z_SV_OCEAN.pac
-	st_smashville_ht.rel
-	Smashville_Concert.tlst
-	SFX / GFX: 0x0064 / 0x0032
-	Flags: OldSubstage
 
 ################
 Smashville_Z.param

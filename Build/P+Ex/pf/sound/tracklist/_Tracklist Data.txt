@@ -1758,6 +1758,7 @@ Fountain_Of_Dreams.tlst - 12 tracks
 
 	Victory Road
 	H06.brstm
+	[Event Match exclusive]
 	Volume: 80
 	Frequency: 40
 
@@ -3241,6 +3242,7 @@ P+_Stadium.tlst - 13 tracks
 
 	Boss Battle (Brawl)
 	Y05.brstm
+	[Event Match exclusive]
 	Volume: 80
 	Frequency: 40
 
@@ -4993,7 +4995,12 @@ Tower_of_Guidance.tlst - 4 tracks
 	Song delay: -1
 
 ################
-Training_Room.tlst - 6 tracks
+Training_Room.tlst - 7 tracks
+
+	Launcher (Project M)
+	Project M/Launcher.brstm
+	Volume: 100
+	Frequency: 40
 
 	Break the Targets (Melee)
 	Melee/Break the Targets.brstm
