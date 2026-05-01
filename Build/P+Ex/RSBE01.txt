@@ -546,32 +546,6 @@ Subspace uses same Internal Constants as Versus [Eon]
 #####################################################
 word 0x0 @ $80B868D8
 
-
-##############################################
-Preloaded Texture memory leak band-aid [Eon]
-##############################################
-HOOK @ $801f2f40
-{
-  subi r4, r13, 0x5970
-  cmpwi r3, 0
-  bne %end%
-  lis r12, 0x801f
-  ori r12, r12, 0x2f60
-  mtctr r12
-  bctr
-}
-
-HOOK @ $801f3058
-{
-  mr r31, r3
-  cmpwi r3, 0
-  bne %end%
-  lis r12, 0x801f
-  ori r12, r12, 0x30a8
-  mtctr r12
-  bctr
-}
-
 .include Source/ProjectM/CloneEngine.asm
 
 .include Source/CodeMenu/CodeMenu.asm
@@ -3005,6 +2979,7 @@ op b 0x38	@ $808A087C
 .include Source/Project+/CStick.asm		# Don't move this to BOOST, it will cause aerial drift for some reason
 .include Source/Project+/Items.asm
 .include Source/Project+/Co-OpSave.asm
+.include Source/P+Ex/Heritage.asm
 .include Source/Community/ItemEx.asm
 .include Source/Community/Syringe.asm		
 

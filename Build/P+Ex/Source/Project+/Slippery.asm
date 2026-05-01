@@ -22,6 +22,8 @@ slippery:
 	beq- setWalkSpeed	# They have normal grip on ice!
 	cmpwi r12, 0x23		# Are they R.O.B.?
 	beq- setWalkSpeed	# because you sure as heck don't want to hear that walk sfx spam!
+	cmpwi r12, 0x40		# Is this Dark Samus?
+	beq- setWalkSpeed	# She floats, so no ice physics!
 
 	lwz r12, 0xD0(r31)	# \
 	lfs f0, 0x20(r12)	# / Max Walk Speed
@@ -63,6 +65,8 @@ slippery:
 	beq- setSpeed			# /
 	cmpwi r12, 0x23			# Are they R.O.B.?
 	beq- setSpeed			# because you sure as heck don't want to hear that walk sfx spam!
+	cmpwi r12, 0x40			# Is this Dark Samus?
+	beq- setSpeed			# She floats, so no ice physics!
 
 	lfs f0, 0x250(r13)		# 1.2
 	fmuls f1, f1, f0
@@ -86,6 +90,8 @@ slippery:
 	beq- normal				# /
 	cmpwi r3, 0x23			# \ Are they R.O.B.?
 	beq- normal				# / because you sure as heck don't want to hear that walk sfx spam!
+	cmpwi r3, 0x40			# \ Are they Dark Samus?
+	beq- normal				# / She floats, so no ice physics!
 
 	lwz r3, 0x7C(r29)		# \
 	lhz r3, 0x3A(r3)		# | Are we running or walking?
@@ -136,6 +142,8 @@ HOOK @ $80870738 # Related to altering dash speeds on slick surfaces.
 	lwz r3, 0x08(r31)
 	lwz r3, 0x110(r3)
 	cmpwi r3, 0xF		# Is this the Ice Climbers?
+	beq- finish
+	cmpwi r3, 0x40		# Is this Dark Samus?
 	beq- finish
 
 	lwz r3, 0xD8(r31)		# \

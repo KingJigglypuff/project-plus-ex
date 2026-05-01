@@ -552,3 +552,80 @@ notCrush:
     %branch(0x8087c874)
 }
 
+######################################
+New KB Direction Setting 6 [DukeItOut]
+######################################
+# KB Directions 6 and 7 are unused.
+#
+# This makes 6 act as follows:
+# 
+# -KB in direction of attacker (same as type 3)
+# -Facing direction unchanged by hit
+# 
+# Use on a low-priority hit while
+# a high-priority sourspot has Front-Only
+# to recreate Shulk's Back Slash!
+######################################
+HOOK @ $80769A1C # Force 6's KB to mimic 3's
+{
+	lis r12 0x8076
+	cmpwi r0, 6
+	beq- forceAttackerKBDirection
+	blt+ %END%		# Type 4 goes through this
+	ori r12, r12, 0x9B04 # Default (Face Screen so testers can easily detect)
+	b customSetting	# Default to Brawl 6-7 (buggy). No clear choice for 7 yet.
+	# Ultimate has direction settings of Left and Right, but
+	# not sure currently that is desired or what applications that would
+	# have. With only 1 slot remaining, it's easier to leave unreserved
+	# in case someone wants something special in the future.
+forceAttackerKBDirection:
+	ori r12, r12, 0x9A98 # Where type 3 goes.
+customSetting:
+	mtctr r12
+	bctr
+}
+HOOK @ $8076D470 # Make 6 not change character direction
+{
+	lwz r4, 0x74(r19)	# Relevant flag info
+	rlwinm r4, r4, 22, 29, 31 # 3 flag bits: 0x400, 0x800, 0x1000 representing 0-7
+	cmpwi r4, 6			# Custom setting 6
+	bne+ end			# Act normally otherwise!
+	li r3, 0			# Force to not update direction!
+end:
+	cmpwi r3, 1			# Original operation 
+}
+# The below two hooks handle the KB animation so that it changes
+HOOK @ $80877630
+{
+	crclr 6				# cr1's eq flag
+	cmpw r18, r31
+	bne- normal
+	lwz r4, 0x74(r19)
+	cmpwi r3, 0xA4; blt+ normal
+	cmpwi r3, 0xA6; bgt+ normal
+	rlwinm r4, r4, 22, 29, 31
+	cmpwi cr1, r4, 6	# Used in the hook below, too! Checks KB direction type
+	bne+ cr1, normal 
+	li r3, 0xD0			# Wall Recoil subaction
+	# set frame 2
+normal:
+	addi r4, r1, 0x18	# Original operation
+}
+HOOK @ $80877664
+{
+	bne+ cr1, Continue
+WallRecoilDamage:
+	bctrl
+	li r3, 2
+	sth r3, 0x18(r1)
+	psq_l f1, 0x18(r1), 0, 5	# Signed 16-bit Load (gets 2.0)
+	lwz r3, 0xD8(r31)	# \
+	lwz r3, 0x8(r3)		# |
+	lwz r12, 0(r3)		# |
+	lwz r12, 0x30(r12)	# / Set Animation Frame
+	mtctr r12
+Continue:
+	bctrl				# Original operation
+						# Will be animation setting if normal
+						# Animation frame setting if abnormal
+}

@@ -1,8 +1,10 @@
-########################################################################
-[P+Ex] SlotsEX Rewrite v1.0.3 [MarioDox, GerraRReal, QuickLava, Squidgy]
+####################################################################################################
+[P+Ex] SlotsEX Rewrite v1.0.4 [MarioDox, GeraRReal, QuickLava, Squidgy]
 # v1.0.3 - Update muCharKind when SlotEx fighter is chosen with
 # Melee Random
-########################################################################
+# v1.0.4 - Patches an issue with DLC.asm that prevents characters stocked in Random from being used.
+# This is because SlotEx.asm checked Random like a normal character.
+####################################################################################################
 .BA<- Table
 .GOTO->Table_Skip
 Table:
@@ -97,8 +99,9 @@ HOOK @ $806948F4                # [0x20 bytes into symbol "exchangeCharKindDetai
 {
   %PTSlotCompareBody(r4, 0)
 }
-op nop @ $806948E4                   # \
-op nop @ $806948F0                   # / Disable a pair of branches preventing IDs lower than 0xE to be properly checked.
+op nop @ $806948E4                   # Disable a branch preventing IDs lower than 0xE to be properly checked.
+op cmpwi r4, 0x29 @ $806948EC        # \
+op beq 0x10       @ $806948F0        # / Don't check Random due to DLC.
 op lbzx r4, r11, r0 @ $80694928      # LBZX the new ID from the character's table entry address, as was set up in the previous hook!
 
 # Replaces: op cmpwi r28, RED	@ $806965B4

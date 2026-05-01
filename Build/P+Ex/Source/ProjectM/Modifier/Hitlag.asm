@@ -12,36 +12,22 @@ HOOK @ $80772B90
 
 #####################################################
 Projectiles Can Experience Hitstop [Magus, DukeItOut]
+#
+# Requires Heritage.asm!
 #####################################################
 HOOK @ $808E53B4
 {
 	lbz r0, 0x21(r27)				# Collision Hit Type
 	cmpwi r0, 3; beq- finish		# No hitlag when being reflected!
-	lwz r0, 0xB8(r26) 				# Get the weapon ID
-	cmpwi r0, 3; beq- checkHitstun 	# Link's Boomerang
-	cmpwi r0, 5; beq- checkHitstun 	# Link's Arrows
-	cmpwi r0, 23; beq- checkHitstun # Snake's Cypher
-	cmpwi r0, 140; beq- checkHitstun# Toon Link's Arrows
-	cmpwi r0, 141; bne+ finish		# Toon Link's Boomerang
-
 checkHitstun:
-	lwz r12, 0x90(r26)		# \
-	lwz r12, 0xC4(r12)		# |
-	mtctr r12				# | Get the creator of this projectile	
-	bctrl					# |
-	mr r4, r3				# / 
-	li r5, 0				# r5 will be a pointer to write to if non-zero!
-	lis r6, 0x80B8			# \ Fighter Manager
-	lwz r3, 0x7C28(r6) 		# /
-	bla 0x815CB0			# \ Get the fighter entry
-	mr r4, r3				# /
-	
-	lwz r3, 0x7C28(r6) 		# Fighter Manager
-	li r5, -1				# \
-	bla 0x814F20			# / Get the fighter pointer
-		
+	lwz r3, 0x60(r26)
+	bla 0x3FF0				# Get fighter that spawned this.
+	cmpwi r3, 0				# \ null check
+	beq finish				# /
+	lwz r3, 0x8(r3)
 	lwz r4, 0x110(r3) 		# Fighter Character ID
 	cmpwi r4, 0x05; bne+ notKirby # Kirby copy abilities will need to be checked!
+	
 	lwz r4, 0x60(r3)		# \
 	lwz r4, 0x70(r4)		# | Check the copy ability ID!
 	lwz r4, 0x20(r4)		# | It is in LA-Basic[72]
@@ -49,9 +35,15 @@ checkHitstun:
 	lwz r4, 0x120(r4)		# /
 	
 notKirby:
-	cmpwi r4, 0x02; beq+ haveHitstun # Link
-	cmpwi r4, 0x29; beq+ haveHitstun # Toon Link
-	cmpwi r4, 0x2E; bne- finish		 # Snake
+	lwz r0, 0xB8(r26)			# Get the weapon ID
+	rlwimi r0, r4, 8, 16, 23	# Move char ID to second byte of r0 while keeping projectile ID in lowest byte.
+	
+	cmplwi r0, 0x2E17; beq- haveHitstun # Snake's Cypher (23)
+	cmplwi r0, 0x0203; beq- haveHitstun	# Link's Boomerang (3)
+	cmplwi r0, 0x0205; beq- haveHitstun	# Link's Arrows (5)
+	cmplwi r0, 0x298C; beq- haveHitstun # Toon Link's Boomerang (140)
+	cmplwi r0, 0x298D; bne+ finish		# Toon Link's Boomerang (141)
+	
 	# These checks are here so that, in builds that clone characters,
 	# they can choose to opt-in on their own terms!
 	# The only clone I currently can think of that should add support

@@ -1,5 +1,5 @@
-#############################################################################################################################################################
-[Project+] RSBE v1.40 (/Project+/pf/sfx, can load soundbank clones for stages and items) (requires CSSLE) [InternetExplorer, DukeItOut, QuickLava, Kapedani]
+#####################################################################################################################################################################
+[Project+] RSBE v1.51 (/Project+/pf/sfx, can load soundbank clones for stages and items) (requires CSSLE) [InternetExplorer, DukeItOut, QuickLava, Kapedani, Squidgy]
 #
 # 1.31: The RWSD location check is now independent of Sound Resource size.
 # 1.31a: SAWNDs Can Now Overwrite vBrawl's Header/Data Lengths (Requires FilePatchCodeSawndHeader.asm)
@@ -7,7 +7,10 @@
 # 1.33: Allow common sawnds to have soundbank clones
 # 1.34: Don't try to load override sawnds if override is empty
 # 1.40: Merged in Header/Data Length Patching Logic, SAWNDs now load via SD Stream (FilePatchCodeSawndHeader.asm no longer required)
-#############################################################################################################################################################
+# 1.41: Initializes new table for custom soundbanks to avoid errors. (SFXExpand.asm required)
+# 1.50: Adds support for variant soundbanks added by oundBank Expansion System 3.0
+# 1.51: Expanded bank clone support from 15 to 4095 per slot.
+#####################################################################################################################################################################
 .alias sprintf                      = 0x803F89FC
 .alias strcat                       = 0x803FA384
 .alias itoa                         = 0x803fcb50
@@ -76,12 +79,6 @@ HOOK @ $801C81B8	# [in "LoadGroup/[nw4r3snd6detail18SoundArchiveLoaderFUlPQ34nw]
   %lwi(r27, SawndStreamStatusBufferAddr) # Setup Address to Sawnd Stream Peek/Status Array in r27!
   
   addi r26, r26, 0x07   # Add 7 to the incoming Soundbank Info Index to get its ID...
-  
-  cmplwi r26, 0x014b                 # \
-  blt- skipIDPatch                   # | Check if this is a custom soundbank, cuz if so...
-  addis r3, r28, CustomBankOff_Hi    # | ... we need to patch its ID in.
-  stw r26, CustomBankOff_Lo(r3)      # / Store custom ID in the Reserved Custom Bank Group entry (offset 0xE3C6C)
-skipIDPatch:
 
   lis r3, 0x805A
   ori r3, r3, 0x7D00
@@ -262,11 +259,11 @@ tryOpenStream:
   stw r3, 0x08(r27)          # |
   stw r3, 0x0C(r27)          # / Zero Out Status array
   addi r3, r3, -0x01         # Set r3 to 0xFFFFFFFF...
-  sth r3, 0x00(r27)          # ... and store as the Group ID in Status Array to 0xFFFF to signal the fail!
+  stw r3, 0x00(r27)          # ... and store as the Group ID in Status Array to 0xFFFF to signal the fail!
   b noSawnd
   
 streamOpened:
-  sth r26, 0x00(r27)    # Store Group ID in Status Array
+  stw r26, 0x00(r27)    # Store Group ID in Status Array
   lwz r3, 0x08(r3)      # \
   lwz r3, 0x264(r3)     # / Get Length of file.
   stw r3, 0x0C(r27)     # Store File Length in Status Array
@@ -285,13 +282,29 @@ streamOpened:
   add r4, r28, r4       # add it to INFO Section Address to point to Group Section Ref Vector
 						# At this point, we have address of group vec in r4
 
-  subi r8, r26, 0x7		# Get Group Info ID					
+  subi r8, r26, 0x7		# Get Group Info ID		
+  # andi. r3, r8, 0x0FFF	# Check base soundbank if it is a variant
   cmplwi r8, 0x0144		# Check if this is a custom soundbank,
   blt- notCustomBank
-  addis r3, r28, CustomBankOff_Hi    # \ if it is, get pointer to Reserved Custom Bank Group entry
-  addi r3, r3, CustomBankOff_Lo      # / (INFO Section Address + 0xE3C6C)
+  # cmplwi r3, 0x0243
+  # bgt notCustomBank
+  /*
+  mr r5, r28		# Custom banks have info 
+  lbz r3, 0x20(r5)
+  lwz r4, 0x24(r5)
+  bla 0x1D3698			# Data ref access
+  mr r5, r28
+  addi r4, r3, 0xA20	# 0x144 * 8 = 0xA20
+  lbz r3, 4(r4)
+  lwz r4, 8(r4)			# Normally E3C6C
+  bla 0x1D3698			# Gets pointer info for bank 144
+  */
+  mr r4, r8
+  bla 0x3FEC
+  addi r3, r3, 0x5C
   b sawndHeaderLenCalc
 notCustomBank:
+  # andi. r8, r8, 0x0FFF  # Use bank soundbank ID if variant
   mulli r8, r8, 0x8			# Multiply Info ID by 8 to index into vec
   add r3, r4, r8			# \ Add this offset to r4 (start of off vec)...
   lwz r3, 0x8(r3)			# / ... then load from 0x08 past that to get the offset to the Group Obj
@@ -304,7 +317,7 @@ sawndHeaderLenCalc:
   mulli r7, r7, 0xC			# Multiply file count by length of file triplet
   addi r7, r7, 0x09			# Add 0x09 to account for Tag, Group ID, and Data Len
                             # At this point, r7 is now Sawnd Header length!
-  sth r7, 0x2(r27)          # Store Sawnd Header length in Status Array, Array setup complete!
+  sth r7, 0x10(r27)         # Store Sawnd Header length in Status Array, Array setup complete!
   lwz r8, 0xC(r27)          # Retrieve Total Sawnd File Size
   sub r8, r8, r7            # Subtract Sawnd Header Length from File Size
   lwz r7, 0x8(r27)			# Grab Sawnd Data Length
@@ -342,12 +355,12 @@ HOOK @ $801C8370	# [in "LoadGroup/[nw4r3snd6detail18SoundArchiveLoaderFUlPQ34nw]
   %lwi(r28, SawndStreamStatusBufferAddr)
   # lis r28, 0x805A       # \ 
   # ori r28, r28, 0x7D40  # / Setup Address to Sawnd Stream Peek/Status Array in r28! ----------------------------> # $805A7D40 is Buffer for Sawnd Stream Status and Info!
-                                                                                                                  # 0x00 is 16-bit Group ID if Stream Loaded, 0xFFFF if not
-  lwz r29, 0x18(r31)    # \                                                                                       # 0x02 is 16-bit Sawnd Header Length
-  lwz r29, 0x04(r29)    # |                                                                                       # 0x04 is 32-bit INFO Section Group Object Address
-  lwz r29, 0x28(r29)    # / Put Pointer to RSAR INFO Section (After Magic + Size) in r29!                         # 0x08 is 32-bit Sawnd Data Length
-                                                                                                                  # 0x0C is 32-bit Sawnd File Length
-  lhz r4, 0x00(r28)          # Try to load the last loaded Group ID from the Sawnd Stream Status Array!
+                                                                                                                  # 0x00 is 32-bit Group ID if Stream Loaded, -1 if not
+  lwz r29, 0x18(r31)    # \                                                                                       # 0x04 is 32-bit INFO Section Group Object Address
+  lwz r29, 0x04(r29)    # |                                                                                       # 0x08 is 32-bit Sawnd Data Length
+  lwz r29, 0x28(r29)    # / Put Pointer to RSAR INFO Section (After Magic + Size) in r29!                         # 0x0C is 32-bit Sawnd File Length
+                                                                                                                  # 0x10 is 16-bit Sawnd Header Length 
+  lwz r4, 0x00(r28)          # Try to load the last loaded Group ID from the Sawnd Stream Status Array!
   cmplw r4, r26              # See if it matches the .sawnd we're processing right now!
   beq+ streamGood            # If they match, then we can process the rest of the stream.
   
@@ -358,7 +371,7 @@ streamGood:                  # But otherwise...
   li r3, SawndStreamSlotID   # Set up our Stream ID
   mr r4, r27                 # Set r4 to our allocation address!
   lwz r5, 0x0C(r28)          # Load .sawnd length into r5
-  lhz r6, 0x02(r28)          # Load .sawnd header length into r6, which'll be our offset to read from, and also
+  lhz r6, 0x10(r28)          # Load .sawnd header length into r6, which'll be our offset to read from, and also
   sub r5, r5, r6             # ... subtract the .sawnd header length from the file length actual soundbank length!
   lwz r7, 0x08(r28)          # Load .sawnd data length into r7...
   sub r5, r5, r7             # ... and subtract *that* from soundbank length to get just header length!
@@ -383,14 +396,35 @@ streamGood:                  # But otherwise...
   
                              # Beginning of patching loop!
   lwz r3, 0x00(r20)          # Load number of Files to patch into r3...
+  mr r19, r3
   mtctr r3                   # ... and put it into CTR, to manage how many loop iterations we do.
   li r7, 0x00                # Set up Header Length Accumulator
   li r8, 0x00                # Set up Data Length Accumulator
   
 patchingLoopHead:
   lwzu r3, 0x08(r20)         # Push r20 to current Group Entry offset, and load its value!
-  add r3, r29, r3            # Add that offset to the INFO Section address to get Group Entry address.
+  mr r6, r26
+  # andi. r6, r26, 0x0FFF	     # Check base soundbank if it is a variant
+  cmpwi r6, 0x14B			       # But if it is a custombank... (0x144+7)
+  blt notCustom
+  # cmpwi r6, 0x24A
+  # bgt notCustom
   
+  li r3, 0
+  subi r4, r26, 7
+  mfctr r9
+  bla 0x3FEC
+  mtctr r9	# Restore counter overwritten by above function!
+  sub r5, r19, r9	# 2 is first, then 1
+  subi r4, r26, 7
+  stw r4, 0(r3)  
+  addi r3, r3, 0xC
+  mulli r5, r5, 0x14
+  add r3, r3, r5
+  b 0x8 # We are not doing the below command
+notCustom:
+  add r3, r29, r3            # Add that offset to the INFO Section address to get Group Entry address.
+
   lwzu r5, 0x0C(r22)         # Push r22 to current set of File Info Triplets, and load File ID!
 
   rlwinm r4, r5, 3, 0, 28    # Multiply the ID by 8, for use in indexing into the File ID list.
@@ -435,7 +469,7 @@ clearStatusArray:
   stw r12, 0x08(r28)         # |
   stw r12, 0x0C(r28)         # / Zero Out Status array
   addi r12, r12, -0x01       # Set r12 to 0xFFFFFFFF...
-  sth r12, 0x00(r28)         # ... and store as the Group ID in Status Array to signal nothing is open!
+  stw r12, 0x00(r28)         # ... and store as the Group ID in Status Array to signal nothing is open!
   
 exit:
   cmpwi r3, 0x0			# if r3 is zero, skip loading later

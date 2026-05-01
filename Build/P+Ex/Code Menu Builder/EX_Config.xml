@@ -18,6 +18,8 @@
             <comment text="YOUR_COMMENT_HERE" />
             -->
         </menuComments>
+		<!--Determines whether or not the player settings pages display the player's current Tag in Hex, for use in setting up Tag-Based Costumes.-->
+		<tagCostumeDisplay enabled="true"/>
     </menuProperties>
 
     <!--To modify the menu's line colors, add new entries into this block!-->
@@ -33,8 +35,8 @@
     <!--To add characters to the code menu, add entries for them into this block!-->
     <!--Note: the "baseListVersion" field determines the base character list your declarations will be added to!-->
     <!--0: vBrawl, 1: vBrawl & Playable Sopo/GBowser/WarioMan, 2: Project M, 3: Project+-->
-    <!--4: P+EX v1.0 (Ridley), 5: P+EX v1.2 (Waluigi), 6: P+EX v1.5 (Alloys), 7: P+EX v1.5 (Alloys + Sceptile)-->
-    <characterList baseListVersion="7">
+    <!--4: P+EX v1.0 (Ridley), 5: P+EX v1.2 (Waluigi), 6: P+EX v1.5 (Alloys), 7: P+EX v1.5 (Alloys + Sceptile), 8: P+Ex v1.7 (Dark Samus)-->
+    <characterList baseListVersion="8">
         <!--Add characters in the following format:
         <character name="YOUR_NAME_HERE" slotID="SLOT_ID_HERE"/>
         -->

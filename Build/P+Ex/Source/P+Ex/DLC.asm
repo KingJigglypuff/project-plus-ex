@@ -1,5 +1,5 @@
 ###########################################################
-Extra Fighters on Random Select [GeraRReal]
+Extra Fighters on Random Select v1.1 [GeraRReal, Squidgy]
 # Based on work by QuickLava and MarioDox.
 
 # The code relies on having the code on Project+Ex due to
@@ -8,6 +8,10 @@ Extra Fighters on Random Select [GeraRReal]
 # You can store up to 32 extra characters on Random Select.
 # Hold L and press X or Y to swap.
 # Allows L+X, L+Y, AND touching to work on SlotEx fighters
+
+# v1.1 - Use setPoke3 instead of setCharPic, for AsyncRSP
+# compatibility
+# v 1.2 - Fix issue with All-Star Random always loading Mario
 ###########################################################
 .BA<- ExtraFighterData
 .BA -> $804ECFC0 ## Store
@@ -26,7 +30,7 @@ ExtraFighterData:
 
 MyCode:
 .RESET
-.alias MaxChar = 1
+.alias MaxChar = 0
 .alias Write = 0x804ECFC0
 // Grab L, R and Z input from previous getSysPadStatus
 HOOK @ $80689A90
@@ -60,10 +64,10 @@ HOOK @ $80689A90
 {
 	lmw r3, 0x8(r1)
 }
-.macro charPic()
+.macro setPoke()
 {
   lis r12, 0x8069
-  ori r12, r12, 0x742C
+  ori r12, r12, 0x4a04
   mtctr r12
   li r12, 0
   bctrl
@@ -129,15 +133,8 @@ HOOK @ $80689A90
   %sendSystemCharKind()
   %loadGPR()
   %saveGPR()
-  %lwd(r5, 0x806948C8)
   lwz r4, 0x1F0(r3)
-  lwz r6, 0x1B8(r3)
-  mulli r6, r6, 4
-  add r6, r6, r4
-  lbzx r4, r5, r6
-  lwz r6, 0x1BC(r3)
-  lwz r5, 0x1B4(r3)
-  %charPic()
+  %setPoke()
 }
 
 .macro moduloInc(<reg>,<max>)
@@ -202,7 +199,16 @@ HOOK @ $80689A90
 op cmpwi r28, 0x29 @ $806965A8
 op beq 0x14 @ $806965AC
 op b 0x2C @ $806965DC
-op b 0x3C @ $806965CC
+
+HOOK @ $806965EC
+{
+  cmpwi r28, 0x28 # Is this None?
+  beq %END%       # Skip checks and proceed as normal.
+  cmpwi r0, 0     # If it isn't None, check our SetZeldas.
+  bne %END%       # If non-zero...
+  crnor 2, 2, 2   # ...crnor to count as non-zero.
+}
+
 HOOK @ $806965C4
 {
   %lwd(r4,Write)

@@ -44,7 +44,6 @@
 32 - Ridley
 33 - Waluigi
 40 - Dark Samus
-41 - Krystal
 62 - Sceptile
 6A - Red Alloy (Ex)
 6B - Blue Alloy (Ex)

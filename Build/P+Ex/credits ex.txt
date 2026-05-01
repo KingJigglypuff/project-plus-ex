@@ -134,6 +134,30 @@ https://docs.google.com/document/d/1YK_gjA9iwin7wm3id73UZFfC294i-anPDKL77J8yCiw/
 AltR - N/A, Sceptile currently lacks an R-Alt.
 AltZ - N/A, Sceptile currently lacks a Z-Alt.
 
+DARK SAMUS
+Pose by BaganSmashBros, model polish and rendered by Cahalan.
+For the creation of the moveset itself, please refer to this external document containing all credits for those involved with the making of Dark Samus. https://docs.google.com/document/d/1qcGJECsuijd2NSCQZiY-DouqSoTC-4lv9o6zrKaUis0/edit?usp=sharing
+00 - Default by King Draco
+01 - Red Default by Cahalan
+02 - Green Default by Cahalan
+04 - Gold Default by Cahalan
+05 - Purple Default by Cahalan
+06 - Silver Default by Cahalan
+07 - Black Default by Cahalan
+20 - Prime 2 Dark Samus by StarWaffle, Cahalan, and King Draco
+21 - Red Prime 2 by Cahalan
+22 - Green Prime 2 by Cahalan
+23 - Brown Prime 2 by Cahalan
+24 - Black Prime 2 by Cahalan
+25 - Purple Prime 2 by Cahalan
+26 - Dark Blue Prime 2 by Cahalan
+30 - Prime 2 Final Boss by Cahalan, Ryztiq, and King Draco
+31 - Red Prime 2 Final Boss by Cahalan
+32 - Green Prime 2 Final Boss by Cahalan
+33 - Purple Prime 2 Final Boss by Cahalan
+AltR - Sm4sh Assist Trophy by Nanobuds
+AltZ - Sm4sh Assist Trophy by Nanobuds
+
 Fighting Alloy Team EX
 Poses by KingJigglypuff, model polish and renders by Mach7 and Cahalan
 For the creation of the project itself, please refer to this external document containing all credits for those involved with the making of the Fighting Alloy Team EX. https://docs.google.com/document/d/17Lvnj_mvPDDAcW5Zj1j1FGXCB17Qxp36esb0v-l4_uk/edit?usp=sharing

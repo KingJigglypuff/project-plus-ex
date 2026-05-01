@@ -73,6 +73,7 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/Community/PSA/NewCommands.asm
 .include Source/Community/PSA/PointerWizardry.asm
 .include Source/Community/PSA/PSA.asm
+.include Source/Community/PSA/VariableParameter.asm
 
 #.include Source/Project+/TexFlags.asm	# This code is currently having issues interacting with the Code Menu. Included 
 					# to allow an understanding of how it will mechanically work in the future.

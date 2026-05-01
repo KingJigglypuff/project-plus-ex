@@ -31,6 +31,7 @@ HOOK @ $80952F38
 {
     %StockException (0x38, 0x32)    #Ridley
     %StockException (0x39, 0x33)    #Waluigi
+	%StockException (0x40, 0x40)    #Dark Samus
 	%StockException (0x62, 0x62)    #Sceptile
     mr r0, r4                        #BrawlEX Corps Fix v1 [ds22]
     b %END%
@@ -315,7 +316,7 @@ HOOK @ $80A0AB1C
 	mtctr r12						#|
 	bctrl 							#/
 HatIDCheck:
-    #%GFXFix(0x69, 0x169)			#Samus Clone Test, ef_custom32
+    %GFXFix(0x40, 0x95)				#Dark Samus, ef_tautau
     lis r4, 0x108					#If not defined, use ef_KbSamus
 end:
 	lwz r12, 0x0(r30)
@@ -885,8 +886,10 @@ Clone Engine Clear Final Smash Fix [DukeItOut]
 # Assigns a FitFinalSpy file for use in Clear Mode.
 HOOK @ $8084D41C
 {
-    cmpwi r31, 47    # Sonic
-    beq+ %END%
+    cmpwi r31, 47    # Sonic, the other character who is sometimes
+    beq+ %END%        # a blue ball and sometimes associated with transparent,
+    cmpwi r31, 64    # tentacled monsters of destruction
+    beq+ %END%        #
     cmpwi r31, 45    # & Knuckles
 }
 
@@ -1015,7 +1018,7 @@ ENDINGTABLE:
 		46, 47, -1, -1, -1, 31, -1, 43, |   # 31 used by Mewtwo, 43 used by Knuckles!
     	12, -1, 39, 36, -1, 38, -1, -1, |	# 36 used by Waluigi! 39 used by Ridley!
 		-1, -1, -1, -1, -1, -1, -1, -1, |
-		-1, -1, -1, -1, -1, -1, -1, -1, |
+		45, -1, -1, -1, -1, -1, -1, -1, |	# 45 used by Dark Samus!
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1, |
@@ -1024,7 +1027,7 @@ ENDINGTABLE:
 		-1, -1, -1, -1, -1, -1, -1, -1, |
 		-1, -1, -1, -1, -1, -1, -1, -1  |  
 
-# Unused slots: 14, 15, 21, 29, 30*, 31*, 36*, 39*, 40*, 43*, 45		*= Used by Project+ or P+Ex
+# Unused slots: 14, 15, 21, 29, 30*, 31*, 36*, 39*, 40*, 43*, 45*		*= Used by Project+ or P+Ex
 
 ENDINGTABLESKIP:
 	.RESET
@@ -1061,6 +1064,7 @@ Clone Classic & All-Star Result Data V1.21 [ds22, Dantarion, DukeItOut]
 .alias Wario_Man_Slot = 0x2D
 .alias Ridley_Slot = 0x38
 .alias Waluigi_Slot = 0x39
+.alias Dark_Samus_Slot = 0x40
 .alias Charizard_Slot = 0x1D
 .alias Squirtle_Slot = 0x1F
 .alias Ivysaur_Slot = 0x20
@@ -1075,6 +1079,7 @@ Clone Classic & All-Star Result Data V1.21 [ds22, Dantarion, DukeItOut]
 .alias Ridley_Trophy = 0x184
 .alias Ridley_Trophy_AllStar = 0x186
 .alias Waluigi_Trophy = 0xFF
+.alias Dark_Samus_Trophy = 0x1E6
 .alias Charizard_Trophy = 0x75
 .alias Squirtle_Trophy = 0x75
 .alias Ivysaur_Trophy = 0x75
@@ -1100,6 +1105,7 @@ HOOK @ $806E29D0		# Character trophy to load for Classic
   li r29, Wario_Man_Trophy;cmpwi r28, Wario_Man_Slot;beq+ GotTrophy	# if it's Wario-Man's slot 
   li r29, Ridley_Trophy;cmpwi r28, Ridley_Slot;beq+ GotTrophy	# if it's Ridley's P+Ex slot 
   li r29, Waluigi_Trophy;cmpwi r28, Waluigi_Slot;beq+ GotTrophy	# if it's Waluigi's P+Ex slot 
+  li r29, Dark_Samus_Trophy;cmpwi r28, Dark_Samus_Slot;beq+ GotTrophy	# if it's Dark Samus' P+Ex slot 
   li r29, Sceptile_Trophy;cmpwi r28, Sceptile_Slot;beq+ GotTrophy	# if it's Sceptile's P+Ex slot 
   li r29, 0x1		# Default to Mario!!!
 GotTrophy:
@@ -1118,6 +1124,7 @@ HOOK @ $806E47D8	# Character trophy to load for All-Star
   li r26, Wario_Man_Trophy_AllStar;cmpwi r4, Wario_Man_Slot; beq+ GotTrophy	# if it's Wario-Man's slot 
   li r26, Ridley_Trophy_AllStar;cmpwi r4, Ridley_Slot; beq+ GotTrophy	# if it's Ridley's P+Ex slot
   li r26, Waluigi_Trophy;cmpwi r4, Waluigi_Slot; beq+ GotTrophy	# if it's Waluigi's P+Ex slot  
+  li r26, Dark_Samus_Trophy;cmpwi r4, Dark_Samus_Slot; beq+ GotTrophy	# if it's Dark Samus' P+Ex slot  
   li r26, Sceptile_Trophy;cmpwi r4, Sceptile_Slot; beq+ GotTrophy	# if it's Sceptile's P+Ex slot 
   li r26, 0x5D		# Default to Mario Finale!!!
   b GotTrophy

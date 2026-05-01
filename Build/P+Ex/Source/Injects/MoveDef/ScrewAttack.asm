@@ -39,7 +39,7 @@ Screw Jump Aerial (Action 0xB0) Enters Free-Fall if Entered Upon Being Hit [King
 * 02010200 8054a928
 * 00070100 8054a938
 * 000F0000 00000000
-* 00000000 00000000
+* 00080000 00000000
 
 CODE @ $80FAE46C #ScrewJumpAerial: 0x80F9FC20 + 0xE84C, replaces top command.
 {

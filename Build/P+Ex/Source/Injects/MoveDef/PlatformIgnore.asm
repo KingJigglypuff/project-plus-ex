@@ -19,7 +19,7 @@ CODE @ $8054A668
 	
 	word 0x0D000200; word PSA_Offset+0x08			#(Concurrent Infinite Loop) Param Offset: 0x80546C38
 	word 0x00070100; word PSA_Offset+0x18			#(Sub Routine) Param Offset: 0x80546C48
-	word 0; word 0									#Return
+	word 0x00080000; word 0							#Return
 }
 CODE @ $8054A6A0
 {
@@ -67,7 +67,7 @@ CODE @ $8054A6A0
 	word 0x08000100; word PSA_Offset2+0x70			#Set Aerial/Onstage State
 	word 0x000F0000; word 0							#EndIf
 	word 0x000F0000; word 0							#EndIf	
-	word 0; word 0									#Return
+	word 0x00080000; word 0							#Return
 }
 CODE @ $8054A790
 {
@@ -81,7 +81,7 @@ CODE @ $8054A790
 	
 	word 0x00070100; word PSA_Offset3+0x10			#(Sub Routine) Param Offset: 0x80546EDC
 	word 0x00070100; word PSA_Offset3+0x18			#(Sub Routine) Param Offset: 0x80546EE4
-	word 0; word 0									#Return
+	word 0x00080000; word 0							#Return
 }
 CODE @ $8054A7C8
 {
@@ -104,7 +104,7 @@ CODE @ $8054A7C8
 	word 0x000B0400; word PSA_Offset4+0x20			#And Compare
 	word 0x12000200; word PSA_Offset4+0x40			#(Basic Variable Set) Param Offset: 0x80546F24
 	word 0x000F0000; word 0							#EndIf
-	word 0; word 0									#Return
+	word 0x00080000; word 0							#Return
 }
 CODE @ $8054A840
 {
@@ -118,7 +118,7 @@ CODE @ $8054A840
 	
 	word 0x00070100; word PSA_Offset5+0x10			#(Sub Routine) Param Offset: 0x80546EDC
 	word 0x00070100; word PSA_Offset5+0x18			#(Sub Routine) Param Offset: 0x80546EE4
-	word 0; word 0									#Return
+	word 0x00080000; word 0							#Return
 }
 word 0x8054A818 @ $80FC04C8							#CapturePulled (Exit)
 word 0x8054A818 @ $80FC04CC							#CaptureWait (Exit)
