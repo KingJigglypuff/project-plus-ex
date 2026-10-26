@@ -1,10 +1,12 @@
-####################################################################################################
-[P+Ex] SlotsEX Rewrite v1.0.4 [MarioDox, GeraRReal, QuickLava, Squidgy]
-# v1.0.3 - Update muCharKind when SlotEx fighter is chosen with
-# Melee Random
+###########################################################################################################
+[P+Ex] SlotsEX Rewrite v1.1.1 [MarioDox, GeraRReal, QuickLava, Squidgy]
+# v1.0.3 - Update muCharKind when SlotEx fighter is chosen with Melee Random.
 # v1.0.4 - Patches an issue with DLC.asm that prevents characters stocked in Random from being used.
-# This is because SlotEx.asm checked Random like a normal character.
-####################################################################################################
+#          This is because SlotEx.asm checked Random like a normal character.
+# v1.1.0 - Adds L input to cycle through slots.
+# v1.1.1 - Disables L input while highlighting playerkind and nametag buttons, to avoid PSCC conflict.
+#        - Disables portarit-clicking behavior unless every slot in a table entry is filled (ie. non-0xFF).
+###########################################################################################################
 .BA<- Table
 .GOTO->Table_Skip
 Table:
@@ -12,9 +14,9 @@ word [128] |                                        # CSS Slot IDs   Names
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x00 - 0x03 |  Mario, Donkey, Link, Samus
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x04 - 0x07 |  SZerosuit, Yoshi, Kirby, Fox,
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x08 - 0x0B |  Pikachu, Luigi, Captain, Ness,
-0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x0C - 0x0F |  Bowser, Peach, Zelda, Sheik
-0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x10 - 0x13 |  IceClimber, Marth, G&W, Falco
-0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x14 - 0x17 |  Ganon, Wario, MetaKnight, Pit
+0x0C30FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x0C - 0x0F |  Bowser, Peach, Zelda, Sheik
+0x1037FFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x10 - 0x13 |  IceClimber, Marth, G&W, Falco
+0xFFFFFFFF, 0x1535FFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x14 - 0x17 |  Ganon, Wario, MetaKnight, Pit
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x18 - 0x1B |  Pikmin, Lucas, Diddy, Pokemon Trainer
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x1C - 0x1F |  Charizard, Squirtle, Ivysaur, Dedede
 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,|    # 0x20 - 0x23 |  Lucario, Ike, Robot, Jigglypuff
@@ -65,7 +67,7 @@ Table_Skip:
   %lwd(r11, LocalMemoryAddrLoc)      # Get table pointer...
   rlwinm r12, <idReg>, 2, 0, 29      # ... quadruple incoming char ID to get offset to table entry...
   add r11, r11, r12                  # ... and add that to the table address to get the target entry address.
-  lbz r12, 0x03(r11)                 # Grab the final byte of the entry...
+  lbz r12, 0x00(r11)                 # Grab the initial byte of the entry...
   cmplwi cr<CRField>, r12, 0xFF      # ... compare it against 0xFF...
   crnor eqBit, eqBit, eqBit          # ... and flip CR0's EQ bit, so the following branch fires if r12 *is* 0xFF (ie. PT slot not requested)!
 }
@@ -122,7 +124,7 @@ HOOK @ $80697040                # [0xE0 bytes into symbol "setCharKind/[muSelCha
   stw r3, 0x1F0(r30)                 # / Zero out selectedPoke.
 }
 
-# Handles Getting Coll Type!
+# Handles Getting Coll Type, and enabling clicking PT style sub-slots on a CSP to change sub-slot!
 HOOK @ $80697B9C                # [0x94 bytes into symbol "getCollKind/[muSelCharPlayerArea]/mu_selchar_player_area_" @ 0x80697B08, Ghidra: $806A3438]
 {
   subic r10, r0, 0x9                 # Subtract 9 from the case ID so that PT's case ID is now 0.
@@ -134,7 +136,16 @@ HOOK @ $80697B9C                # [0x94 bytes into symbol "getCollKind/[muSelCha
   rlwinm r12, r12, 2, 0, 29          # ... quadruple it to get the offset to the associated table entry...
   add r11, r11, r12                  # ... and add it to the table address to get its address.
 
-  lbz r9, 0x00(r11)                  # Load the parent ID into r9...
+  li r12, 0x4                        # \
+  mtctr r12                          # / Prepare our loop through the target table entry's slots...
+  subi r11, r11, 0x1                 # ... and prepare r11 to lbzu from it in our loop.
+loopHead:                            # For each entry...
+  lbzu r12, 0x1(r11)                 # ... load its value...
+  cmplwi r12, 0xFF                   # ... compare it to 0xFF...
+  beq+ exit                          # ... and if it *was* 0xFF, that's a null slot, jump to exit!
+  bdnz loopHead                      # Otherwise, as long as there are slots left to check, continue checking.
+                                     # If we make it through the loop this table entry was fully populated, allow clicking!
+  lbzu r9, -0x03(r11)                # Load the parent ID into r9...
   lbzx r10, r11, r10                 # ... and the active sub-slot ID into r10!
 
 exit:
@@ -245,7 +256,7 @@ exit:
 }
 
 # Handle Melee Random Coin Placement for Sub-Slot Characters 
-HOOK @ $8068AE28                # [0x64 bytes into symbol "buttonProcInFaceArea/[muSelCharTask]/mu_selchar.o" @ 0x8068ADC4, Ghidra: $806966C4
+HOOK @ $8068AE28                # [0x64 bytes into symbol "buttonProcInFaceArea/[muSelCharTask]/mu_selchar.o" @ 0x8068ADC4, Ghidra: $806966C4]
 {
   subi r12, r4, 0x28                 # r4 contains the current muCharKind
   cmplwi r12, 0x1
@@ -280,9 +291,68 @@ subSlotLoopHead:
   bc 0, 2, charEntryLoopHead         # Only repeat loop if there are still entries to check AND the last check failed!
 
   bne+ exit                          # Re-use the previous check to exit early if we didn't find a match!
-  stw r10, 0x1F0(r28)                 # Otherwise, store the matching sub-slot index in the selectedPoke field.
+  stw r10, 0x1F0(r28)                # Otherwise, store the matching sub-slot index in the selectedPoke field.
   stw r4, 0x1B8(r28)                 # Otherwise, store the found ID in muCharKind
 
   exit:
   li r4, 0  # original instruction
+}
+
+# L-Load Hijack by MarioDox, adjusted for EX by QuickLava
+HOOK @ $80689B28                    # [lands 0x268 bytes into symbol "buttonProc/[muSelCharTask]/mu_selchar.o" @ 0x806898C0, Ghidra: ]
+{
+  lwz r12, 0xAC(r30)                # \
+  addic. r12, r12, -0x1C            # |
+  cmplwi r12, 0x2                   # | If we're hovering over the PlayerKind or Nametag buttons, disable input to avoid conflicts with PSCC!
+  blt- end                          # /
+  
+  lwz r12, 0x54(r1)                 # gets pressed input for this frame
+  rlwinm. r12, r12, 0, 25, 25       # isolate 6th bit, which is used for triggers, L is 0x40
+  beq- end
+
+  # Checks if you're holding a coin, and if so, gets the related port instead of your own
+  mr r3, r26                        # Prep r3 (which will be our PlayerArea ptr register) with the active hand's stored pointer.
+  lwz r12, 0xA0(r30)                # Get address of currently held coin.
+  cmpwi r12, 0x00                   # Compare it against 0x00 to see if it's null.
+  beq- updateSubslot                # If our coint pointer was null, then we'll keep that prepped value.
+  lwz r3, 0x14(r12)                 # Otherwise, grab the PlayerArea pointer from the held coin instead.
+  
+updateSubslot:
+  mr r29, r3                        # Backup r3 in r29 (safe to use, overwritten in following vBrawl instruction) so we can keep it across later function calls.
+  li r12, 0x4                       # \
+  mtctr r12                         # / Prepare our loop through the target table entry's slots...
+  %lwd(r11, LocalMemoryAddrLoc)     # ... and load the table address into r11.
+  lwz r12, 0x1B8(r3)                # \
+  cmplwi r12, 0x28                  # | Grab the currently selected parent slot ID, and if it's 0x28 (Nothing) exit early.
+  beq- end                          # /
+  rlwinm r12,r12,2,0,29             # Otherwise, quadruple to get the corresponding entry's offset in table.
+  add r11, r11, r12                 # Add that to the table address in r11 to get the address of our entry.
+  lwz r4, 0x1F0(r3)                 # Load current Poke3.
+loopHead:
+  addi r4, r4, 0x1                  # Increment the value...
+  cmplwi r4, 0x3                    # ... then compare it to 0x3.
+  ble+ skipReset                    # If it's less than or equal skip resetting, cuz our value is fine...
+  li r4, 0x00                       # ... but otherwise we'll reset it.
+skipReset:
+  lbzx r12, r11, r4                 # Load ID associated with this subslot.
+  cmplwi r12, 0xFF                  # Compare the value against 0xFF...
+  bne+ setPoke3                     # ... and if that's not a match, our new ID is valid, go handle that!
+  bdnz+ loopHead                    # Otherwise, continue in our loop for as long as we have entries to check.
+  li r4, 0x00                       # If we make it through the loop without ever hitting a valid ID, we've failed; reset Poke3...
+  li r29, 0x00                      # ... and additionally zero out r29, which we'll use as our signal to skip applying effects after we reset Poke3.
+setPoke3:
+  lis r12,0x8069                    # \
+  ori r12,r12,0x4A04                # | 
+  mtctr r12                         # | We've already set up our args in r3 and r4, call setPoke3/[muSelCharPlayerArea]!
+  bctrl                             # /
+doEffects:
+  cmplwi r29, 0x00                  # Compare our backed up value against 0x00...
+  beq- end                          # ... and if it is null, then we didn't actually find a match for ourselves, skip effects!
+  mr r3, r29                        # Otherwise, restore our backed up value.
+  lis r12,0x8069                    # \
+  ori r12,r12,0xA4DC                # | dispCharPicEffect/[muSelCharPlayerArea] 
+  mtctr r12                         # | we're cool like that, we need the flash
+  bctrl                             # /
+end:
+  lwz r0,0x54(r1)                   # Restore Original Operation
 }

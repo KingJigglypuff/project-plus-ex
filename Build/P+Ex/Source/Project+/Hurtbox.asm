@@ -1,10 +1,11 @@
 ############################################################################################
-Skip Attacker On-Hit Functions if it hits a Custom Hurtbox kind 2.0 [MarioDox, DukeItOut]
+Skip Attacker On-Hit Functions if it hits a Custom Hurtbox kind 2.1 [MarioDox, DukeItOut]
 ############################################################################################
 # Allows aesthetic or projectile-unaffecting stage hazards to exist
 #
 # 1.1: Fixed bug where some reflectors could fail in Subspace or other scenarios.
 # 2.0: No longer relies upon task ID manipulation to function.
+# 2.1: Fixed issue where stages with multiple hurtboxes would not know how to handle them.
 ############################################################################################
 # Hit types: Player = A | Items = B | Articles = C | Stage hurtboxes = 6-9 | Boss hitboxes = 5
 # Normal Stage Hurtboxes = 6
@@ -46,12 +47,10 @@ HOOK @ $8074BF60				# Related to initializing a hurtbox category.
 	slw r0, r0, r12				# Used r31 before, we're doing this to mask the top bits
 	rlwimi r0, r31, 24, 0, 1	# 0x80 and 0x40 are used as flags for custom flag concepts.
 }
-HOOK @ $807420C0
+HOOK @ $80742108
 {
-	stb r7, 0x22(r28)	# Original operation. Set task type parameter for collision
-	
 	li r6, 0			# Default to initalize custom byte to.
-	lbz r8, 0x10(r16)
+	lbz r8, 0x10(r16)	# Yes, this register is used in this function. In fact, it uses r14-r31! Complicated routine.
 	cmpwi r8, 6; blt- end # \ Only stage hazards should be manipulatable!
 	cmpwi r8, 9; bgt- end # /
 	
@@ -61,7 +60,8 @@ HOOK @ $807420C0
 	lwz r8, 0x30(r8)
 	lbz r6, 0x48(r8)	# Self Collision Mask's custom upper byte
 end:
-	stb r6, 0x2B(r28)	# Set the collision type there, we'll need it!
+	stb r6, 0x2B(r4)	# Set the collision type there, we'll need it! (r4 happens to have the right address)
+	lwz r0, 0x4E78(r30)	# Original operation
 }
 HOOK @ $80780414
 {

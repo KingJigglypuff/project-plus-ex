@@ -143,7 +143,7 @@ Table_Skip:
 	.RESET
 
 ###########################################################################################################################################################
-[Project+] SoundBank Expansion System (RSBE.Ver) v3.1 [codes, DukeItOut, JOJI, Squidgy]
+[Project+] SoundBank Expansion System (RSBE.Ver) v3.3 [codes, DukeItOut, JOJI, Squidgy]
 # v1.1 - Kirbycide Fix + Voice clips volume fix + CSS Hiccup Fix
 # v1.2 - Fixes Mr. Resetti's brsar conflicts
 # v2.0 - Removed Sound Resource table occupation and made dynamic to better support resource size changes
@@ -163,6 +163,8 @@ Table_Skip:
 #			# The following characters are affected: Luigi (Action 0x116), Peach (Action 0x116), Donkey Kong (Action 0x133) and Dedede (Action 0x116)
 #			# Dedede already does this from the .pac file, so he did not require modification.
 #			# SEQ banks and melodies for characters are still limited to the above four and clones of their banks.
+# v3.2 - Fixed issue where 3D audio falloff waas really quiet due to using the sound default
+# v3.3 - Fixed issue where the Wii Home Menu and Mr. Resetti could crash the game due to making the requirements too lenient for testing a sound.
 #
 # 90432134 references -> Sound Resource + 0x298934-to-0x29897F
 # 901A3090 references -> Written to CodeFlag+0x4
@@ -488,11 +490,8 @@ HOOK @ $801C7C4C
 HOOK @ $801C74EC
 {
   lwz r0, 0(r3)			# Original operation. Get anticipated sound range.
-  andi. r5, r30, 0xFFFF
-  cmplwi r5, CustomSound_Lo;  blt- %END%
-  
-  li r0, 0xE5				# \ E500: CustomSound_Hi
-  rlwinm r0, r0, 8, 0, 31	# /
+  cmplwi r30, CustomSound_Lo;  blt- %END%
+  lis r0, 0xF000
 }
 HOOK @ $801C750C
 {
@@ -504,8 +503,8 @@ HOOK @ $801C750C
 }
 HOOK @ $801C7570
 {
-  cmplwi r30, CustomSound_Lo;  blt- loc_0x10
-  
+  andi. r5, r30, 0xFFFF
+  cmplwi r5, CustomSound_Lo;  blt- loc_0x10
   %lwd(r3,TableBlockPtr); addi r3, r3, Table2Offset+0x3C
 loc_0x10:
   lwz r0, 0(r3)			# Original operation
@@ -609,6 +608,9 @@ Normal:
 ### More Sound Info Data
 HOOK @ $801C73CC
 {  
+  lwz r0, 0(r3) # Sound Count in entire RSAR (i.e. the Wii Menu has 16 and NTSC-U's main brsar has 10348)
+  cmplwi r0, 0x1000 # 
+  blt- %END%	# Don't do anything to the smaller RSARs for Mr. Resetti and the Home Menu!
   mr r6, r3 # We need to keep this
   lwz r5, 0x28(r29)
   lbz r3, 0x20(r5)
@@ -927,132 +929,3 @@ op beq- 0x10 @ $801CA640
 # op nop @ $80078068
 # Check how it works in the base game to support PAL (EU) language switching.
 # Not relevant for Brawl versions other than European so not implemented for now.
-
-############################################
-Hitbox Sound Effect Change System v2.1 [Eon]
-############################################
-#hitbox flags sfx 29, 30 and 31 point to ra-basic[8],ra-basic[9],ra-basic[10], and then flag 12 plays all three sounds at once, reading from same 3 ra's (0 = no sound)
-#hitbox sfx flag is specifically mapped to 0x00003E00 of hitbox flags
-#formulas to stick into wolfram alpha to set id as you want : 
-#   (0x<originalhitboxflag> bitwise and 0xFFFFC1FF) + (29 << 9) = new flag with sfx id 29, replace the 29 with 30 or 31 if you want them
-#
-#example - falcon punches original hitbox flag was 29030485, so putting into wolfram alpha
-#(0x29030485 bitwise and 0xFFFFC1FF) + (30 << 9) gives me 29033c85, so that is the hitbox flag if i wanted to have that hitbox read ra-basic[9] for its sfx id
-############################################
-.macro playSound(<soundRegister>) 
-{
-  mr r4, <soundRegister>  #sound id
-  mr r3, r29 #sound module
-  li r5, 0 
-  li r6, 0
-  li r7, 0
-  lwz r12, 0x0(r3)
-  lwz r12, 0x1C(r12)
-  mtctr r12
-  bctrl #play sound  
-}
-.macro readRA(<arg>)
-{
-  mr r3, r31
-  lis r4, 0x2000 #RA-Basic
-  or r4, r4, <arg>
-  lis r12, 0x8079
-  ori r12, r12, 0x76D8
-  mtctr r12
-  bctrl
-}
-
-HOOK @ $80762040
-{
-  rlwinm r0, r0, 7, 27, 31
-  cmpwi r0, 12
-  beq customSound
-  cmpwi r0, 28
-  ble end
-customSound:
-  lis r12, 0x8002
-  ori r12, r12, 0xE30C
-  mtctr r12
-  bctrl #getInstance/[gfTaskScheduler]
-
-  #get task id's from hit log entry
-  lbz r4, 0x22(r31)
-  lwz r5, 0x0C(r31)
-  lis r12, 0x8002
-  ori r12, r12, 0xF018
-  mtctr r12
-  bctrl #getTaskById/[gfTaskScheduler] #gets the attackers main index 
-  mr r31, r3
-  lwz r5, 0x34(r30)
-  rlwinm r5, r5, 7, 27, 31
-  cmpwi r5, 12
-  beq allThree
-
-  #select which ra-basic to read based on hitbox sound flag
-  subi r5, r5, 21 #29 -> 8, 30 -> 9, 31 -> 10 
-  %readRA(r5)
-  %playSound(r3)
-  cmpw r3, r3
-  b %end%
-allThree:
-  li r5, 8
-  %readRA(r5)
-  cmpwi r3, 0
-  beq skipOne
-  %playSound(r3)
-skipOne:
-  li r5, 9
-  %readRA(r5)
-  cmpwi r3, 0
-  beq skipTwo
-  %playSound(r3)
-skipTwo:
-  li r5, 10
-  %readRA(r5)
-  cmpwi r3, 0
-  beq skipThree
-  %playSound(r3)
-skipThree:
-  cmpw r3, r3
-  b %end%
-    
-end:
-  cmpwi r0, 0
-}
-
-#########################################################################
-[Project+] Expansion sawnd characters are mute while metal V2 [DukeItOut]
-#
-# V2: Added clone bank support
-#########################################################################
-HOOK @ $80077EA0
-{
-	andi. r4. r4. 0xFFFF # Filter sfx clones
-	andi. r3, r3, 0xFFF	 # Filter bank clones
-	cmpwi r3, 38	# Original operation
-}
-HOOK @ $80077EA4
-{
-	ble %END%
-	cmpwi r3, 0x144; bge- %END%		# Is it an expansion bank? Then it's probably for a character.
-	cmpwi r3, 0x26;	ble+ %END%		# 0x01-0x26 are for normal character soundbanks
-	lis r12, 0x8007
-	ori r12, r12, 0x7FC4
-	mtctr r12
-	bctr
-}
-HOOK @ $80077EB4
-{
-  lwzx r0, r5, r6	# Original operation
-  cmplwi r3, 0x144;  blt+ %END%		# If less than this, it knows how to get the metal status
-  cmpwi r4, 0x4000;	 blt+ sfxClip	# They're probably playing a global sound effect if it is less than this!
-  subi r12, r4, 0x4000	# \
-  subi r8, r3, 0x144	# | All of these banks use similar formatting, so exploit this!
-  mulli r8, r8, 0xA5	# | 
-  sub r12, r12, r8		# /
-  cmpwi r12, 0x2E; bgt+ sfxClip		# 2F-A4 in a bank are normal SFX IDs, not voice clips!
-voiceClip:
- li r3, 1; blr
-sfxClip:
- li r3, 0; blr
-}

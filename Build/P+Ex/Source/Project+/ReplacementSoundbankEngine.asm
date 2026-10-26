@@ -8,7 +8,7 @@
 # 1.34: Don't try to load override sawnds if override is empty
 # 1.40: Merged in Header/Data Length Patching Logic, SAWNDs now load via SD Stream (FilePatchCodeSawndHeader.asm no longer required)
 # 1.41: Initializes new table for custom soundbanks to avoid errors. (SFXExpand.asm required)
-# 1.50: Adds support for variant soundbanks added by oundBank Expansion System 3.0
+# 1.50: Adds support for variant soundbanks added by SoundBank Expansion System 3.0
 # 1.51: Expanded bank clone support from 15 to 4095 per slot.
 #####################################################################################################################################################################
 .alias sprintf                      = 0x803F89FC

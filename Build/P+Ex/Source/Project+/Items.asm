@@ -59,7 +59,6 @@ HOOK @ $806A3F60
 	bctrl					# /
 	lwz r3, 0xC4(r20)	# Original operation
 }
-
 HOOK @ $80952120    # stOperatorDropItem::processBegin
 {
     lis r31, 0x80AE          # \ Access pointer at 80ADAD5C
@@ -86,3 +85,14 @@ HOOK @ $806AB234 # Handles item frequency description
 Normal:
     addi r5, r5, 129 # Original operation, gets offset to text index for item frequency description using the item frequency as an offset
 }
+
+###################################################################
+!Team Healer's slot spawns items outside of team battles [DukeItOut]
+###################################################################
+op NOP @ $80055B68
+
+###################################
+Fix More Small Condition [Kapedani]
+###################################
+op blt- 0x1c @ $80896050
+op blt- 0x18 @ $80896098

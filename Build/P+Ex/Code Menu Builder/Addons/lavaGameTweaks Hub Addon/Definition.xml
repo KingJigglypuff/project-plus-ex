@@ -27,7 +27,7 @@
 		</codeMenuSelection>
 		<codeMenuComment text="Passive Mechanics: "/>
 		<codeMenuToggle name="Magic Series" shortName="LINE_005"/>
-		<codeMenuToggle name="Final Smash Meter" shortName="LINE_009"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_009" hidden="true"/>
 		<codeMenuToggle name="Focus Attacks" shortName="LINE_013"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_R01">
@@ -53,7 +53,7 @@
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
 		<codeMenuToggle name="Magic Series" shortName="LINE_006"/>
-		<codeMenuToggle name="Final Smash Meter" shortName="LINE_010"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_010" hidden="true"/>
 		<codeMenuToggle name="Focus Attacks" shortName="LINE_014"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_R02">
@@ -79,7 +79,7 @@
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
 		<codeMenuToggle name="Magic Series" shortName="LINE_007"/>
-		<codeMenuToggle name="Final Smash Meter" shortName="LINE_011"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_011" hidden="true"/>
 		<codeMenuToggle name="Focus Attacks" shortName="LINE_015"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_R03">
@@ -105,7 +105,7 @@
 		</codeMenuSelectionMirror>
 		<codeMenuComment text="Passive Mechanics: "/>
 		<codeMenuToggle name="Magic Series" shortName="LINE_008"/>
-		<codeMenuToggle name="Final Smash Meter" shortName="LINE_012"/>
+		<codeMenuToggle name="Final Smash Meter" shortName="LINE_012" hidden="true"/>
 		<codeMenuToggle name="Focus Attacks" shortName="LINE_016"/>
 	</codeMenuPage>
 	<codeMenuPage shortName="PAGE_R04">

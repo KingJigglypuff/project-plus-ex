@@ -1,5 +1,12 @@
 ##################################################################################
-[Project M] Half Damage from Outside Sources While Grabbed v1.3 [Magus, DukeItOut]
+[Project M] Half Damage from Outside Sources While Grabbed v1.7 [Magus, DukeItOut, Eon]
+##################################################################################
+# 1.4: Stabilized code
+# 1.5: This code now sets RA-Basic[0] and [1] to a pointer and type for KB
+# 	stacking to reference, but it will be quickly discarded afterwards!
+# 1.6: Sets RA-Basic[2] to the ID of the prop that attacked if a character,
+#	item or projectile.
+# 1.7: Set defender LA-Float[6] to -10 if hit by the fighter that is pummeling them, instead of defaulting to 0
 ##################################################################################
 HOOK @ $80769E58
 {
@@ -16,20 +23,75 @@ HOOK @ $80769E58
 	mr r3, r5				# |
 	bne- %END%				# /
   
-  
   lwz r4, 0x60(r4)	
+  
+  lwz r6, 0x28(r24)		# Owner of hitbox
+  lwz r5, 0x70(r4)		# \
+  lwz r5, 0x20(r5)		# | Store it in AIS Var-0x30!
+  lwz r5, 0x0C(r5)		# |
+  lwz r5, 0x2D0(r5)		# |
+  stw r6, 0x30(r5)		# /
+  lwz r3, 0x08(r6)		# \
+  lwz r3, 0x3C(r3)		# |
+  lwz r3, 0xA4(r3)		# | Get type of owner of hitbox.
+  mtctr r3				# |
+  bctrl					# /
+  stw r3, 0x34(r5)		# Store type to AIS Var-0x34!
+  lwz r11, 0x08(r6)		# Pointer to Object Info
+  cmpwi r3, 0; beq+ charID	# if it is type 0, it is a character
+  cmpwi r3, 2; beq+ wepID	# if it is type 2, it is a weapon/article
+  cmpwi r3, 4; bne- notWeaponArticle # type 4 is an item 
+itemID:
+  lwz r3, 0x8C0(r11)	# Get the item ID!
+  b setID
+wepID:  
+  lwz r3, 0xB8(r11)		# Get the article ID!
+  b setID
+charID:
+  lwz r3, 0x110(r11)	# Get the character ID!
+setID:
+  stw r3, 0x38(r5)		# Store into AIS Var-0x38!
+notWeaponArticle:
   lwz r5, 0x5C(r4)		  # \
   lwz r5, 0x94(r5)		  # | Get character grabbing
   cmpwi r5, 0; beq- %END% # | (if none, don't bother!)
   lwz r5, 0x44(r5)		  # /
-  lwz r6, 0x28(r24)		# \ Owner of hitbox (if a projectile, won't match character grabbing)
-  cmpw r5, r6			# /
-  beq- %END%			# If it matches, don't halve damage!
-	
-halveDamage:	
-	lfs f2, 0x14(r13)		# \ 
-	fmuls f0, f0, f2		# | halve the damage!
-	stfs f0, 4(r31)			# /
+  cmpw r5, r6			# Check if matches who is grabbing. (Projectiles do not count)
+  beq- attackedByGrabber            # If it matches, don't halve damage!
+    
+halveDamage:    
+    lfs f2, 0x14(r13)        # \ 
+    fmuls f0, f0, f2        # | halve the damage!
+    stfs f0, 4(r31)            # /
+    b %end%
+attackedByGrabber:
+    #set defender la-float[6] to -10 if hit by the fighter that is pummeling them
+    lwz r3, 0xD8(r4)
+    lwz r3, 0x64(r3)
+
+    lis r4, 0x1100
+    ori r4, r4, 0x6
+
+    lfs f27, 0x8(r1)
+    lis r5, 0xC120
+    stw r5, 0x8(r1)
+    lfs f1, 0x8(r1)
+    stfs f27, 0x8(r1)
+    lwz r12, 0x0(r3)
+    lwz r12, 0x3C(r12)
+    mtctr r12
+    bctrl
+
+    #restore appropriate variables after doing a function call
+    mr r3, r23
+    lwz r12, 0x8(r23)
+    lwz r12, 0xA4(r12)
+    mtctr r12
+    bctrl
+    lwz r12, 0x0(r3)
+    lfs f0, 4(r31)
+    lfs f1, 0(r31)
+    
 }
 
 ########################################################
@@ -113,4 +175,18 @@ HOOK @ $807531AC
   lwz r5, 0x14(r5)	# |
   stfs f1, 0x18(r5) # /
   mr r5, r27
+}
+
+##########################################
+Don't Turn When Grabbing Ledge [DukeItOut]
+##########################################
+HOOK @ $8087A65C
+{
+
+    lwz r3, 0x54(r31)    # Turn module
+    lwz r12, 0x00(r3)    # \
+    lwz r12, 0x14(r12)   # / End Turn
+    mtctr r12
+    bctrl             
+    lwz r3, 0xD8(r31) # Variant of original operation    
 }

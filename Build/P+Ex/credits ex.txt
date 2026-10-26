@@ -158,6 +158,27 @@ For the creation of the moveset itself, please refer to this external document c
 AltR - Sm4sh Assist Trophy by Nanobuds
 AltZ - Sm4sh Assist Trophy by Nanobuds
 
+ZERO
+Pose, model polish, and render by Mach7.
+For the creation of the moveset itself, please refer to this external document containing all credits for those involved with the making of Zero. https://docs.google.com/document/d/1LB9l8RpUpJ9-A2Cln__3DoT-V3cZiO-ItBEYT0DhbwI/edit?usp=sharing
+00 - Default by Eji_Ar, Mollymations, VirtualBeef, tyleto, and Mach7
+02 - Black Zero by Mach7
+03 - X's 1st Armor by Mach7
+04 - Vile by Mach7
+05 - Vile V color by Mach7
+06 - Mega Man Zero color by Mach7
+07 - Nightmare Zero color by Mach7
+08 - TvC Alt 2 by Mach7
+09 - TvC Alt 3 by Mach7
+10 - Mega Man by Mach7
+11 - Bass by Mach7
+12 - Axl color by Mach7
+13 - Green Biker by Mach7
+14 - Suna Light by Mach7
+15 - ViA by Mach7
+16 - Zero.EXE by Mach7
+AltZ - Mega Man X by MG64 and Mach7
+
 Fighting Alloy Team EX
 Poses by KingJigglypuff, model polish and renders by Mach7 and Cahalan
 For the creation of the project itself, please refer to this external document containing all credits for those involved with the making of the Fighting Alloy Team EX. https://docs.google.com/document/d/17Lvnj_mvPDDAcW5Zj1j1FGXCB17Qxp36esb0v-l4_uk/edit?usp=sharing

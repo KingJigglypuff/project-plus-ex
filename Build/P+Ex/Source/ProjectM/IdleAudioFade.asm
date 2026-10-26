@@ -1,12 +1,12 @@
 ###################################
 Idle Audio Fade v2.05 [InternetExplorer, mawwwk, DukeItOut]
 ###################################
-.macro Word(<reg>, <arg1>)
+.macro lwi(<reg>, <val>)
 {
-.alias temp_Hi = <arg1> / 0x10000
-.alias temp_Lo = <arg1> & 0xFFFF
-    lis <reg>, temp_Hi
-    ori <reg>, <reg>, temp_Lo
+    .alias  temp_Hi = <val> / 0x10000
+    .alias  temp_Lo = <val> & 0xFFFF
+    lis     <reg>, temp_Hi
+    ori     <reg>, <reg>, temp_Lo
 }
 
 .alias InactiveFrames = 7200
@@ -20,11 +20,11 @@ HOOK @ $801BCE60
     
     lis r12, 0x805B; lwz r12, 0x50AC(r12)   # Check if in replay
     lwz r12, 0x10(r12); lwz r12, 0(r12)     # Skip volume change if so
-    %Word(r11, 0x807039D8); cmpw r11, r12   # Compare with "sqReplay"
+    %lwi(r11, 0x807039D8); cmpw r11, r12   # Compare with "sqReplay"
     beq %END%
     
-    %Word(r5, 0x805BAD00)       # Addr for reading controller inputs
-    %Word(r12, 0x805A7400)      # Addr storing frames since last input
+    %lwi(r5, 0x805BAD00)       # Addr for reading controller inputs
+    %lwi(r12, 0x805A7400)      # Addr storing frames since last input
     lfs f3, 0x0C(r12)           # Volume change per frame
     li r4, 0                    # Initialize port count 
 	

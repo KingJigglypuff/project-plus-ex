@@ -1,6 +1,6 @@
-####################################################
-P+ Stamina REDUX v1.3 [wiiztec, DukeItOut, Kapedani]
-####################################################
+#####################################################
+P+ Stamina REDUX v1.32 [wiiztec, DukeItOut, Kapedani]
+#####################################################
 
 .alias g_ftDataCommon							= 0x80B88268
 .alias g_ftManager                          	= 0x80B87C28
@@ -34,6 +34,7 @@ P+ Stamina REDUX v1.3 [wiiztec, DukeItOut, Kapedani]
 .alias g_ecMgr									= 0x805a0148
 .alias ecMgr__setEffect 						= 0x8005F7E0
 .alias gfTask__getTask							= 0x8002dc40
+.alias atan2									= 0x80400b38
 .alias randf									= 0x8003fb64
 .alias _float_1_0								= 0x80AD7DCC
 
@@ -148,7 +149,7 @@ HOOK @ $80839248	# Fighter::processFixPosition
 	cmpwi r0, 0x3			# | check if attack + special is pressed
 	bne+ notSelfDestruct	# /
 destructSelf:
-	li r4, 5
+	li r4, 7
 	b selfDestruct
 notSelfDestruct:
 
@@ -227,7 +228,7 @@ belowCrashBreaker:
 	lwz r12, 0xd8(r28)	# \
 	lwz r12, 0xc(r12)	# | &moduleAccesser->moduleEnumeration->postureModule->pos
 	addi r4, r12, 0xc	# /
-	lfs f1, 0x40(r12)	# postureModule->lr
+	%lf (f1, r12, _float_1_0) # lr = 1.0
 	%lwd (r3, g_itManager)
 	li r5, 0x06		# \ Spawn Bob-omb sudden death variant
 	li r6, 0x1		# /
@@ -286,7 +287,7 @@ belowCrashBreaker:
 
 	lwz r3, 0x8(r1)
 	mflr r0 
-	stw r0, 0x8(r1) 
+	stw r0, 0xC(r1) 
 	bl explode
 explodeAttackData:
 	word 0x23	# power 
@@ -303,11 +304,13 @@ explodeAttackData:
 	word 0x3F800000	# sdiMultiplier (1.0)
 	word 0x007FEDE5
 	word 0x96014000
-	word 0x00106100
+	word 0x00106D00
 	word 0x00000000
 
 explode:
 	mflr r6 			# \
+	lwz r0, 0xC(r1)
+	mtlr r0
 	li r4, 0			# |
 	li r5, 0			# |
 	lwz r3, 0x60(r3)	# |
@@ -318,8 +321,37 @@ explode:
 	mtctr r12			# |
 	bctrl 				# /
 
-	lwz r0, 0x8(r1)
-	mtlr r0
+	mr r3, r26			# \
+	lwz r12, 0x3c(r26)	# |
+	lwz r12, 0x9C(r12)	# | Check if Fighter->getInput()
+	mtctr r12			# |
+	bctrl 				# /
+	lwz r12, 0x4(r3)	# \
+	lwz r12, 0x10(r12)	# | input->getStickMain()
+	mtctr r12			# |
+	bctrl 				# /
+	stw r3, 0xC(r1)		# \
+	lfs f2, 0xC(r1)		# |
+	stw r4, 0xC(r1)		# | atan2(y, x)
+	lfs f1, 0xC(r1)		# |
+	%call (atan2)		# /
+	%lwi(r12, 0x42652ee0)	# \
+	stw r12, 0xC(r1)	    # | convert to degree
+	lfs f2, 0xC(r1)			# |
+	fmuls f1, f1, f2		# /
+
+	lwz r3, 0x8(r1)		# \
+	fctiwz f1,f1	 # \
+	stfd f1,0x8(r1)	 # | float to int
+    lwz r5, 0xC(r1)	 # /  
+	li r4, 0x0			# |
+	lwz r3, 0x60(r3)	# |
+	lwz r3, 0xd8(r3)	# |
+	lwz r3, 0x1c(r3)	# | item->moduleAccesser->moduleEnumeration->attackModule->setVector(0, vector)
+	lwz r12, 0x0(r3)	# |
+	lwz r12, 0x50(r12)	# |
+	mtctr r12			# |
+	bctrl				# /
 
 changeColor:
 	addi r4, r1, 0x10	# \
@@ -1258,7 +1290,7 @@ notCoinMode:
     lwz r10,0x8(r10)    # | Check if ftOwner->ftOwnerData->hitPointMax was set  
     cmpwi r10, 0x0      # |
 	beq- interruptLink	# /
-	b noLink
+	b noAddDamage
 noHeld:
 	li r4, 0			# \
 	lwz r3, 0xd8(r31)	# |
@@ -1276,7 +1308,19 @@ noHeld:
     bctrl                   # /
 	cmpwi r3, 0x0	# \ check if held is a fighter
 	bne+ noLink		# /
-
+	lwz r3, 0x8(r1)		# \
+	li r4, 0			# |
+	lis r12, 0x40a0		# |
+	stw r12, 0x8(r1)	# |
+	lfs f1, 0x8(r1)		# |
+	stw r3, 0x8(r1)		# |
+	lwz r3, 0x60(r3)	# | heldFighter->moduleAccesser->moduleEnumeration->damageModule->addDamage(5.0, 0)
+	lwz r3, 0xd8(r3)	# |
+	lwz r3, 0x38(r3)	# | 
+	lwz r12, 0x8(r3)	# | 
+	lwz r12, 0x4c(r12)	# |
+	mtctr r12 			# |
+	bctrl				# /
 	li r4, 0			
 	stw r4, 0x18(r1)
 	lwz r3, 0x8(r1)		# \

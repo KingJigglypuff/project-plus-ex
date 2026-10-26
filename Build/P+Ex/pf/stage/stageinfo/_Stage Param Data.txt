@@ -24,7 +24,7 @@ Battlefield_R.param
 
 	STGBATTLEFIELD_R_BF_LUNAR.pac
 	st_battle_NoShadowRotate.rel
-	Battlefield.tlst
+	Battlefield_Lunar.tlst
 
 ################
 Battlefield_Z.param
@@ -81,9 +81,9 @@ Big_Blue_L.param
 Big_Blue_R.param
 
 	STGBIGBLUE_R_SV_BIGBLUE.pac
-	st_smashville_bigblue.rel
+	st_smashville_ht.rel
 	Big_Blue.tlst
-	SFX / GFX: 0x006F / 0x0032
+	SFX / GFX: 0x00D9 / 0x0032
 
 ################
 Big_Blue_Z.param
@@ -271,7 +271,7 @@ Ceres_Space_Colony_Z.param
 Clock_Town.param
 
 	STGCLOCKTOWN.pac
-	st_smashville_noambience.rel
+	st_battle_noshadowrotate.rel
 	Clock_Town.tlst
 	SFX / GFX: 0x0064 / 0x0032
 
@@ -279,7 +279,7 @@ Clock_Town.param
 Clock_Town_L.param
 
 	STGCLOCKTOWN_L_BF_MAJORA.pac
-	st_palutena.rel
+	st_battle_noshadowrotate.rel
 	Clock_Town.tlst
 	SFX / GFX: 0x0054 / 0x0064
 
@@ -294,7 +294,7 @@ Clock_Town_ML_00.param
 Clock_Town_R.param
 
 	STGCLOCKTOWN_R_SV_CLOCKTOWN.pac
-	st_smashville_noambience.rel
+	st_smashville_ht.rel
 	Clock_Town.tlst
 	SFX / GFX: 0x0064 / 0x0032
 
@@ -331,7 +331,7 @@ Cookie_Country_L.param
 Cookie_Country_R.param
 
 	STGCOOKIECOUNTRY_R_FOD_COOKIE.pac
-	st_dxfountain.rel
+	st_dxfountain_ht.rel
 	Cookie_Country.tlst
 
 ################
@@ -369,7 +369,7 @@ Corneria_ML_00.param
 Corneria_R.param
 
 	STGCORNERIA_R_FOD_SAURIA.pac
-	st_dxfountain.rel
+	st_dxfountain_ht.rel
 	Sauria.tlst
 	SFX / GFX: 0x006D / 0x0061
 
@@ -392,7 +392,7 @@ Dead_Line.param
 Dead_Line_L.param
 
 	STGDEADLINE_L_CHEMICALPLANT.pac
-	st_greenhill_act2.rel
+	st_final.rel
 	Chemical_Plant_Zone.tlst
 
 ################
@@ -464,7 +464,7 @@ Dinosaur_Land_L.param
 Dinosaur_Land_R.param
 
 	STGDINOSAURLAND_R_GHZ_DINOSAUR.pac
-	st_final.rel
+	st_greenhill_ht.rel
 	Yoshis_Island_Melee.tlst
 
 ################
@@ -589,6 +589,44 @@ Edit_Stage.param
 	Flags: OldSubstage
 
 ################
+Event_06.param
+
+	STGDXZEBES.pac
+	st_brinstar.rel
+	Brinstar.tlst
+	SFX / GFX: 0x006B / 0x0063
+
+################
+Event_09.param
+
+	[Substages / DualLoad]
+	- STGEMBLEM.pac
+	- STGEMBLEM_00.pac
+	- STGEMBLEM_01.pac
+	- STGEMBLEM_02.pac
+
+	st_castlesiege.rel
+	Castle_Siege_Brawl.tlst
+	SFX / GFX: 0x005E / 0x004A
+	MemoryAllocation: 0x483300 (4731648 bytes)
+	Flags: DualLoad
+
+################
+Event_10.param
+
+	STGBATTLEFIELD_MR_BF_DUEL.pac
+	st_final.rel
+	Battlefield_64.tlst
+
+################
+Event_20.param
+
+	STGDREAMLAND_MR_DL_64.pac
+	st_dreamland64_ht.rel
+	Dream_Land_64.tlst
+	SFX / GFX: 0x006C / 0x005E
+
+################
 Event_30.param
 
 	STGWARIOWARE.pac
@@ -698,8 +736,8 @@ Flat_Zone_Z.param
 Fountain_of_Dreams.param
 
 	STGFOUNTAINOFDREAMS.pac
-	st_dxfountain.rel
-	Fountain_of_Dreams.tlst
+	st_dxfountain_ht.rel
+	Fountain_Of_Dreams.tlst
 	SFX / GFX: 0x0200 / 0x0033
 
 ################
@@ -707,14 +745,14 @@ Fountain_of_Dreams_L.param
 
 	STGFOUNTAINOFDREAMS_L_SECTONIAGEM.pac
 	st_palutena.rel
-	Fountain_of_Dreams.tlst
+	Fountain_Of_Dreams.tlst
 
 ################
 Fountain_of_Dreams_R.param
 
 	STGFOUNTAINOFDREAMS_R_FOD_CAVE.pac
-	st_dxfountain.rel
-	Fountain_of_Dreams.tlst
+	st_dxfountain_ht.rel
+	Fountain_Of_Dreams.tlst
 
 ################
 Fountain_of_Dreams_Z.param
@@ -751,7 +789,7 @@ Fourside_ML_00.param
 Fourside_R.param
 
 	STGFOURSIDE_R_GHZ_NEWPORKCITY.pac
-	st_final.rel
+	st_greenhill_ht.rel
 	New_Pork_City.tlst
 
 ################
@@ -819,7 +857,7 @@ Golden_Temple_L.param
 Golden_Temple_R.param
 
 	STGGOLDENTEMPLE_R_SV_GOLDEN.pac
-	st_smashville_noambience.rel
+	st_smashville_ht.rel
 	Golden_Temple.tlst
 	SFX / GFX: 0x0064 / 0x0032
 
@@ -849,7 +887,7 @@ Green_Hill_Zone_L.param
 ################
 Green_Hill_Zone_ML_00.param
 
-	STGGREENHILLZONE_ML_ORIGINAL.pac
+	STGGREENHILL.pac
 	st_greenhill.rel
 	Green_Hill_Zone_Brawl.tlst
 	SFX / GFX: 0x0066 / 0x0054
@@ -987,16 +1025,45 @@ Hyrule_Castle_ML_00.param
 Hyrule_Castle_R.param
 
 	STGHYRULECASTLE_R_WL_HYRULE.pac
-	st_greenhill_act2.rel
+	st_final.rel
 	Hyrule_Castle.tlst
 
 ################
 Hyrule_Castle_Z.param
 
 	STGHYRULECASTLE_Z_SV_KAKARIKO.pac
-	st_village.rel
+	st_smashville_ht.rel
 	Kakariko.tlst
 	SFX / GFX: 0x0054 / 0x0064
+
+################
+Hyrule_Temple.param
+
+	STGHYRULETEMPLE.pac
+	st_dxshrine.rel
+	Hyrule_Temple.tlst
+
+################
+Hyrule_Temple_L.param
+
+	STGHYRULETEMPLE_L_SKYLOFT.pac
+	st_dxshrine.rel
+	Skyloft.tlst
+
+################
+Hyrule_Temple_R.param
+
+	STGHYRULETEMPLE_R_LM_CASTLE.pac
+	st_final.rel
+	Hyrule_Temple.tlst
+
+################
+Hyrule_Temple_Z.param
+
+	STGHYRULETEMPLE_Z_SV_SKYLOFT.pac
+	st_smashville_ht.rel
+	Skyloft.tlst
+	SFX / GFX: 0x0064 / 0x0032
 
 ################
 Infinite_Glacier.param
@@ -1018,7 +1085,7 @@ Infinite_Glacier_L.param
 Infinite_Glacier_R.param
 
 	STGINFINITEGLACIER_R_FOD_SUMMIT.pac
-	st_dxfountain.rel
+	st_dxfountain_ht.rel
 	Infinite_Glacier.tlst
 
 ################
@@ -1041,6 +1108,14 @@ Jungle_Japes_L.param
 
 	STGJUNGLEJAPES_L_KONGOFALLS.pac
 	st_kongofalls.rel
+	Jungle_Japes.tlst
+	SFX / GFX: 0x006A / 0x005C
+
+################
+Jungle_Japes_ML_00.param
+
+	STGJUNGLEJAPES.pac
+	st_junglejapes_noswim.rel
 	Jungle_Japes.tlst
 	SFX / GFX: 0x006A / 0x005C
 
@@ -1085,7 +1160,7 @@ Kongo_Jungle_MR_00.param
 Kongo_Jungle_R.param
 
 	STGKONGOJUNGLE_R_GHZ_HORNETHOLE.pac
-	st_greenhill_act2.rel
+	st_greenhill_ht.rel
 	Hornet_Hole.tlst
 
 ################
@@ -1300,8 +1375,15 @@ Mushroom_Kingdom.param
 ################
 Mushroom_Kingdom_L.param
 
+	STGMUSHROOMKINGDOM_L_MK3.pac
+	st_final_substage.rel
+	Mushroom_Kingdom_Mix.tlst
+
+################
+Mushroom_Kingdom_ML_00.param
+
 	[Substages / Normal]
-	- STGMUSHROOMKINGDOM_L_1-1.pac
+	- STGMUSHROOMKINGDOM_ML_1-1.pac
 
 	st_mariopast.rel
 	Mushroomy_Kingdom.tlst
@@ -1309,7 +1391,7 @@ Mushroom_Kingdom_L.param
 	Flags: SlowStart
 
 ################
-Mushroom_Kingdom_ML_00.param
+Mushroom_Kingdom_ML_01.param
 
 	[Substages / Normal]
 	- STGMUSHROOMKINGDOM_ML_1-2.pac
@@ -1321,7 +1403,7 @@ Mushroom_Kingdom_ML_00.param
 	Flags: SlowStart
 
 ################
-Mushroom_Kingdom_ML_01.param
+Mushroom_Kingdom_ML_02.param
 
 	STGMUSHROOMKINGDOM_ML_MELEE.pac
 	st_mushroomkingdom.rel
@@ -1392,7 +1474,7 @@ Onett_L.param
 Onett_R.param
 
 	STGONETT_R_SV_ONETT.pac
-	st_smashville_noambience.rel
+	st_smashville_ht.rel
 	Onett.tlst
 	SFX / GFX: 0x0064 / 0x0032
 
@@ -1566,9 +1648,9 @@ Pokemon_Stadium_2.param
 ################
 Pokemon_Stadium_2_L.param
 
-	STGPOKEMONSTADIUM_L_PS2_ULTRA.pac
-	st_stadium_static.rel
-	Pokemon_Stadium_2.tlst
+	STGPOKEMONSTADIUM_L_TRANSFORMING.pac
+	st_stadium.rel
+	Pokemon_Stadium_2_Brawl.tlst
 	SFX / GFX: 0x0059 / 0x0045
 
 ################
@@ -1582,10 +1664,10 @@ Pokemon_Stadium_2_ML_00.param
 ################
 Pokemon_Stadium_2_R.param
 
-	STGPOKEMONSTADIUM_R_PS2_RADIANT.pac
-	st_final.rel
-	Pokemon_Stadium_2.tlst
-	SFX / GFX: 0x0059 / 0x0045
+	STGPOKEMONSTADIUM_R_PS2_GATEWAY.pac
+	st_gateway.rel
+	Gateway_Colosseum.tlst
+	SFX / GFX: 0xFFFF / 0x0045
 
 ################
 Pokemon_Stadium_2_Z.param
@@ -1721,6 +1803,7 @@ Results.param
 	STGRESULT.pac
 	
 	Results.tlst
+	MemoryAllocation: 0x380000 (3670016 bytes)
 
 ################
 Rumble_Falls.param
@@ -1778,10 +1861,9 @@ Saffron_City.param
 ################
 Saffron_City_L.param
 
-	STGSAFFRONCITY_L_PS2_POKEMONAMIE.pac
-	st_final.rel
-	Saffron_City.tlst
-	SFX / GFX: 0x006E / 0x005F
+	STGSAFFRONCITY_L_MAGNETTRAIN.pac
+	st_magnettrain.rel
+	Magnet_Train.tlst
 
 ################
 Saffron_City_MR_00.param
@@ -1800,9 +1882,9 @@ Saffron_City_R.param
 ################
 Saffron_City_Z.param
 
-	STGSAFFRONCITY_Z_MAGNETTRAIN.pac
-	st_magnettrain.rel
-	Magnet_Train.tlst
+	STGSAFFRONCITY_Z_PS2_RADIANT.pac
+	st_final.rel
+	Radiant_Stadium.tlst
 
 ################
 Shadow_Moses.param
@@ -1879,15 +1961,8 @@ Sky_Sanctuary.param
 Sky_Sanctuary_L.param
 
 	STGSKYSANCTUARY_L_GHZ_PUMPKINHILL.pac
-	st_greenhill_act2.rel
+	st_greenhill_ht.rel
 	Pumpkin_Hill.tlst
-
-################
-Sky_Sanctuary_MR_00.param
-
-	STGSKYSANCTUARY_MR_SSZ_ORIGINAL.pac
-	st_palutena.rel
-	Sky_Sanctuary.tlst
 
 ################
 Sky_Sanctuary_R.param
@@ -2095,20 +2170,6 @@ Subspace_Z.param
 	Subspace.tlst
 
 ################
-Temple.param
-
-	STGTEMPLE.pac
-	st_dxshrine.rel
-	Temple.tlst
-
-################
-Temple_L.param
-
-	STGTEMPLE_L_SKYLOFT.pac
-	st_dxshrine.rel
-	Skyloft.tlst
-
-################
 Temple_of_Time.param
 
 	STGTEMPLEOFTIME.pac
@@ -2145,21 +2206,6 @@ Temple_of_Time_Z.param
 	st_oldin.rel
 	Bridge_of_Eldin.tlst
 	SFX / GFX: 0x0054 / 0x0064
-
-################
-Temple_R.param
-
-	STGTEMPLE_R_LM_CASTLE.pac
-	st_final.rel
-	Temple.tlst
-
-################
-Temple_Z.param
-
-	STGTEMPLE_Z_SV_SKYLOFT.pac
-	st_smashville_noambience.rel
-	Skyloft.tlst
-	SFX / GFX: 0x0064 / 0x0032
 
 ################
 Training.param
@@ -2239,7 +2285,7 @@ Venom_L.param
 Venom_R.param
 
 	STGVENOM_R_SV_VENOM.pac
-	st_smashville_noambience.rel
+	st_smashville_ht.rel
 	Venom.tlst
 	SFX / GFX: 0x0064 / 0x0032
 

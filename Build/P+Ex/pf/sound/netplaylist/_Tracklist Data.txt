@@ -59,6 +59,64 @@ Battlefield_64.tlst - 1 track
 	Frequency: 40
 
 ################
+Battlefield_Lunar.tlst - 11 tracks
+
+	Duel Zone (Remix)
+	SSB64/Duel Zone (Remix).brstm
+	Volume: 80
+	Frequency: 40
+
+	Multi-Man Melee 1
+	W23.brstm (0x2815)
+	Frequency: 40
+
+	Multi-Man Melee 2
+	Melee/Multi-Man Melee 2.brstm
+	Volume: 60
+	Frequency: 40
+
+	Metal Battle
+	Melee/Metal Battle.brstm
+	Volume: 80
+	Frequency: 40
+
+	Marionation Gear (Chousoujuu Mecha MG)
+	R07.brstm (0x27D7)
+	Frequency: 40
+	Song delay: 18
+
+	Tunnel Scene (X)
+	Q12.brstm (0x27CE)
+	Frequency: 40
+	Song delay: -1
+
+	Isaac Battle Theme
+	Golden Sun/Isaac Battle Theme.brstm
+	Volume: 80
+	Frequency: 40
+
+	Venus Lighthouse
+	Golden Sun/Venus Lighthouse.brstm
+	Volume: 60
+	Frequency: 40
+	Song delay: -1
+
+	Felix Battle Theme / Doom Dragon
+	R12.brstm (0x27DC)
+	Frequency: 40
+
+	Jenna Battle Theme
+	Golden Sun/Jenna Battle Theme.brstm
+	Volume: 45
+	Frequency: 40
+	Song delay: -1
+
+	X-Naut Fortress
+	Mario/X-Naut Fortress.brstm
+	Volume: 70
+	Frequency: 40
+
+################
 Battlefield_Melee.tlst - 6 tracks
 
 	Battlefield (Melee)
@@ -843,7 +901,7 @@ Credits.tlst - 50 tracks
 	Frequency: 40
 
 	Fox
-	H01.brstm
+	G01.brstm
 	Volume: 80
 	Frequency: 40
 
@@ -1603,7 +1661,7 @@ Electroplankton.tlst - 2 tracks
 	Frequency: 40
 
 ################
-Final_Destination.tlst - 9 tracks
+Final_Destination.tlst - 10 tracks
 
 	Final Destination (Super Smash Bros. Melee)
 	W25.brstm (0x2817)
@@ -1640,6 +1698,10 @@ Final_Destination.tlst - 9 tracks
 	Main Theme (Project M)
 	Project M/Main Theme.brstm
 	Volume: 55
+	Frequency: 40
+
+	Vs. Tabuu
+	Y07.brstm (0x2825)
 	Frequency: 40
 
 	The One Who Rules All (The Last Story)
@@ -1902,6 +1964,29 @@ Ganon_Castle.tlst - 7 tracks
 	Molgera Battle
 	C11.brstm (0x273D)
 	Frequency: 40
+
+################
+Gateway_Colosseum.tlst - 4 tracks
+
+	Gateway Colosseum
+	Pokemon/Gateway Colosseum.brstm
+	Volume: 65
+	Frequency: 90
+
+	Neon Colosseum
+	Pokemon/Neon Colosseum.brstm
+	Volume: 60
+	Frequency: 90
+
+	First Battle (Pokémon Colosseum)
+	Pokemon/First Battle.brstm
+	Volume: 60
+	Frequency: 90
+
+	Miror B.'s Retro Groove
+	Pokemon/Miror B.'s Retro Groove.brstm
+	Volume: 80
+	Frequency: 20
 
 ################
 Golden_Temple.tlst - 12 tracks
@@ -2318,6 +2403,29 @@ Hyrule_Castle_64.tlst - 1 track
 	Main Theme - The Legend of Zelda (Super Smash Bros. ver.)
 	Zelda/Main Theme (SSB).brstm
 	Volume: 80
+	Frequency: 40
+
+################
+Hyrule_Temple.tlst - 5 tracks
+
+	Temple
+	W24.brstm (0x2816)
+	Frequency: 40
+
+	Great Temple / Temple
+	C03.brstm (0x2735)
+	Frequency: 40
+
+	The Dark World
+	C04.brstm (0x2736)
+	Frequency: 40
+
+	Black Mist
+	C05.brstm (0x2737)
+	Frequency: 40
+
+	Gerudo Valley
+	C13.brstm (0x273F)
 	Frequency: 40
 
 ################
@@ -3527,7 +3635,7 @@ Pokemon_Stadium_2.tlst - 18 tracks
 
 	Battle! Champion Blue
 	Pokemon/Battle! Champion Blue (Origins).brstm
-	Volume: 60
+	Volume: 55
 	Frequency: 40
 
 	Battle! Team Rocket
@@ -3785,6 +3893,39 @@ Pumpkin_Hill.tlst - 1 track
 	A Ghost's Pumpkin Soup
 	Sonic/A Ghost's Pumpkin Soup.brstm
 	Volume: 75
+	Frequency: 40
+
+################
+Radiant_Stadium.tlst - 6 tracks
+
+	Battle! Champion Diantha
+	Pokemon/Battle! Champion Diantha.brstm
+	Volume: 105
+	Frequency: 80
+
+	Battle! Champion Blue
+	Pokemon/Battle! Champion Blue (Origins).brstm
+	Volume: 55
+	Frequency: 40
+
+	Victory Road (Pokémon Ruby & Sapphire)
+	H06.brstm (0x2773)
+	Frequency: 40
+	Song delay: 84
+
+	Battle! Lorekeeper Zinnia
+	Pokemon/Battle! Lorekeeper Zinnia.brstm
+	Volume: 60
+	Frequency: 40
+
+	Decisive Battle! N
+	Pokemon/Decisive Battle! N.brstm
+	Volume: 65
+	Frequency: 40
+
+	Vs Legendary Pokémon (Black & White)
+	Pokemon/Vs Legendary Pokemon [BW].brstm
+	Volume: 65
 	Frequency: 40
 
 ################
@@ -4754,33 +4895,6 @@ Space_Colony_Ark.tlst - 8 tracks
 	Frequency: 40
 
 ################
-Space_Debris.tlst - 5 tracks
-
-	Main Theme (Star Fox 64)
-	Star Fox/Main Theme (SSB).brstm
-	Volume: 72
-	Frequency: 40
-
-	Space Armada
-	G10.brstm (0x276C)
-	Frequency: 40
-	Song delay: 88
-
-	Space Battleground
-	G07.brstm (0x2769)
-	Frequency: 40
-
-	Area 6
-	G11.brstm (0x276D)
-	Frequency: 40
-	Song delay: 72
-
-	MacBeth
-	Star Fox/MacBeth.brstm
-	Volume: 70
-	Frequency: 40
-
-################
 Spear_Pillar.tlst - 11 tracks
 
 	Dialga / Palkia Battle at Spear Pillar!
@@ -4854,29 +4968,6 @@ Subspace.tlst - 5 tracks
 
 	Subspace Area
 	Y15.brstm (0x282D)
-	Frequency: 40
-
-################
-Temple.tlst - 5 tracks
-
-	Temple
-	W24.brstm (0x2816)
-	Frequency: 40
-
-	Great Temple / Temple
-	C03.brstm (0x2735)
-	Frequency: 40
-
-	The Dark World
-	C04.brstm (0x2736)
-	Frequency: 40
-
-	Black Mist
-	C05.brstm (0x2737)
-	Frequency: 40
-
-	Gerudo Valley
-	C13.brstm (0x273F)
 	Frequency: 40
 
 ################

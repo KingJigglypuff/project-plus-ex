@@ -141,13 +141,13 @@ F-Smash Sensitivity uses IC-Basic 3220 [0.8->0.8]
 Pivot Sensitivity [0.8->0.475]
 	int[2] 1, 28500 @ $80FAC244 // The latter is divided by 5000
 Dash within Dash Uses Run Sensitivity [0.80->0.62]
-	int 3126 @ $80FAC2B8 // This is divded by 5000
+	int 3126 @ $80FAC2B8 // This is divided by 5000
 
 
 Threshold to begin tracking distance vs time on stick movements [0.25->0.35]
 	float  0.35 @ $80AD7528
 	float -0.35 @ $80AD752C
-D-Pad acceleration threshold for solo Wiimote movement [30->23.999]
-	float 23.999 @ $805A182C
+D-Pad acceleration threshold for solo Wiimote movement [30->16] # 23.999 in previous versions
+	float 16 @ $805A182C
 Item Ground Smash U-Throw Velocity [4.1->4.34]
 	float 4.34 @ $80F9FDBC

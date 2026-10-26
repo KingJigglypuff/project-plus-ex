@@ -163,7 +163,7 @@ float[256] |		# 0x80 * 2
 	0.0,		0.0,	| # EXFighter64
 	0.0,		0.0,	| # EXFighter65
 	0.0,		0.0,	| # EXFighter66
-	0.0,		0.0,	| # EXFighter67
+	0.2257, 	8.5516,	| # Zero (EXFighter67)
 	0.0,		0.0,	| # EXFighter68
 	0.0,		0.0,	| # EXFighter69
 	-0.4884,	11.3475,| # Red Alloy Ex(EXFighter6A)

@@ -6,7 +6,7 @@ R: Battlefield_R.param
 L: Battlefield_L.param
 Z: Battlefield_Z.param
 0x4000: Battlefield_MR_00.param
-0xC000: Battlefield_MR_00.param
+0xC000: Event_10.param
 
 
 ################
@@ -190,7 +190,7 @@ Z: Flat_Zone_Z.param
 
 
 ################
-19.asl - 7 entries
+19.asl - 8 entries
 
 Base: Castle_Siege.param
 R: Castle_Siege_R.param
@@ -199,6 +199,7 @@ Z: Castle_Siege_Z.param
 0x4000: Castle_Siege_MR_00.param
 0x8000: Castle_Siege_ML_00.param
 0x8001: Castle_Siege_ML_01.param
+0xC000: Event_09.param
 
 
 ################
@@ -319,10 +320,10 @@ Base: Results.param
 ################
 29.asl - 4 entries
 
-Base: Temple.param
-R: Temple_R.param
-L: Temple_L.param
-Z: Temple_Z.param
+Base: Hyrule_Temple.param
+R: Hyrule_Temple_R.param
+L: Hyrule_Temple_L.param
+Z: Hyrule_Temple_Z.param
 
 
 ################
@@ -335,12 +336,13 @@ Z: Yoshis_Story_Z.param
 
 
 ################
-2B.asl - 4 entries
+2B.asl - 5 entries
 
 Base: Jungle_Japes.param
 R: Jungle_Japes_R.param
 L: Jungle_Japes_L.param
 Z: Jungle_Japes_Z.param
+0x8000: Jungle_Japes_ML_00.param
 
 
 ################
@@ -360,7 +362,7 @@ R: Dream_Land_R.param
 L: Dream_Land_L.param
 Z: Dream_Land_Z.param
 0x4000: Dream_Land_MR_00.param
-0xC000: Dream_Land_MR_00.param
+0xC000: Event_20.param
 
 
 ################
@@ -411,7 +413,7 @@ L: Planet_Zebes_L.param
 Z: Planet_Zebes_Z.param
 0x8000: Planet_Zebes_ML_00.param
 0x8001: Planet_Zebes_ML_01.param
-0xC000: Planet_Zebes_ML_01.param
+0xC000: Event_06.param
 
 
 ################
@@ -496,13 +498,12 @@ Z: Clock_Town_Z.param
 
 
 ################
-43.asl - 5 entries
+43.asl - 4 entries
 
 Base: Sky_Sanctuary.param
 R: Sky_Sanctuary_R.param
 L: Sky_Sanctuary_L.param
 Z: Sky_Sanctuary_Z.param
-0x4000: Sky_Sanctuary_MR_00.param
 
 
 ################
@@ -578,7 +579,7 @@ Z: Venus_Lighthouse_Z.param
 
 
 ################
-4C.asl - 6 entries
+4C.asl - 7 entries
 
 Base: Mushroom_Kingdom.param
 R: Mushroom_Kingdom_R.param
@@ -586,6 +587,7 @@ L: Mushroom_Kingdom_L.param
 Z: Mushroom_Kingdom_Z.param
 0x8000: Mushroom_Kingdom_ML_00.param
 0x8001: Mushroom_Kingdom_ML_01.param
+0x8002: Mushroom_Kingdom_ML_02.param
 
 
 ################

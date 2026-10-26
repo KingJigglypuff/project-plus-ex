@@ -4,10 +4,10 @@
 op nop 			@ $80023b88
 op b 0x1C4904	@ $80024028
 
-##########################################
-[Project+] Skip strap screen [PyotrLuzhin]
-##########################################
-op b 0x298		@ $806CADE8
+#################################
+Skip prize unlock screen [mawwwk]
+#################################
+op b 0x10 @ $806f5eb0
 
 Fixed OSReport Syntax on File Reading [DukeItOut]
 * 0042101F 0000000A

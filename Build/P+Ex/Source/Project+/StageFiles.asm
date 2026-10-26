@@ -465,9 +465,9 @@ HOOK @ $80930300
 unusual:				//Those two stage types demand hardcoded pointers
   rlwinm r0, r3, 2, 0, 29
 }	
-	
+
 ########################################################
-Custom Stage SD File Loader [DukeItOut, Kapedani]
+Custom Stage SD File Loader [DukeItOut, Kapedani, bugfix by mawwwk]
 # 
 # This version forces stage reloading if a flag is set, as well as uses the flag to determine if it's a replay
 #
@@ -714,7 +714,11 @@ getCharacterKind:
 	addi r16, r16, 0x1		# /
 loop:	
 	# r29 - Most accurate choice, defaulting to the start
-	# r21 - How many inputs it shares
+	# r26 - Offset of currently-checked entry in ASL file
+	# r25 - Current button input in ASL list
+	# r23 - Address of list of inputs/titles
+	# r21 - Highest number of shared inputs across checked entries
+	# r7 - Count of matching bits between ASL entry and button input
 	lhzx r25, r23, r26
 	and. r25, r16, r25
 	beq- not_found
@@ -734,6 +738,13 @@ bitSet:
 	mtctr r0				# Return the stage loop
 	cmpw r7, r21			# \ If it doesn't match more than the previous best, skip
 	ble+ not_found			# /
+	lhzx r25, r23, r26
+	cmpwi r25, 0x1800		# If current ASL entry button is greater than 0x17FF,
+	blt storeOffset			# require an exact match from any button IDs greater than that
+checkExact:
+	cmpw r16, r25			# Check if button ID matches ASL entry,
+	bne not_found			# otherwise go next
+storeOffset:
 	mr r21, r7				# The amount of inputs shared by the new highest
 	mr r29, r26				# Most accurate input offset 
 not_found:	
@@ -1043,9 +1054,6 @@ setID:
 forceSkip:
 	mr r5, r29	# Restores song ID, original operation
 }
-	
-.include source/Project+/MyMusic.asm		# Integrated heavily into the above!
-.include source/Project+/Random.asm			# Custom random code to load expansion and non-striked slots, properly
 
 ##########################################################
 KK Concert Music Only Triggers Via TLST File [DukeItOut]

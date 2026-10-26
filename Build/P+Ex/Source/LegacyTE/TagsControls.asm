@@ -1,3 +1,103 @@
+##################################################
+[Project+] CSS Tags with Rumble are Coloured [Eon] 
+##################################################
+#Logic to find if rumble on for tag from `CSS Tags with Rumble are teal, X To toggle V1.2 [ChaseMcDizzle, Fracture, Yohan1044]`
+#Logic to find if rumble on for port from `[Project+] Customize Controls on CSS V9.1 + C-stick taunts renamed [Fracture]`
+
+.alias selectedTagColor = 0x009090      # Currently selected tag in menu
+.alias transitionColor = 0x088888       # Moving from selected to unselected
+.alias unselectedTagColor = 0x108080	# Unselected tag in menu
+
+HOOK @ $8069F9FC
+{
+  cmpwi r19, -1		# Check if CSS custom control menu is open
+  beq renderColours	# Remove these 5 lines if that code isn' t included in your build
+  li r16, 0			#
+  li r17, 0			#
+  b end				#
+
+renderColours:
+  subi r15, r27, 0x1	# getTagNo
+  cmpwi r15, -1
+  beq portRumble
+  mulli r15,r15, 0x2 	# Checks tag ordering, finds current working tag
+  addi r15, r15, 0x68
+  lhzx r15, r3, r15
+  mulli r15, r15, 0x124
+  lis r16, 0x805A		# Is rumble enabled?
+  lwz r16, 0xE0(r16)
+  lwz r16, 0x28(r16)
+  add r16, r16, r15
+  lbz r16, 0xEC(r16)
+  b storeCentre
+  
+portRumble:
+  lbz r16, 0x60(r24)	# Specific rumble check for player port
+  cmpwi r16, 1;  bgt- end
+  lbz r16, 0x57(r24)
+  subi r16, r16, 49
+  lis r15, 0x9017
+  ori r15, r15, 0xBE60
+  lbzx r16, r15, r16
+
+storeCentre:
+  cmpw r25, r27			# if current working tag is centre tag, remember its value for if going off-centre
+  bne end
+  mr r17, r16
+  
+end:
+  cmpwi r26, 4		# Original op (is current tag centred)
+}
+
+# Selected tag
+.alias redVal = selectedTagColor / 0x10000
+.alias greenTemp = selectedTagColor & 0xFF00
+.alias greenVal = greenTemp / 0x100
+.alias blueVal = selectedTagColor & 0xFF
+
+HOOK @ $8069FA0C
+{
+  li r18, 0x0
+
+  cmpwi r16, 1
+  bne %END%
+  li r20, redVal
+  li r19, greenVal
+  li r18, blueVal
+}
+
+# Unselected tag
+.alias redVal = unselectedTagColor / 0x10000
+.alias greenTemp = unselectedTagColor & 0xFF00
+.alias greenVal = greenTemp / 0x100
+.alias blueVal = unselectedTagColor & 0xFF
+
+HOOK @ $8069FA1C
+{
+  li r18, 0x50
+  cmpwi r16, 1
+  bne %END%
+  li r20, redVal
+  li r19, greenVal
+  li r18, blueVal
+}
+
+# Transition between selected > unselected
+.alias redVal = transitionColor / 0x10000
+.alias greenTemp = transitionColor & 0xFF00
+.alias greenVal = greenTemp / 0x100
+.alias blueVal = transitionColor & 0xFF
+
+HOOK @ $806A05C8
+{
+  li r8, 0xFF
+  cmpwi r17, 1
+  bne %END%
+  li r5, redVal
+  li r6, greenVal
+  li r7, blueVal
+}
+
 ######################################################################################################
 [Legacy TE] Holding L when new name at CSS goes to custom controls & back to CSS v1.21 [ChaseMcDizzle]
 ######################################################################################################
@@ -34,6 +134,7 @@ loc_0x60:
   cmpwi r3, 0x0
 
 }
+
 HOOK @ $8068D7C0
 {
   lis r8, 0x8000
@@ -55,6 +156,7 @@ HOOK @ $8068D7C0
 loc_0x3C:
   cmpw r0, r30
 }
+
 HOOK @ $8002D654
 {
   lis r8, 0x8000
@@ -79,9 +181,7 @@ loc_0x4C:
 
 loc_0x58:
   mr r26, r3
-
 }
-
 
 #################################################################################################################
 [Project+] X To toggle Rumble V1.3 (requires Fracture's Controls) [ChaseMcDizzle, Fracture, Yohan1044, DukeItOut]
@@ -209,89 +309,6 @@ loc_0x1C:
 
 loc_0x24:
   li r19, 0x0
-}
-
-##################################################
-[Project+] CSS Tags with Rumble are Coloured [Eon] 
-##################################################
-#Logic to find if rumble on for tag from `CSS Tags with Rumble are teal, X To toggle V1.2 [ChaseMcDizzle, Fracture, Yohan1044]`
-#Logic to find if rumble on for port from `[Project+] Customize Controls on CSS V9.1 + C-stick taunts renamed [Fracture]`
-HOOK @ $8069f9fc
-{
-  cmpwi r19, -1   #makes sure CSS custom control menu isnt open, remove top 5 lines if that code isnt included in your build
-  beq renderColours
-  li r16, 0
-  li r17, 0
-  b end
-renderColours:
-
-  #getTagNo
-  subi r15, r27, 0x1
-  cmpwi r15, -1
-  beq portRumble
-
-#checks tag ordering, finds current working tag
-  mulli r15,r15, 0x2 
-  addi r15, r15, 0x68
-  lhzx r15, r3, r15
-
-  mulli r15, r15, 0x124
-  #Is rumble enabled?
-  lis r16, 0x805A
-  lwz r16, 0xE0(r16)
-  lwz r16, 0x28(r16)
-  add r16,r16,r15
-  lbz r16, 0xEC(r16)
-  b storeCentre
-
-  #specific rumble check for player port
-portRumble:
-  lbz r16, 0x60(r24)
-  cmpwi r16, 1;  bgt- 0x24
-  lbz r16, 0x57(r24)
-  subi r16,r16,49
-  lis r15, 0x9017;  ori r15,r15, 0xBE60
-  lbzx r16,r15,r16
-
-  #if current working tag is centre tag, remember its value for if going off-centre
-storeCentre:
-  cmpw r25, r27;  bne end
-  mr r17, r16
-
-  #original command (is working tag centred)
-end:
-  cmpwi r26, 4
-}
-#Centred Tag
-HOOK @ $8069fa0c 
-{
-  li r18, 0x0
-
-  cmpwi r16, 1
-  bne %end%
-  li r20, 0x00  #red
-  li r19, 0x90  #green
-  li r18, 0x90  #blue
-}
-#Off Centre Tag
-HOOK @ $8069fa1c
-{
-  li r18, 0x50
-  cmpwi r16, 1
-  bne %end%
-  li r20, 0x10  #red
-  li r19, 0x80  #green
-  li r18, 0x80  #blue
-}
-#Changing from Centred to Off Centre
-HOOK @ $806a05c8 
-{
-  li r8, 0xFF
-  cmpwi r17, 1
-  bne %end%
-  li r5, 0x10
-  li r6, 0x80
-  li r7, 0x80
 }
 
 ###########################################################

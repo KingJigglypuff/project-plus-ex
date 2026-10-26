@@ -1,15 +1,58 @@
-#######################################################################################
-[Legacy TE] Unbounded Team Color Engine EX Variant v1.3 [DukeItOut, DesiacX, QuickLava]
+#################################################################################################
+[Legacy TE] Unbounded Team Color Engine EX Variant v1.41 [DukeItOut, DesiacX, QuickLava, Squidgy]
 #
-# v1.1 - Adjusted to accomodate Mdl+Tex splitting
-# v1.2 - Reimplemented findCharTeamColorNo override to not affect teamSet.
-#      - Split iterating and wrapping teamSet into incTeamColor and decTeamColor hooks.
-# v1.3 - Additional code optimization and cleanup.
-#######################################################################################
+# v1.10 - Adjusted to accomodate Mdl+Tex splitting
+# v1.20 - Reimplemented findCharTeamColorNo override to not affect teamSet
+#       - Split iterating and wrapping teamSet into incTeamColor and decTeamColor hooks
+# v1.30 - Additional code optimization and cleanup.
+# v1.40 - Fixed default loading instead of team color sometimes when random was selected
+#       - Randomize teamSet when fighter is random
+# v1.41 - Fixed enabling Team Mode after returning to CSS with some costumes breaking team color
+#################################################################################################
 .alias maxTeamIndex = 0x2
 .alias CharDataTable_Hi = 0x817D
 .alias CharDataTable_Lo = 0x52A0
 .alias CharDataTable_CostAddrOff = CharDataTable_Lo + 0x8
+
+# Randomize teamSet for random fighters
+HOOK @ $8068499c # lands 0x2BC bytes into symbol "setToGlobal/[muSelCharTask]/mu_selchar.o" @ 0x806846E0
+{
+    lwz r5, 0x1B8(r24)                         # get this->selchCharKind
+    cmpwi r5, 0x29                             # ...and check if it's random
+    bne+ getTeamColor                            # If not random, skip to getting teamSet
+    lis r11, CharDataTable_Hi                  # Initialize the upper half of r11 with the top half of the charData table address...
+    mr r3, r29                                 # Get fighter into r3
+    rlwimi r11, r3, 4, 20, 27                  # ... shift and mask charKind to multiply it by 0x10 and add it to r11...
+    lwz r11, CharDataTable_CostAddrOff(r11)    # ... then use the lower half of our address to load their costume array address directly.
+    cmpwi r11, -1                              # Compare the loaded address with -1...
+    beq- getTeamColor                          # ... and if it was, skip down to the end of the code.
+    lwz r4, 0x1C0(r24)                         # Get team color
+    add r12, r2, r4                            # \
+    lbz r12, -0x7130(r12)                      # / Get the Color Code for Last Team (guranteed to want last, cuz we're in wrap case
+    subi r11, r11, 0x2                         # Prepare r11 for lbzu'ing in the below loop.
+    # li r0, 0                                   # Initialize r0 to prepare it for use as loop counter...
+    # mtctr r0                                   # ... and then move it to count register.
+    li r0, -1                                  # Initialize r0 to -1, as what will be out match counter.
+loopStart:
+    lbzu r10, 0x02(r11)                        # Fetch next costume entry's color code.
+    cmplw r10, r12                             # Compare it against the desired color code.
+    bne+ notMatch                              # ... and if it they don't match, skip to noMatch.
+    addic. r0, r0, 0x1                         # Otherwise, increment our match counter...
+notMatch:
+    cmplwi r10, 0xC                            # If we need to keep looking, compare the loaded color code to the terminator code (0xC)...
+    bne+ loopStart                             # ... and if it was not the terminator, restart the loop.
+    cmpwi r0, 0                                # Make sure teamSet is greater than -1
+    blt- getTeamColor                          # If not, skip this stuff
+    mr r3, r0                                  # r0 is now our highest teamSet, load it into r3
+    addi r3, r3, 1                             # teamSet + 1 is max of randi
+    lis r12, 0x8003                            # Call randi
+    ori r12, r12, 0xfc7c                       # \
+    mtctr r12                                  # |
+    bctrl                                      # /
+    stb r3, 0x1C4(r24)                         # Store randomly selected value to teamSet
+getTeamColor:
+    lwz r4, 0x1C0(r24)                         # load team color. Original operation.
+}
 
 # Skip Wario-specific findCharTeamColorNo call (setToGlobal).
 op b 0x24 @ $80684978             # lands 0x298 bytes into symbol "setToGlobal/[muSelCharTask]/mu_selchar.o" @ 0x806846E0
@@ -28,6 +71,8 @@ HOOK @ $806998DC     # lands 0x60 bytes into symbol "incTeamColor/[muSelCharPlay
     lis r11, CharDataTable_Hi                  # Initialize the upper half of r11 with the top half of the charData table address...
     rlwimi r11, r0, 4, 20, 27                  # ... shift and mask charKind to multiply it by 0x10 and add it to r11...
     lwz r11, CharDataTable_CostAddrOff(r11)    # ... then use the lower half of our address to load their costume array address directly.
+    cmpwi r11, -1                              # Compare the loaded address with -1...
+    beq- noMatchFound                          # ... and if it was, skip down to the end of the code.
     lbz r12, -0x7130(r2)                       # Get the Color Code for Team 0 (guranteed to want 0, cuz we're in wrap case)
     li r10, 0x00                               # Init Match Counter to 0x00
     subi r11, r11, 0x2                         # Prepare r11 for lbzu'ing in the below loop.
@@ -56,6 +101,8 @@ HOOK @ $80699C20     # lands 0x5C bytes into symbol "decTeamColor/[muSelCharPlay
     lis r11, CharDataTable_Hi                  # Initialize the upper half of r11 with the top half of the charData table address...
     rlwimi r11, r0, 4, 20, 27                  # ... shift and mask charKind to multiply it by 0x10 and add it to r11...
     lwz r11, CharDataTable_CostAddrOff(r11)    # ... then use the lower half of our address to load their costume array address directly.
+    cmpwi r11, -1                              # Compare the loaded address with -1...
+    beq- %END%	         	               # ... and if it was, skip down to the end of the code.
     addi r12, r2, maxTeamIndex                 # \
     lbz r12, -0x7130(r12)                      # / Get the Color Code for Last Team (guranteed to want last, cuz we're in wrap case)
     subi r11, r11, 0x2                         # Prepare r11 for lbzu'ing in the below loop.
@@ -113,6 +160,8 @@ op NOP          @ $80685C18    # lands 0x594 bytes into symbol "initPlayerArea/[
 # Retainment of team color upon reentering CSS. r0 == Costume Index to Restore, r4 == Team ID, r5 == Incoming charKind
 HOOK @ $80685C14    # lands 0x590 bytes into symbol "initPlayerArea/[muSelCharTask]/mu_selchar.o" @ 0x80685684
 {
+    cmpwi r5, 0x29                             # Check if charKind is random
+    beq- %END%                                 # ...and skip retaining color if it is
     lis r11, CharDataTable_Hi                  # Initialize the upper half of r11 with the top half of the charData table address...
     rlwimi r11, r5, 4, 20, 27                  # ... shift and mask charKind to multiply it by 0x10 and add it to r11...
     lwz r11, CharDataTable_CostAddrOff(r11)    # ... then use the lower half of our address to load their costume array address directly.
@@ -132,4 +181,7 @@ loopStart:
 notMatch:
     cmplwi r10, 0xC                            # If we need to keep looking, compare the loaded color code to the terminator code (0xC)...
     bc+ 0, 2 loopStart                         # ... and if it was not the terminator, restart the loop.
+	cmpwi r0, 0x00                             # \
+	bge+ %END%                                 # | If we didn't find any matches iterating up to this costume though, default to 0!
+	li r0, 0                                   # /
 }

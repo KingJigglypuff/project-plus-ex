@@ -98,118 +98,32 @@ HOOK @ $8077d120
   cmpwi r0, 2 #pointer default functionality
 }
 
-#######################
-!Raycast debugger [Eon]
-#######################
-#Disabled by default. If enabled, any raycasting checks will always display.
-#draws the ray you are trying to check for in red, and draws anything the ray comes in contact with in green
-#stRay basic raycast command used for anything that isnt explictly collisions
-HOOK @ $801380EC
-{
-    addi r3, r1, 0xC
-    addi r4, r24, 0x2C
-    lfs f1, 0x0(r4)
-    lfs f2, 0x8(r4)
-    fadds f2, f1, f2
-    stfs f1, 0x0(r3)
-    stfs f2, 0x8(r3)
-    lfs f1, 0x4(r4)
-    lfs f2, 0xC(r4)
-    fadds f2, f1, f2
-    stfs f1, 0x4(r3)
-    stfs f2, 0xC(r3)
-    addi r4, r1, 0x8
-    lis r0, 0xFF00
-    ori r0, r0, 0x00FF
-    stw r0, 0x0(r4)
-    li r5, 0
-    lfs f1, -0x68CC(r2)
-    lis r12, 0x8004
-    ori r12, r12, 0x1104
-    mtctr r12
-    bctrl
-
-
-    lbz r0, 0x12(r24) #orig 
-}
-HOOK @ $80138218
-{
-    addi r3, r1, 0x50
-    stwu r1, -0x10(r1)
-    addi r4, r1, 0x8
-    lis r0, 0x00FF
-    ori r0, r0, 0x00FF
-    stw r0, 0x0(r4)
-    li r5, 0
-    lfs f1, -0x68CC(r2)
-    lis r12, 0x8004
-    ori r12, r12, 0x1104
-    mtctr r12
-    bctrl
-    addi r1, r1, 0x10
-
-
-    lfs f1, 0x8(r1) #orig 
-}
-
-#havok materials #draws same stuff for havok collision checks
-HOOK @ $800869cc
-{
-    stw r0, 0x6C(r1)
-    addi r3, r1, 0x5C
-    stwu r1, -0x10(r1)
-    addi r4, r1, 0x8
-    lis r0, 0xFF00
-    ori r0, r0, 0x00FF
-    stw r0, 0x0(r4)
-    li r5, 0
-    lfs f1, -0x68CC(r2)
-    lis r12, 0x8004
-    ori r12, r12, 0x1104
-    mtctr r12
-    bctrl
-    addi r1, r1, 0x10
-
-}
-HOOK @ $80086a24
-{
-    addi r3, r1, 0x48
-    stwu r1, -0x10(r1)
-    addi r4, r1, 0x8
-    lis r0, 0x00FF
-    ori r0, r0, 0x00FF
-    stw r0, 0x0(r4)
-    li r5, 0
-    lfs f1, -0x68CC(r2)
-    lis r12, 0x8004
-    ori r12, r12, 0x1104
-    mtctr r12
-    bctrl
-    addi r1, r1, 0x10
-
-    cmpwi r29, 0
-}
-
 #######################################################
 PSA Command 1F080200 (spawn item variant) [Sammi Husky]
 #######################################################
 * 047C8674 83A3000C
 
-#################################################################
-On hit Action change through Trip Rate v1.26 [MarioDox, Eon (refactor)]
+#######################################################################
+On hit Action change through Trip Rate v1.27 [MarioDox, Eon (refactor)]
 #################################################################
 v1.2: Automatized, trip rate is decimal action ID change
 v1.25: Added anti-lock behavior, can't change action if it's already in it
 v1.26: Anti-lock behavior works properly
-#################################################################
-HOOK @ $8076BD5C
+v1.27: Fixes various issues related to unexpected behaviors
+#######################################################################
+HOOK @ $8076BD50
 {
+    stw r0, 0x14(r1) #\save registers so that success condition doesnt break them
+    stw r31, 0xC(r1) #/
     stwu r1, -0x10(r1)
     mflr r0
     stw r0, 0x14(r1)
     mr r31, r4
-    lwz r5, 0x44(r5)
+    lwz r5, 0x44(r3)
     lwz r5, 0x40(r5)
+
+    lwz r3, 0xD8(r3) #original instruction now that we're done with it
+
     lfs f1, 0x6C(r5)
     fctiw f1,f1
     stfd f1,0x08(r1)
@@ -238,28 +152,8 @@ end:
     mtlr r0
     addi r1, r1, 0x10
 }
-
-#######################################################################
-!Char Specific Paralyze Effect [MarioDox]
-#######################################################################
-#Currently disabled, as it breaks specific projectile interactions when reflected.
-.macro customParalyze(<ID>, <GFXHi>, <GFXLo>)
-{
-	cmpwi r3, <ID>
-	bne- 0x10
-	lis r4, <GFXHi>
-	addi r4, r4, <GFXLo>
-	b %END%
-}
-HOOK @ $8085c684 #onParalyzeDamage
-{
-	lbz r3, 0x123(r5)		#Get attacker fighter id
-	%customParalyze(0x18, 0x0019,0x0007)	# ZSS, vanilla
-	b default:
-default:
-	li r4, 0x0
-	addi r4, r4, 0x002D		#Common gfx, dizzy spark
-}
+op nop @ $8076BD54 #\remove register saves in original function so they dont double save 
+op nop @ $8076BD58 #/not necessary but feels messy without, and means r0/r31 would be usable in above code
 
 .include Source/Community/PSA/CreateAndThrowItem.asm
 
@@ -358,4 +252,63 @@ orig:
     li r4, 2
     %getVariable()
     fmr f0, f1
+}
+
+########################################################################################
+Graphic Effect (Detached) Commands Can Specify an ID Offset in Arg 0x10 v1.0 [QuickLava]
+# Mimics the functionality found in the Graphic Effect (Attached) commands where you
+# can specify an offset value to add to the originally specified Graphic ID.
+########################################################################################
+.alias getValueIntHi = 0x8079
+.alias getValueIntLo = 0x7104
+.alias argListStackOff = 0x818
+HOOK @ $807A568C
+{
+    lwz r27, 0x04(r3)             # Restore Original Instruction (Load EfID Argument)
+	lwz r12, 0x08(r21)            # \  
+    lbz r12, 0x02(r12)            # / Grab the number of arguments on this event.
+	cmplwi r12, 0x10              # \
+	ble+ %END%                    # / If its 16 or fewer, we don't have our extra argument, exit!
+getIDOffset:                      # 
+	addi r3, r1, argListStackOff  # Grab the active soAnimCmdArgList for this set of events, in preparation for grabbing our argument.
+	li r4, 0x10                   # Set r4 to 0x10, the index of the argument we care about.
+	lwz r12, 0x00(r3)             # \
+	lwz r12, 0x10(r12)            # | Grab the pointer for the at() function via the arg list's vTable...
+	mtctr r12                     # | ... then put it into CTR and call it! Afterwards, r3 will be pointer to our argument.
+	bctrl                         # / 
+	lwz r12, 0x00(r3)             # Load the type of the returned argument...
+	lwz r3, 0x04(r3)              # ... as well as its value.
+	cmplwi r12, 0x05              # Check if the argument was a variable...
+    bne finalizeValue             # ... and if it wasn't, skip the below for resolving it.
+handleVariable:                   # If it was a variable though, we need to get its actual value.
+	mr r4, r3                     # First, move our variable ID into r4, since that's where we'll need it.
+	mr r3, r31                    # Then grab our soModuleAccesser from its place in r31.
+	lis r12, getValueIntHi        # \
+	ori r12, r12, getValueIntLo   # | Set up and call soValueAccesser::getValueInt()!
+	mtctr r12                     # | Afterwards, r3 is our variable value.
+	bctrl                         # /
+finalizeValue:                    #
+	add r27, r27, r3              # Finally, add our retrieved value to the original Effect ID stored in r27!
+}
+
+#######################################################################
+!Char Specific Paralyze Effect [MarioDox]
+#######################################################################
+#Currently disabled, as it breaks specific projectile interactions when reflected.
+.macro customParalyze(<ID>, <GFXHi>, <GFXLo>)
+{
+	cmpwi r3, <ID>
+	bne- 0x10
+	lis r4, <GFXHi>
+	addi r4, r4, <GFXLo>
+	b %END%
+}
+HOOK @ $8085c684 #onParalyzeDamage
+{
+	lbz r3, 0x123(r5)		#Get attacker fighter id
+	%customParalyze(0x18, 0x0019,0x0007)	# ZSS, vanilla
+	b default:
+default:
+	li r4, 0x0
+	addi r4, r4, 0x002D		#Common gfx, dizzy spark
 }

@@ -146,7 +146,7 @@ lcancel:
 	%setInt(0x1000005a)
 end:
 	lwz r31, 0xC(r1)
-  lwz r30, 0x10(r1)
+	lwz r30, 0x10(r1)
 	lwz r0, 0x34(r1)
 	mtlr r0
 	addi r1, r1, 0x30
@@ -348,68 +348,7 @@ loc_0x98:
 ##############################################
 Disable Aerial Attack Landing Lag IASA [Magus]
 ##############################################
-* 04FAF168 800000FF
-
-########################################
-Remove grabbing Items with Aerials [Eon]
-########################################
-CODE @ $80FC2798
-{
-  word 0x00020000; word 0
-  word 0x00020000; word 0
-  word 0x00020000; word 0
-}
-
-#############################################
-Aerial Staling Set before Subaction Set [Eon]
-#############################################
-#nair
-CODE @ $80FC2820
-{
-  word 0x0C1C0200; word 0x80FB2EC4
-  word 0x04000100; word 0x80FB2EBC
-}
-#fair
-CODE @ $80FC2848
-{
-  word 0x0C1C0200; word 0x80FB2F04
-  word 0x04000100; word 0x80FB2EFC
-}
-#bair
-CODE @ $80FC2860
-{
-  word 0x0C1C0200; word 0x80FB2F1C
-  word 0x04000100; word 0x80FB2F14
-}
-#uair
-CODE @ $80FC2888
-{
-  word 0x0C1C0200; word 0x80FB2F54
-  word 0x04000100; word 0x80FB2F4C
-}
-#dair
-CODE @ $80FC28A0
-{
-  word 0x0C1C0200; word 0x80FB2F6C
-  word 0x04000100; word 0x80FB2F64
-}
-
-#############################################################
-Teeter Cancelling [Shanus, Yeroc, Dantarion, Wind Owl, Magus]
-#############################################################
-.alias Teeter_Loc = 0x80546120
-
-CODE @ $80546120
-{
-  word 2; word Teeter_Loc+0x8
-  word 0x02010200; word 0x80FAF3EC
-  word 0x00070100; word 0x80FABBB4
-  word 0x00080000; word 0;
-}
-CODE @ $80FC1C58
-{
-  word 0x00070100; word Teeter_Loc
-}
+op lwz r0, 0xFF(r0) @ $80FAF168
 
 ##############################################
 Ignore Damage Gauge Setting [InternetExplorer]
@@ -443,7 +382,7 @@ HOOK @ $8004FF64
 	lwz r12, 0x08(r12)
 	lbz r6, 0xE5(r12)	# 0x4D (+ 0x98)
 	andi. r6, r6, 0xFC	# Clear lowest two bits
-	lis r4, 0x9018; 
+	lis r4, 0x9018
 	
 	lbz r5, -0xC94(r4)	# 9017F36C
 	cmpwi r5, 1

@@ -56,3 +56,27 @@ HOOK @ $8002AD8C
   add r3, r3, r0
   subi r3, r3, 0x404
 }
+#########################################
+Wiimote Movement Compensation [DukeItOut]
+#########################################			
+HOOK @ $800482F4
+{
+	lwz r6, 8(r29)		# Controller info (See ButtonPresses.asm and 80048270)
+	cmpwi r6, 0x0;  blt- finish	# If it's less than 0, it's a CPU or no controller
+	cmpwi r6, 0x8;  bge- finish	# If it's higher, it's a replay
+	mulli r6, r6, 0x40		# Wiimote info is 0x100 later
+	lis r12, 0x805B			#
+	ori r12, r12, 0xAF00	#
+	add r12, r6, r12		#	
+	lwz r6, 0x40(r12)	# Controller type
+	cmpwi r6, 2			# Is it a Wiimote?
+	bne+ finish
+	lis r12, 0x3f9a			# \
+	ori r12, r12, 0xf694	# | 1.21065 = 0.012500 / 0.010325
+	stw r12, 0x18(r1)		# |
+	lfs f2, 0x18(r1) 		# /
+	fmuls f0, f0, f2	# Multiply X to compensate Wiimotes!
+	fmuls f1, f1, f2	# Multiply Y to compensate Wiimotes!
+finish:
+	stfs f1, 0x1C(r1)	# Original operation
+}

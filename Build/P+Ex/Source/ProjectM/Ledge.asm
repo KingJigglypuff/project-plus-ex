@@ -538,3 +538,8 @@ Tether Reel Size Fix [DukeItOut]
 # so this was not caught during development.
 #############################################################################
 op NOP @ $808E86F4 # Don't make the grapple move rescale!
+
+###################################
+Rolls go all the way to the ledge [Eon]
+###################################
+op lwz r3, 0x2C0(r31) @ $8011dd9c

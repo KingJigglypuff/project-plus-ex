@@ -41,10 +41,14 @@
 2D - Roy
 2E = Mewtwo
 2F = Knuckles
+31 - Mega Man X
 32 - Ridley
 33 - Waluigi
 40 - Dark Samus
+41 - Krystal
+42 - Blaze
 62 - Sceptile
+67 - Zero
 6A - Red Alloy (Ex)
 6B - Blue Alloy (Ex)
 6C - Yellow Alloy (Ex)

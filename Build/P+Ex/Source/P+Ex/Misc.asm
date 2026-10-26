@@ -89,6 +89,27 @@ HOOK @ $809E8124
     mr r31, r3
 }
 
+###############################################
+Add Statuses and Motions to Mario Fireball TEST
+###############################################
+.alias amount = 100
+
+op li r0, amount @ $809e5afc
+op li r0, amount @ $809e5414
+
+op li r0, amount @ $809e663c
+HOOK @ $809e6aac 
+{
+  li r12, amount
+  stw r12, 0x138(r26)
+}
+HOOK @ $809e6f10
+{
+  li r12, amount
+  stw r12, 0x264(r26)
+}
+op li r0, amount @ $809e7358
+
 #########################################################################
 Main Send Param Values Above 127 Increase Sound Volume v1.1.0 [QuickLava]
 # Description:       

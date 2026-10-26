@@ -8,6 +8,8 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/LegacyTE/Replays.asm
 
 .include Source/Project+/StageFiles.asm
+.include Source/Project+/MyMusic.asm
+.include Source/Project+/Random.asm
 .include Source/Project+/CustomRequirements.asm
 .include Source/Project+/Shake.asm
 .include Source/Project+/Slippery.asm
@@ -28,7 +30,6 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/ProjectM/SpecialModes/Rules.asm
 .include Source/ProjectM/SpecialModes/Stamina.asm
 .include Source/ProjectM/SpecialModes/Turbo.asm
-.include Source/ProjectM/SpecialModes/War.asm
 .include Source/ProjectM/SpecialModes/Wild.asm
 .include Source/ProjectM/SpecialModes/Zero2Death.asm
 
@@ -56,16 +57,20 @@ op blt- 0x34	   @ $8018CFC8
 .include Source/LegacyTE/ASLHelper.asm
 .include Source/LegacyTE/UnboundedTeamEngine.asm
 
+.include Source/ProjectM/CloneEngine.asm
 .include Source/ProjectM/CustomAI.asm
 .include Source/ProjectM/Events.asm
 .include Source/ProjectM/Handicap.asm
 
 .include Source/Community/MusicSelect.asm
 .include Source/Community/PassiveAnim.asm
+.include Source/Community/SoundbankFix.asm
 .include Source/Community/Subspace.asm
 .include Source/Community/SubspaceSwap.asm
+.include Source/Community/BarrelCannon.asm
 .include Source/Community/WallAttach.asm
 .include Source/Community/lavaInjectLoader.asm
+.include Source/Community/FSMeter.asm
 
 .include Source/Community/PSA/Angle.asm
 .include Source/Community/PSA/IC-Basics.asm
@@ -80,14 +85,12 @@ op blt- 0x34	   @ $8018CFC8
 
 .include Source/P+Ex/AllStar.asm
 .include Source/P+Ex/CustomEnding.asm
-.include Source/P+Ex/DLC.asm
-.include Source/P+Ex/Misc.asm
 .include Source/P+Ex/SlotEx.asm
-.include Source/P+Ex/SoundbankFix.asm
+.include Source/P+Ex/Misc.asm
+.include Source/P+Ex/DLC.asm
 .include Source/Community/lavaInjectLoader.asm
 #.include Source/Community/Character-CostumeSwapper.asm # Disabled by default, as there's no characters in base P+Ex who utilize this function. This code is simply here for people to make use of for their own builds.
 
 .include Source/Extras/Console.asm	# Only use this on a Wii or Wii U! The codes in this are necessary for the slower specifications of the actual console.
-#.include Source/Extras/Netplay.asm	# Only use this in Dolphin! The codes in this will result in bad behavior on the Wii!
 
 .include Source/Extras/More.asm

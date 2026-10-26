@@ -662,9 +662,11 @@ op  blr  @ $8001eb94
 
 .include Source/Project+/ReplacementSoundbankEngine.asm
 
-####################################
-SDHC/SDXC Extension 2.0 [Bero, Jako]
-####################################
+##################################################
+SDHC/SDXC/SDUC Extension v3.0 [Glitch, Bero, Jako]
+##################################################
+# v3.0: Experimental SDUC support for cards up to 128TB
+
 .macro LoadAddress(<arg1>,<arg2>)	// Simple register address load math
 {
 	.alias temp_Hi = <arg2> / 0x10000 
@@ -674,87 +676,90 @@ SDHC/SDXC Extension 2.0 [Bero, Jako]
 }
 .macro MakeJump(<arg1>,<arg2>)		// Simple jump directly to an address
 {
-	%LoadAddress(<arg1>,<arg2>
+	%LoadAddress(<arg1>,<arg2>)
 	mtctr <arg1>
 	bctr
 }
 
-
 HOOK @ $803CB3D8
 {
-  rlwinm. r3, r3, 0, 11, 11
-  beq- loc_0x18
-  li r3, 0x1
-  %LoadAddress(r4,0x80580300)
+  rlwinm. r3, r3, 0, 11, 11		# (Mask: 0x00100000)
+  beq- end
+  li r3, 1
+  %LoadAddress(r4, 0x80580300)
   stw r3, 0(r4)
-loc_0x18:
-  cmpwi r29, 0x0
+end:
+  cmpwi r29, 0	# Original op
 }
+
 HOOK @ $803EEE18
 {
   lwz r3, 0x14(r1)
-  rlwinm. r3, r3, 0, 9, 9
-  beq- loc_0x30
-  lhz r3, 0xE(r1)
-  rlwinm r3, r3, 16, 10, 15
-  lhz r0, 0x10(r1)
-  or r3, r3, r0
-  cmplwi r3, 0xFFFF
-  li r0, 0x9
+  rlwinm. r3, r3, 0, 9, 9		# (Mask: 0x00400000)
+  beq end
   lwz r3, 0xC(r1)
-  rlwinm r3, r3, 24, 16, 31
-  addi r3, r3, 0x1
-  bgt- sdxc
-  b sdhc
-sdxc:
-  mulli r6, r3, 0x4000  # | Now supports FAT32-formatted SDXC cards! They use sector size(?) of 0x4000
+  rlwinm r3, r3, 24, 8, 31		# (Mask: 0xffffff00)
+  lwz r0, 0x8(r1)
+  rlwinm r0, r0, 24, 4, 7		# (Mask: 0x0000000f)
+  or r3, r3, r0
+  addi r3, r3, 1
+  li r0, 9
+  lis r6, 0x40
+  cmplw r3, r6
+  bge loc_0x00F
+  mulli r6, r3, 0x400 		# | SDHC cards use sector size(?) of 0x400
   b done
-sdhc:
-  mulli r6, r3, 0x400 # | SDHC cards use sector size(?) of 0x400
-  b done
+loc_0x00F:
+  lis r6, 0xffff
+  ori r6, r6, 0xfc00
 done:
-  %MakeJump(r3,0x803EEE58) # | Jump to address 803EEE58 instead of going to 803EEE1C
-loc_0x30:
-  lwz r5, 0xC(r1)
+  %MakeJump(r3, 0x803EEE58) # | Jump to address 803EEE58 instead of going to 803EEE1C
+end:
+  lwz r5, 0xC(r1)			# Original op
 }
+
 HOOK @ $803CB620
 {
-  %LoadAddress(r11,0x805A9350)
+  %LoadAddress(r11, 0x805A9350)
   lwz r11, 0(r11)
-  cmpwi r11, 0x0;  beq- loc_0x34
-  cmpwi r4, 0x40;  beq- loc_0x34
+  cmpwi r11, 0x0;  beq- end
+  cmpwi r4, 0x40;  beq- end
   li r11, 0x1
   stw r11, 8(r1)
   %MakeJump(r11,0x803CB410)	# | Jump to 803CB410 instead of going to 803CB624
-loc_0x34:
-  stwu r1, -0x40(r1)
+end:
+  stwu r1, -0x40(r1)		# Original op
 }
+
 HOOK @ $803CB4AC
 {
   li r6, 0x0
   cmpwi r22, 0x0;  beq- %END%
   li r6, 0x1
 }
+
 HOOK @ $803CB5D4
 {
-  lwz r3, 28(r28)
-  cmpwi r3, 0x1
-  lwz r3, -0x31E4(r13)
+  lwz r3, 0x1C(r28)
+  cmpwi r3, 1
+  lwz r3, -0x31E4(r13)	# Original op
   beq- %END%
-  lwz r0, 0(r3);  stw r0, 0(r25)
-  lwz r0, 4(r3);  stw r0, 4(r25)
-  lwz r0, 8(r3);  stw r0, 8(r25)
-  lwz r0, 12(r3);  stw r0, 12(r25)
+  lwz r0, 0(r3);    stw r0, 0(r25)
+  lwz r0, 4(r3);    stw r0, 4(r25)
+  lwz r0, 8(r3);    stw r0, 8(r25)
+  lwz r0, 0xC(r3);  stw r0, 0xC(r25)
   %MakeJump(r3,0x803CB5E0)
 }
+
 op bl 0x191904 @ $803EEA20
 op bl 0x191708 @ $803EEC1C
+
 CODE @ $80580324
 {
   %LoadAddress(r24,0x80580300)
   lwz r24, 0(r24)
   cmpwi r24, 0x0;  beq- loc_0x1C
-  mr r25, r5;  b loc_0x20
+  mr r25, r5;      b loc_0x20
 
 loc_0x1C:
   mullw r25, r5, r6
@@ -762,6 +767,7 @@ loc_0x20:
   rlwinm. r0, r4, 0, 27, 31
   blr 
 }
+
 op bl 0x1917E0 @ $803EEB6C
 op bl 0x1915E4 @ $803EED68
 
@@ -769,16 +775,18 @@ CODE @ $8058034C
 {
   %LoadAddress(r3,0x80580300)
   lwz r3, 0(r3)
-  cmpwi r3, 0x0;  beq- loc_0x1C
-  addi r25, r25, 0x1;  b loc_0x20
+  cmpwi r3, 0;       beq- loc_0x1C
+  addi r25, r25, 1;  b loc_0x20
 
 loc_0x1C:
   add r25, r25, r23
 loc_0x20:
   blr 
 }
+
 op bl 0x1B48E0 @ $803CBA24
 op bl 0x1B45A4 @ $803CBD60
+
 CODE @ $80580304
 {
   %LoadAddress(r22,0x80580300)
@@ -789,14 +797,14 @@ loc_0x18:
   cmplw r4, r0
   blr 
 }
+
 HOOK @ $803EE0BC
 {
   li r0, 0x0
   %LoadAddress(r3,0x805A9350)
   stw r0, 0(r3)
-  lis r3, 0x805A
+  lis r3, 0x805A	# Original op
 }
-
 
 ###############################
 checkModSDFile [DukeItOut] 

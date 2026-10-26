@@ -257,7 +257,7 @@ CODE @ $80545150
 	word 5; IC_Basic 20001
 	word 0; word 3
 	word 1; scalar 190.0
-	word 0; word 1
+	word 0; word 8
 	word 2; word PSA_Off+0x50
 	word 2; word PSA_Off+0x68
 	word 2; word PSA_Off+0x80
@@ -884,7 +884,6 @@ CODE @ $80FAC624
 	word 0x00070100; word PSA_Off2+0x30
 }
 
-
 ################################################################
 Shield Break Getup is 30 Frames and Ending Interruptible [Magus]
 ################################################################
@@ -960,24 +959,47 @@ Team Colour Shade Modifier [ds22]
 * 00000080 80808080
 * FFFFFF80 00000000
 
-###################################
-No Autosweetspot Ledges v2.0 [Eon]
-#
-# converted to PSA
-###################################
-.alias PSA_Off = 0x80546EE8
-CODE @ $80546EE8
+########################################
+Remove grabbing Items with Aerials [Eon]
+########################################
+CODE @ $80FC2798
 {
-    word 2; word PSA_Off+0x28
-    word 6; word 7      #if compare
-    word 5; IC_Basic 23 #vertical character velocity
-    word 0; word 0      #<
-    word 1; scalar 0    #0
-    word 0x02040400; word PSA_Off+0x8
-    word 0x02040400; word 0x80FAA3DC
-    word 0; word 0
+  word 0x00020000; word 0
+  word 0x00020000; word 0
+  word 0x00020000; word 0
 }
-CODE @ $80FC1458
+
+#############################################
+Aerial Staling Set before Subaction Set [Eon]
+#############################################
+#nair
+CODE @ $80FC2820
 {
-    word 0x00070100; word PSA_Off
+  word 0x0C1C0200; word 0x80FB2EC4
+  word 0x04000100; word 0x80FB2EBC
 }
+#fair
+CODE @ $80FC2848
+{
+  word 0x0C1C0200; word 0x80FB2F04
+  word 0x04000100; word 0x80FB2EFC
+}
+#bair
+CODE @ $80FC2860
+{
+  word 0x0C1C0200; word 0x80FB2F1C
+  word 0x04000100; word 0x80FB2F14
+}
+#uair
+CODE @ $80FC2888
+{
+  word 0x0C1C0200; word 0x80FB2F54
+  word 0x04000100; word 0x80FB2F4C
+}
+#dair
+CODE @ $80FC28A0
+{
+  word 0x0C1C0200; word 0x80FB2F6C
+  word 0x04000100; word 0x80FB2F64
+}
+

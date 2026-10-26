@@ -1,4 +1,7 @@
-
+###################################
+## Net-Random.asm file differences:
+## - Set DEFAULT_RSS_INDEX to 0xFF
+## - Disable gfFileIO__writeSDFile call to avoid overwriting .rss files
 #####################################
 RSS Page Switch [DukeItOut, Kapedani]
 #####################################
@@ -43,9 +46,9 @@ RSS Page Switch [DukeItOut, Kapedani]
 .alias ASL_BUTTON					= 0x800B9EA2
 .alias MUSIC_SELECT_STEP			= 0x80002810
 
-.alias MAX_PAGES 					= 0x5
-.alias DEFAULT_RSS_INDEX			= 0xFF	# Index of main .rss to load/save, Netplay - 0xFF
-.alias NUM_PRESETS					= 0x7	# Change for more presets
+.alias MAX_PAGES 					= 5
+.alias DEFAULT_RSS_INDEX			= 0xFF	# Index of main .rss to load/save (0xFF used for netplay)
+.alias NUM_PRESETS					= 0x8	# Change for more presets
 
 .alias LAST_PRESET = NUM_PRESETS - 1
 
@@ -665,7 +668,7 @@ exit:
 	stw r4, 0x8(r3)					# |
 	li r4, -1						# |
 	stw r4, 0x14(r3)				# |
-	%call (gfFileIO__writeSDFile)	# |
+	#%call (gfFileIO__writeSDFile)	# | File write disabled for netplay
 	addi r1, r1, 0x70 				# /
 
 dontSave:

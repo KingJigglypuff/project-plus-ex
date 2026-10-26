@@ -3,7 +3,7 @@ Screw Jump Aerial (Action 0xB0) Enters Free-Fall if Entered Upon Being Hit [King
 ###########################################################################################
 # For use with the Screw Attack (Melee) item. Opponents enter the Free-fall state (Action 0x10) after being stricken with the item (the action checks if your knockback velocity equals 0, and executes custom coding if it's not). Requires Eon's Pointer Wizardry system.
 * 4A000000 8054a880
-* 16000000 00000118
+* 16000000 00000120
 * 00000005 21000000
 * 00000005 22000010
 * 00000000 00000060

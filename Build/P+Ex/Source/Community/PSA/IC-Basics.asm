@@ -103,13 +103,16 @@ Custom Float IC-Basics[DukeItOut]
 # Custom float value returns
 #
 # IC-Basic[1100] = Current Knockback Speed
+# IC-Basic[1101] = Relative X Speed (surprisingly isn't a thing in Brawl for IC-Basics?)
+# IC-Basic[1102] = Relative X Force Speed (used by wavedashing and landing)
 ##########################################
 HOOK @ $808548EC
 {
 	ble+ %END%		# if 36 or less, it's an already-existing IC-Basic!
 		
 	cmpwi r0, 100; beq+ Knockback
-	
+	cmpwi r0, 101; beq+ RelativeXSpeed
+	cmpwi r0, 102; beq+ RelativeXForce
 	b invalid
 
 Knockback:
@@ -124,8 +127,23 @@ Knockback:
 	bla 0x400D94		# sqrt of f1. Vector length of knockback.
 	b finish
 #	
+RelativeXForce:
+	lwz r12, 0x88(r31)
+	lwz r12, 0x14(r12)
+	lwz r12, 0x1C(r12)  # Force info	
+	lfs f1, 0x08(r12)	# X Speed
+	b RelativeX
+RelativeXSpeed:
+	lwz r12, 0x28(r31)	# \ X Speed
+	lfs f1, 0x40(r12)	# /
+RelativeX:
+	lwz r12, 0x18(r31)	# \ X Direction
+	lfs f0, 0x40(r12)	# /
+	fmuls f1, f1, f0	# X Speed * X Direction = Relative X Speed!
+	b finish
+#	
 invalid:
-	fsubs f1, f1, f1	# Return Zero if not valid
+	lfs f1, 0x10(r13)	# Return Zero if not valid
 finish:
     lis r12, 0x8085
     ori r12, r12, 0x52A4

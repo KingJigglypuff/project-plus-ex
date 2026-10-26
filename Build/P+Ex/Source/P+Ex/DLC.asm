@@ -1,5 +1,5 @@
 ###########################################################
-Extra Fighters on Random Select v1.1 [GeraRReal, Squidgy]
+Extra Fighters on Random Select v1.3 [GeraRReal, Squidgy]
 # Based on work by QuickLava and MarioDox.
 
 # The code relies on having the code on Project+Ex due to
@@ -7,11 +7,11 @@ Extra Fighters on Random Select v1.1 [GeraRReal, Squidgy]
 
 # You can store up to 32 extra characters on Random Select.
 # Hold L and press X or Y to swap.
-# Allows L+X, L+Y, AND touching to work on SlotEx fighters
 
 # v1.1 - Use setPoke3 instead of setCharPic, for AsyncRSP
 # compatibility
 # v 1.2 - Fix issue with All-Star Random always loading Mario
+# v 1.3 - Removed SlotEx functionality as it is rendered redundant by latest SlotEx code
 ###########################################################
 .BA<- ExtraFighterData
 .BA -> $804ECFC0 ## Store
@@ -108,33 +108,6 @@ HOOK @ $80689A90
   mtctr r12
   li r12, 0
   bctrl
-}
-
-# A macro for the setPoke3 check, for SlotEx
-.macro setSlotEx()
-{
-  cmpwi r0, 4
-  bge 0x40 # Skip if the checks are repeated more than 4 times
-  %lwd(r16, 0x806948C8)
-  mulli r29, r29, 4
-  add r16, r16, r29
-  lbzx r28, r16, r17
-  lbzx r29, r16, r4
-  cmpwi r29, 0xFF
-  bne 0x10
-  %loadGPR()
-  b %END%
-  cmpw r28, r29
-  bne 0xC
-  mr r29, r19
-  b SlotEx
-
-  stw r4, 0x1F0(r3)
-  %sendSystemCharKind()
-  %loadGPR()
-  %saveGPR()
-  lwz r4, 0x1F0(r3)
-  %setPoke()
 }
 
 .macro moduloInc(<reg>,<max>)
@@ -317,26 +290,13 @@ CheckSlot: # Check Slots for...
   lwz r29, 0x01B8(r3)
   cmpwi r29, 0x29
   li r0, 0
-  bne SlotEx
+  bne bEND
 ExtraFighter:
   stw r0, 0x1BC(r3)
   lwz r4, 0x1E8(r3)
   %moduloInc(r4,MaxChar)
   stw r4, 0x1E8(r3)
   %setZeldas()
-  b bEND
-SlotEx:
-  mr r8, r0           # use r8 to increment because r0 defaults to 0 - this is all done to skip duplicate slots
-  addi r8, r8, 1      # increment selected SlotEx position by 1
-  mr r0, r8           # move incremented value to r0
-  mr r19, r29
-  lwz r4, 0x1F0(r3)
-  subi r4, r4, 1      # decrement r4 by 1
-  add r4, r4, r8      # add currently selected slot to r4 - basically allows us to "skip" slot to get to the next one
-  %moduloInc(r4,3)
-  mr r17, r4
-  %moduloDec(r17,3)
-  %setSlotEx()
 bEND:
   %loadGPR()
 }
@@ -358,26 +318,13 @@ CheckSlot: # Check Slots for...
   lwz r29, 0x01B8(r3)
   cmpwi r29, 0x29
   li r0, 0
-  bne SlotEx
+  bne bEND
 ExtraFighter:
   stw r0, 0x1BC(r3)
   lwz r4, 0x1E8(r3)
   %moduloDec(r4,MaxChar)
   stw r4, 0x1E8(r3)
   %setZeldas()
-  b bEND
-SlotEx:
-  mr r8, r0           # use r8 to increment because r0 defaults to 0 - this is all done to skip duplicate slots
-  addi r8, r8, 1      # increment selected SlotEx position by 1
-  mr r0, r8           # move incremented value to r0
-  mr r19, r29
-  lwz r4, 0x1F0(r3)
-  addi r4, r4, 1      # increment r4 by 1
-  sub r4, r4, r8      # subtract currently selected slot from r4 - basically allows us to "skip" slot to get to the next one
-  %moduloDec(r4,3)
-  mr r17, r4
-  %moduloInc(r17,3)
-  %setSlotEx()
 bEND:
   %loadGPR()
 }
